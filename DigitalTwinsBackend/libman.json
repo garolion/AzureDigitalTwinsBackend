@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "@aspnet/signalr@1.0.4",
+      "destination": "wwwroot/lib/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.min.js"
+      ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jstree@3.3.7",
+      "destination": "wwwroot/lib/jstree/",
+      "files": [
+        "jstree.min.js",
+        "themes/default/style.min.css"
+      ]
+    }
+  ]
+}

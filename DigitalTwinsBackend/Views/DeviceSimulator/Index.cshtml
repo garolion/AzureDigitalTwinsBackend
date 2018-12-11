@@ -1,0 +1,64 @@
+﻿
+@model DigitalTwinsBackend.ViewModels.SimulatorViewModel
+
+@{
+    ViewData["Title"] = "Device Simulator";
+}
+
+<h2>Device simulator</h2>
+
+<h4>Send data</h4>
+<hr />
+<div class="row">
+    <div>
+        <form asp-action="SimulatorAction">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <a asp-action="AddSensor">Add new Sensor</a>
+            </div>
+            <div class="form-group">
+                <label asp-for="DeviceConnectionString" class="control-label"></label>
+                <input asp-for="DeviceConnectionString" class="form-control" />
+                <span asp-validation-for="DeviceConnectionString" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <h4>Simulated sensors</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Hardware Id
+                            </th>
+                            <th>
+                                Data Type
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.SimulatedSensorList)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.HardwareId)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DataType)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Edit or Delete", "Edit", new { id = item.HardwareId })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" name="Action" value="Launch" class="btn btn-default" />
+                <input type="submit" name="Action" value="Cancel" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,94 @@
+﻿@model DigitalTwinsBackend.ViewModels.SensorViewModel
+
+@{
+    ViewData["Title"] = "Sensor details";
+}
+
+<h2>Details</h2>
+
+<h4>Space</h4>
+<hr />
+<div class="row">
+    <div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="SelectedSensor.HardwareId" class="control-label"></label>
+            <input asp-for="SelectedSensor.HardwareId" class="form-control" disabled="disabled" />
+            <span asp-validation-for="SelectedSensor.HardwareId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SelectedSensor.DataUnitType" class="control-label"></label>
+            <select asp-for="SelectedSensor.DataUnitType" class="form-control" asp-items="@(new SelectList(Model.DataUnitTypeList,"Name","Name"))" disabled="disabled"></select>
+            <span asp-validation-for="SelectedSensor.DataUnitType" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div>
+    <h4>Values</h4>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Time
+                </th>
+                <th>
+                    Value
+                </th>
+                <th>
+                    Type
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(Model.SelectedSensor.Value != null)
+            {
+            <tr>
+                <td>
+                    <input asp-for="SelectedSensor.Value.Timestamp" class="form-control" disabled="disabled" />
+                </td>
+                <td>
+                    <input asp-for="SelectedSensor.Value.Value" class="form-control" disabled="disabled" />
+                </td>
+                <td>
+                    <input asp-for="SelectedSensor.Value.Type" class="form-control" disabled="disabled" />
+                </td>
+            </tr>
+                <tr>
+                    <td colspan="3">
+                        <h4>Historical values</h4>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="control-label">Value</label>
+                    </td>
+                    <td>
+                        <label class="control-label">Description</label>
+                    </td>
+                </tr>
+                @foreach (var value in Model.SelectedSensor.Value.HistoricalValues)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => value.Value)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => value.Description)
+
+                            </td>
+                        </tr>
+                    }
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <a asp-area="" asp-controller="Home" asp-action="Spaces">Back to home</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,51 @@
+﻿@model DigitalTwinsBackend.Models.SimulatedSensor
+
+@{
+    ViewData["Title"] = "AddSensor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Add Sensor</h2>
+
+<h4>Simulated Sensor</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddSensor">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="DataType" class="control-label"></label>
+                <select asp-for="DataType" class="form-control" asp-items="@(new SelectList(Enum.GetNames(typeof(DigitalTwinsBackend.Models.DataTypeEnum))))"></select>
+                <span asp-validation-for="DataType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HardwareId" class="control-label"></label>
+                <input asp-for="HardwareId" class="form-control" />
+                <span asp-validation-for="HardwareId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MinValue" class="control-label"></label>
+                <input asp-for="MinValue" class="form-control" />
+                <span asp-validation-for="MinValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxValue" class="control-label"></label>
+                <input asp-for="MaxValue" class="form-control" />
+                <span asp-validation-for="MaxValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="InitialValue" class="control-label"></label>
+                <input asp-for="InitialValue" class="form-control" />
+                <span asp-validation-for="InitialValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

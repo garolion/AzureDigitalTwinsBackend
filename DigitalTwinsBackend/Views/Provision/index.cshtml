@@ -1,0 +1,94 @@
+@model DigitalTwinsBackend.ViewModels.ProvisionViewModel
+
+@{
+    ViewData["Title"] = "Provision";
+}
+
+<h2>Provision</h2>
+
+<div class="row">
+    <div>
+        <form asp-action="Provision" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="control-label">Parent of the root space of your script. Choose 'None' to create your Spaces at the root level.</label>
+                <select asp-for="RootParent.Id" class="form-control" asp-items="@(new SelectList(Model.SpaceList,"Id","Name"))"></select>
+            </div>
+            <div class="form-group">
+                <label class="label-value">Insert Quick Start sample data</label>
+                <input id="InsertQuickStartDataCheckBox" type="checkbox" onclick="return AddQuickStartData()" />
+            </div>
+            <div class="form-group">
+                <label asp-for="YamlScript" class="control-label"></label>
+                <textarea id="YamlScriptTextArea" asp-for="YamlScript" class="form-control" rows="25" cols="1"></textarea>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <label class="control-label">Add source files (.js) for UDFs</label>
+                    <input type="file" asp-for="UDFFiles" multiple class="form-control" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12" style="padding-top:10px;">
+                    <input type="submit" id="btnUpload" value="Launch Provisioning" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function AddQuickStartData() {
+
+        var quickStartScript = [
+            "- name: Quickstart Building",
+            "  type: Venue",
+            "  resources:",
+            "  - type: IoTHub",
+            "  spaces:",
+            "  - name: Floor 1",
+            "    type: Floor",
+            "    spaces:",
+            "    - name: Area A",
+            "      type: Area",
+            "    - name: Conference Room 11",
+            "      type: Room",
+            "      subType: ConferenceRoom",
+            "    - name: Focus Room A1",
+            "      type: Room",
+            "      subType: FocusRoom",
+            "      devices:",
+            "      - name: Raspberry Pi 3 A1",
+            "        hardwareId: 1234567890AB",
+            "        sensors:",
+            "        - dataType: Motion",
+            "          hardwareId: SAMPLE_SENSOR_MOTION",
+            "        - dataType: CarbonDioxide",
+            "          hardwareId: SAMPLE_SENSOR_CARBONDIOXIDE",
+            "        - dataType: Temperature",
+            "          hardwareId: SAMPLE_SENSOR_TEMPERATURE",
+            "      matchers:",
+            "      - name: Matcher Motion A1",
+            "        dataTypeValue: Motion",
+            "      - name: Matcher CarbonDioxide A1",
+            "        dataTypeValue: CarbonDioxide",
+            "      - name: Matcher Temperature",
+            "        dataTypeValue: Temperature",
+            "      userdefinedfunctions:",
+            "      - name: Motion Processor",
+            "        matcherNames:",
+            "        - Matcher Motion A1",
+            "        - Matcher CarbonDioxide A1",
+            "        - Matcher Temperature",
+            "        script: availability.js",
+            "      roleassignments:",
+            "      - roleId: 98e44ad7-28d4-4007-853b-b9968ad132d1 #System Role: SpaceAdministrator",
+            "        objectName: Motion Processor",
+            "        objectIdType: UserDefinedFunctionId"
+        ].join("\n");
+
+        var isChecked = document.getElementById("InsertQuickStartDataCheckBox").checked;
+        if (isChecked) {
+            document.getElementById("YamlScriptTextArea").value = quickStartScript;
+        }
+    }
+</script>

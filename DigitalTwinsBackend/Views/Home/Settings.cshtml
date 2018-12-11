@@ -1,0 +1,69 @@
+﻿@model DigitalTwinsBackend.Helpers.AppConfig
+
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<h2>Modify</h2>
+
+<h4>Application settings</h4>
+<hr />
+
+<div class="row">
+    <div>
+        <form asp-action="Settings">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="AADInstance" class="control-label"></label>
+                <input asp-for="AADInstance" class="form-control" />
+                <span asp-validation-for="AADInstance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientId" class="control-label"></label>
+                <input asp-for="ClientId" class="form-control" />
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Resource" class="control-label"></label>
+                <input asp-for="Resource" class="form-control" />
+                <span asp-validation-for="Resource" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tenant" class="control-label"></label>
+                <input asp-for="Tenant" class="form-control" />
+                <span asp-validation-for="Tenant" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BaseUrl" class="control-label"></label>
+                <input asp-for="BaseUrl" class="form-control" />
+                <span asp-validation-for="BaseUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CacheTime" class="control-label"></label>
+                <input asp-for="CacheTime" class="form-control" />
+                <span asp-validation-for="CacheTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SimulatorTimer" class="control-label"></label>
+                <input asp-for="SimulatorTimer" class="form-control" />
+                <span asp-validation-for="SimulatorTimer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DeviceConnectionString" class="control-label"></label>
+                <input asp-for="DeviceConnectionString" class="form-control" />
+                <span asp-validation-for="DeviceConnectionString" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,120 @@
+﻿@model DigitalTwinsBackend.ViewModels.OntologyViewModel
+
+@{
+    ViewData["Title"] = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>List</h2>
+
+<h4>Ontologies</h4>
+
+<div class="row">
+    <div class="col-md-offset-0">
+        <form asp-action="List">
+            <div class="form-group">
+                <input type="submit" name="filterButton" value="All" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="DeviceType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="DeviceSubtype" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="DeviceBlobtype" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="DeviceBlobSubtype" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SensorDataType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SensorDataSubtype" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SensorDataUnitType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SensorType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SensorPortType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SpaceBlobType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SpaceBlobSubtype" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SpaceStatus" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SpaceType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="SpaceSubtype" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="UserBlobType" class="btn btn-default" />
+                <input type="submit" name="filterButton" value="UserBlobSubtype" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-offset-0">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Id
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Loaded
+                    </th>
+                    <th>
+                        Types
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OntologyList)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Loaded)
+                        </td>
+                        <td>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Id
+                                        </th>
+                                        <th>
+                                            Category
+                                        </th>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Friendly Name
+                                        </th>
+                                        <th>
+                                            Logical Order
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var type in item.types)
+                                    {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => type.Id)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => type.Category)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => type.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => type.FriendlyName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => type.LogicalOrder)
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

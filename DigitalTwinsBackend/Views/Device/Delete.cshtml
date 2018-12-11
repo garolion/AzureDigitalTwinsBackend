@@ -1,0 +1,96 @@
+﻿@model DigitalTwinsBackend.ViewModels.DeviceViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h4>Device</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Delete">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="SelectedDeviceItem.Id" type="hidden" />
+            <input asp-for="SelectedDeviceItem.Status" type="hidden" />
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.Id" class="control-label"></label>
+                <input asp-for="SelectedDeviceItem.Id" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.Name" class="control-label"></label>
+                <input asp-for="SelectedDeviceItem.Name" class="form-control" />
+                <span asp-validation-for="SelectedDeviceItem.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.HardwareId" class="control-label"></label>
+                <input asp-for="SelectedDeviceItem.HardwareId" class="form-control" />
+                <span asp-validation-for="SelectedDeviceItem.HardwareId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.SpaceId" class="control-label"></label>
+                <select asp-for="SelectedDeviceItem.SpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList, "Id", "Name"))"></select>
+                <span asp-validation-for="SelectedDeviceItem.SpaceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.Type" class="control-label"></label>
+                <select asp-for="SelectedDeviceItem.Type" class="form-control" asp-items="@(new SelectList(Model.DeviceTypeList, "Name", "Name"))"></select>
+                <span asp-validation-for="SelectedDeviceItem.Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.SubType" class="control-label"></label>
+                <select asp-for="SelectedDeviceItem.SubType" class="form-control" asp-items="@(new SelectList(Model.DeviceSubTypeList, "Name", "Name"))"></select>
+                <span asp-validation-for="SelectedDeviceItem.SubType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.Status" class="control-label"></label>
+                <input asp-for="SelectedDeviceItem.Status" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedDeviceItem.ConnectionString" class="control-label"></label>
+                <textarea asp-for="SelectedDeviceItem.ConnectionString" class="form-control" rows="5" cols="1"></textarea>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Delete" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-4">
+        <h4>Sensors</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Id
+                    </th>
+                    <th>
+                        HardwareId
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SelectedDeviceItem.Sensors)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.HardwareId)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

@@ -1,0 +1,26 @@
+﻿@model DigitalTwinsBackend.ViewModels.ProvisionViewModel
+
+@{
+    ViewData["Title"] = "Provision";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Provision</h2>
+
+<h4>Report</h4>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        @foreach (var message in Model.Messages)
+        {
+            <div class="label-group">
+                <label class="label-value">@message</label>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <a asp-area="" asp-controller="Provision" asp-action="Index">Back to provision form</a>
+</div>
+

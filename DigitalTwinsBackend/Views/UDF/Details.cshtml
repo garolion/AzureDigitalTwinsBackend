@@ -1,0 +1,90 @@
+﻿@model DigitalTwinsBackend.ViewModels.UDFViewModel
+
+@{
+    ViewData["Title"] = "DetailsUDF";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>User Defined Function</h4>
+    <hr />
+    <div class="row">
+        <div>
+            <div class="form-group">
+                <label asp-for="UDF.Id" class="control-label"></label>
+                <input asp-for="UDF.Id" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="UDF.Name" class="control-label"></label>
+                <input asp-for="UDF.Name" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="UDF.SpaceId" class="control-label"></label>
+                <input asp-for="UDF.SpaceId" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="25" cols="1"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h4>Matchers</h4>
+    @if (Model.UDF != null && Model.UDF.Matchers != null)
+    {
+        foreach (var matcher in Model.UDF.Matchers)
+        {
+        <div class="col-xs-4">
+            <div class="udfEncart">
+                <h5>Matcher</h5>
+                <div class="label-group">
+                    <label class="label-field">Matcher Id</label>
+                    <label class="label-value">@matcher.Id</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">Name</label>
+                    <label class="label-value">@matcher.Name</label>
+                </div>
+                <div class="label-group">
+                    @foreach (var condition in matcher.Conditions)
+                    {
+                        <div class="col-xs-12">
+                            <div class="sensorEncart">
+                                <h5>Condition</h5>
+                                <div class="label-group">
+                                    <label class="label-field">Id</label>
+                                    <label class="label-value">@condition.Id</label>
+                                </div>
+                                <div class="label-group">
+                                    <label class="label-field">Target</label>
+                                    <label class="label-value">@condition.Target</label>
+                                </div>
+                                <div class="label-group">
+                                    <label class="label-field">Path</label>
+                                    <label class="label-value">@condition.Path</label>
+                                </div>
+                                <div class="label-group">
+                                    <label class="label-field">Comparison</label>
+                                    <label class="label-value">@condition.Comparison</label>
+                                </div>
+                                <div class="label-group">
+                                    <label class="label-field">Value</label>
+                                    <label class="label-value">@condition.Value</label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        }
+    }
+ </div>
+
+<div>
+    <a asp-controller="Spaces" asp-action="List">Back to List</a>
+</div>

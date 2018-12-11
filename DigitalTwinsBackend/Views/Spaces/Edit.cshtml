@@ -1,0 +1,105 @@
+﻿@model DigitalTwinsBackend.ViewModels.SpaceViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Space</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="SelectedSpaceItem.Id" type="hidden" />
+            <div class="form-group">
+                <label asp-for="SelectedSpaceItem.Id" class="control-label"></label>
+                <input asp-for="SelectedSpaceItem.Id" class="form-control" disabled="disabled" />
+                <span asp-validation-for="SelectedSpaceItem.Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedSpaceItem.Name" class="control-label"></label>
+                <input asp-for="SelectedSpaceItem.Name" class="form-control" />
+                <span asp-validation-for="SelectedSpaceItem.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedSpaceItem.FriendlyName" class="control-label"></label>
+                <input asp-for="SelectedSpaceItem.FriendlyName" class="form-control" />
+                <span asp-validation-for="SelectedSpaceItem.FriendlyName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedSpaceItem.ParentSpaceId" class="control-label"></label>
+                <select asp-for="SelectedSpaceItem.ParentSpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList, "Id", "Name"))"></select>
+                <span asp-validation-for="SelectedSpaceItem.ParentSpaceId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedSpaceItem.Type" class="control-label"></label>
+                <select asp-for="SelectedSpaceItem.Type" class="form-control" asp-items="@(new SelectList(Model.SpaceTypeList, "Name", "Name"))"></select>
+                <span asp-validation-for="SelectedSpaceItem.Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedSpaceItem.SubType" class="control-label"></label>
+                <select asp-for="SelectedSpaceItem.SubType" class="form-control" asp-items="@(new SelectList(Model.SpaceSubTypeList, "Name", "Name"))"></select>
+                <span asp-validation-for="SelectedSpaceItem.SubType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedSpaceItem.Status" class="control-label"></label>
+                <select asp-for="SelectedSpaceItem.Status" class="form-control" asp-items="@(new SelectList(Model.SpaceStatusList, "Name", "Name"))"></select>
+                <span asp-validation-for="SelectedSpaceItem.Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-4">
+        <h4>Devices</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Id
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SelectedSpaceItem.Devices)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", "Device", new { id = item.Id })
+                            @Html.ActionLink("Delete", "Delete", "Device", new { id = item.Id })
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td rowspan="2">
+                        <a asp-controller="Device" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id">Create a new Device</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+<div>
+    <a asp-area="" asp-controller="Spaces" asp-action="List">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

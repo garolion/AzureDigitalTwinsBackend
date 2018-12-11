@@ -1,0 +1,54 @@
+﻿@model DigitalTwinsBackend.ViewModels.SimulatorViewModel
+
+@{
+    ViewData["Title"] = "EditSensor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit Sensor</h2>
+
+<h4>
+    Simulated Sensor</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="SensorInEdit.DataType" class="control-label"></label>
+                <select asp-for="SensorInEdit.DataType" class="form-control" asp-items="@(new SelectList(Enum.GetNames(typeof(DigitalTwinsBackend.Models.DataTypeEnum))))"></select>
+                <span asp-validation-for="SensorInEdit.DataType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SensorInEdit.HardwareId" class="control-label"></label>
+                <input asp-for="SensorInEdit.HardwareId" class="form-control" />
+                <span asp-validation-for="SensorInEdit.HardwareId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SensorInEdit.MinValue" class="control-label"></label>
+                <input asp-for="SensorInEdit.MinValue" class="form-control" />
+                <span asp-validation-for="SensorInEdit.MinValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SensorInEdit.MaxValue" class="control-label"></label>
+                <input asp-for="SensorInEdit.MaxValue" class="form-control" />
+                <span asp-validation-for="SensorInEdit.MaxValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SensorInEdit.InitialValue" class="control-label"></label>
+                <input asp-for="SensorInEdit.InitialValue" class="form-control" />
+                <span asp-validation-for="SensorInEdit.InitialValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" name="Action" value="Save" class="btn btn-default" />
+                <input type="submit" name="Action" value="Delete" class="btn btn-default" />
+            </div>
+            <input asp-for="SelectedSensor" type="hidden" />
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

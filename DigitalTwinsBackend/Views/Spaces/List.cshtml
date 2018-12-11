@@ -1,0 +1,105 @@
+﻿@model DigitalTwinsBackend.ViewModels.SpacesViewModel
+
+@{
+    ViewData["Title"] = "List";
+}
+
+<h2>Spaces</h2>
+
+<div class="row">
+    <div class="col-xs-7">
+        <a asp-action="Create" class="ButtonNew">Create a new Space</a>
+    </div>
+    <div class="col-md-5">
+        <form asp-action="Search">
+            <label class="control-label">Type</label>
+            <select asp-for="@Model.SearchType" class="control-label" asp-items="@(new SelectList(Model.SpaceTypeList, "Name", "Name"))"></select>
+            <label class="control-label">Name</label>
+            <input asp-for="@Model.SearchString" class="control-label" width="20" />
+            <input type="submit" value="Search" class="btn btn-default" />
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Id
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        FriendlyName
+                    </th>
+                    <th>
+                        Type
+                    </th>
+                    <th>
+                        SubType
+                    </th>
+                    <th>
+                        ParentSpaceId
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SpaceList)
+                {
+                    if (item.Id != Guid.Empty)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Id)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FriendlyName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Type)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SubType)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ParentSpaceId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </td>
+                            <td>
+                                @{ if (item.ParentSpaceId != Guid.Empty)
+                                    {
+                                        @*@Html.ActionLink("<== Navigate to Parent", "Details", new { id = item.ParentSpaceId }) <br />*@
+                                        <a asp-action="Details" asp-route-id="@item.ParentSpaceId" class="ButtonDetails">Navigate to Parent</a> <br/>
+                                    }
+                                }
+                                @*@Html.ActionLink("==> Navigate to this Space", "Details", new { id = item.Id }) <br />
+                                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |*@
+
+                                <a asp-action="Details" asp-route-id="@item.Id" class="ButtonDetails">Navigate to this Space</a> <br />
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="ButtonEdit">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="ButtonDelete">Delete</a>
+
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div>
+    <a asp-area="" asp-controller="Home" asp-action="Spaces">Back to home</a>
+</div>
