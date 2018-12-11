@@ -1,0 +1,195 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
+for details on configuring this project to bundle and minify static web assets. */
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    color: black;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+}
+
+.spaceEncart {
+    margin: 10px 0px;
+    padding: 0px 20px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    color: #555;
+    text-align: left;
+    background-color:antiquewhite;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+.deviceEncart {
+    margin: 10px 0px;
+    padding: 0px 20px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    color: #555;
+    text-align: left;
+    background-color:honeydew;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+.sensorEncart {
+    margin: 10px 0px;
+    padding: 0px 20px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    color: #555;
+    text-align: left;
+    background-color: lavender;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+.udfEncart {
+    margin: 10px 0px;
+    padding: 0px 20px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    color: #555;
+    text-align: left;
+    background-color:seashell;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+.userEncart {
+    margin: 10px 0px;
+    padding: 0px 20px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    color: #555;
+    text-align: left;
+    background-color:thistle;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+}
+
+.label-field {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    width: 120px;
+}
+
+.label-value {
+    font-size: 14px;
+    font-weight: normal;
+    color: #555;
+}
+
+.label-group {
+    margin-bottom: 5px;
+}
+.label-group-top {
+    margin-top: 5px;
+}
+
+.ButtonNew,
+.ButtonDelete,
+.ButtonEdit,
+.ButtonDetails,
+.ButtonNavigate {
+    display: inline-block;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: white;
+}
+
+.ButtonNew {
+    background-color: #1270BE;
+}
+.ButtonEdit {
+    background-color: #267F00;
+}
+.ButtonDetails {
+    background-color: #FF8800;
+}
+.ButtonDelete {
+    background-color: red;
+}
+
+    .ButtonNew:hover,
+    .ButtonNew:focus,
+    .ButtonEdit.hover,
+    .ButtonEdit:focus,
+    .ButtonDetails:hover,
+    .ButtonDetails.focus,
+    .ButtonDelete:hover,
+    .ButtonDelete:focus {
+        color: #333;
+        text-decoration: none;
+    }
+
+.ButtonNew:hover,
+.ButtonNew:focus {
+    background-color: #9FD2F8;
+}
+
+.ButtonEdit:hover,
+.ButtonEdit.focus {
+    background-color: #BBE2AE;
+}
+
+.ButtonDetails:hover,
+.ButtonDetails.focus {
+    background-color: #FFCB9B;
+}
+
+.ButtonDelete:hover,
+.ButtonDelete.focus {
+    background-color: #FFB5B2;
+}
