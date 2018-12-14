@@ -10,6 +10,6 @@ namespace DigitalTwinsBackend.Models
         public int Id {get; set;}
         public string Name { get; set; }
         public bool Loaded { get; set; }
-        public List<SystemType> types { get; set; }
+        public List<Type> types { get; set; }
     }
 }

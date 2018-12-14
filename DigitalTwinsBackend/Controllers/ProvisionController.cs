@@ -15,11 +15,11 @@ using DigitalTwinsBackend.Helpers;
 
 namespace DigitalTwinsBackend.Controllers
 {
-    public class ProvisionController : Controller
+    public class ProvisionController : BaseController
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
         //private SpaceViewModel _model;
-        private IMemoryCache _cache;
+        //private IMemoryCache _cache;
 
         public ProvisionController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
@@ -32,22 +32,37 @@ namespace DigitalTwinsBackend.Controllers
 
         public IActionResult Index()
         {
+            //Reset();
             var model = new ProvisionViewModel(_cache);
+            SendViewData();
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Provision(ProvisionViewModel model)
         {
-            CacheHelper.ResetMessagesInCache(_cache);
+            Reset();
 
-            IEnumerable<SpaceDescription> spaceCreateDescriptions;
-            spaceCreateDescriptions = new Deserializer().Deserialize<IEnumerable<SpaceDescription>>(model.YamlScript);
-            var spaces = await DigitalTwinsHelper.CreateSpaces(_cache, Loggers.SilentLogger, spaceCreateDescriptions, model.UDFFiles, model.RootParent.Id);
+            try
+            {
+                if (model.YamlScript == null)
+                    throw new Exception("You must enter a valid YAML Script!");
 
-            model.Messages = CacheHelper.GetMessagesFromCache(_cache);
+                IEnumerable<SpaceDescription> spaceCreateDescriptions;
+                spaceCreateDescriptions = new Deserializer().Deserialize<IEnumerable<SpaceDescription>>(model.YamlScript);
 
-            return View(model);
+                model.CreatedSpaces = await DigitalTwinsHelper.CreateSpaces(_cache, Loggers.SilentLogger, spaceCreateDescriptions, model.UDFFiles, model.RootParent.Id);
+                model.Messages = CacheHelper.GetInfoMessagesFromCache(_cache);
+                SendViewData();
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                SendViewData();
+                return RedirectToAction(nameof(Index));
+            }
+
         }
     }
 }

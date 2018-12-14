@@ -55,8 +55,10 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.OntologyList)
+                @if (Model.OntologyList != null)
                 {
+                    foreach (var item in Model.OntologyList)
+                    {
                     <tr>
                         <td>
                             @Html.DisplayFor(modelItem => item.Id)
@@ -113,8 +115,9 @@
                             </table>
                         </td>
                     </tr>
+                    }
                 }
             </tbody>
         </table>
     </div>
-</div>
+</div>           

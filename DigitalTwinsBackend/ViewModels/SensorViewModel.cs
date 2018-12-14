@@ -13,9 +13,9 @@ namespace DigitalTwinsBackend.ViewModels
         private IMemoryCache _cache;
 
         public Sensor SelectedSensor { get; set; }
-        public IEnumerable<SystemType> DataTypeList { get; set; }
-        public IEnumerable<SystemType> DataUnitTypeList { get; set; }
-        public IEnumerable<SystemType> DataSubTypeList { get; set; }
+        public IEnumerable<Models.Type> DataTypeList { get; set; }
+        public IEnumerable<Models.Type> DataUnitTypeList { get; set; }
+        public IEnumerable<Models.Type> DataSubTypeList { get; set; }
         public IEnumerable<Space> SpaceList { get; set; }
 
         public SensorViewModel() { }
@@ -23,26 +23,34 @@ namespace DigitalTwinsBackend.ViewModels
         {
             _cache = memoryCache;
 
-            LoadAsync().Wait();
-
-            if (id != null)
+            try
             {
-                LoadSelectedSensorAsync((Guid)id).Wait();
+                LoadAsync().Wait();
+
+                if (id != null)
+                {
+                    LoadSelectedSensorAsync((Guid)id).Wait();
+                }
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
             }
         }
 
-        public async Task LoadSelectedSensorAsync(Guid id)
+        private async Task LoadSelectedSensorAsync(Guid id)
         {
             this.SelectedSensor = await DigitalTwinsHelper.GetSensorAsync(id, _cache, Loggers.SilentLogger, false);
         }
 
-        public async Task LoadAsync()
+        private async Task LoadAsync()
         {
             SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
 
-            DataTypeList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.SensorDataType, _cache, Loggers.SilentLogger);
-            DataUnitTypeList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.SensorDataUnitType, _cache, Loggers.SilentLogger);
-            DataSubTypeList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.SensorDataSubtype, _cache, Loggers.SilentLogger);
+            DataTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataType, _cache, Loggers.SilentLogger);
+            DataUnitTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataUnitType, _cache, Loggers.SilentLogger);
+            DataSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataSubtype, _cache, Loggers.SilentLogger);
         }
 
     }

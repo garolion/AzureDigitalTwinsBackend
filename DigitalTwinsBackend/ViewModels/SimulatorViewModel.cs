@@ -11,10 +11,9 @@ namespace DigitalTwinsBackend.ViewModels
     public class SimulatorViewModel
     {
         IMemoryCache _cache;
-        public String DeviceConnectionString { get; set; }
-
+        public Guid SelectedDevice { get; set; }
+        public IEnumerable<Device> DeviceList { get; set; }
         public List<SimulatedSensor> SimulatedSensorList { get; set; }
-
         public SimulatedSensor SensorInEdit { get; set; }
 
         private string selectedSensor;
@@ -39,14 +38,23 @@ namespace DigitalTwinsBackend.ViewModels
         public SimulatorViewModel(IMemoryCache memoryCache)
         {
             _cache = memoryCache;
-            LoadAsync().Wait();
+
+            try
+            {
+                LoadAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
+            }
         }
 
         public async Task LoadAsync()
         {
             SimulatedSensorList = await CacheHelper.GetSimulatedSensorListFromCacheAsync(_cache);
 
-            DeviceConnectionString = ConfigHelper.Config.parameters.DeviceConnectionString;
+            DeviceList = await DigitalTwinsHelper.GetDevicesAsync(_cache, Loggers.SilentLogger);
         }
     }
 }

@@ -51,10 +51,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.SpaceList)
+                @if (Model.SpaceList != null)
                 {
-                    if (item.Id != Guid.Empty)
+                    foreach (var item in Model.SpaceList)
                     {
+                        if (item.Id != Guid.Empty)
+                        {
                         <tr>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Id)
@@ -94,7 +96,8 @@
                             </td>
                         </tr>
                     }
-                }
+                 }
+            }
             </tbody>
         </table>
     </div>

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using DigitalTwinsBackend.Helpers;
 using DigitalTwinsBackend.Hubs;
 using DigitalTwinsBackend.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DigitalTwinsBackend.Helpers
 {
@@ -26,18 +27,18 @@ namespace DigitalTwinsBackend.Helpers
 
     public sealed class FeedbackHelper
     {
-        //public static FeedbackHelper Channel = new FeedbackHelper();
-
+        private IMemoryCache _cache;
         private IHttpContextAccessor _httpContextAccessor;
         private static readonly Lazy<FeedbackHelper> lazy = new Lazy<FeedbackHelper>(() => new FeedbackHelper());
         public static FeedbackHelper Channel { get { return lazy.Value; } }
 
-        public void SetHttpContextAccessor(IHttpContextAccessor httpContextAccessor)
+        public void SetHttpContextAccessor(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
+            _cache = memoryCache;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task SendMessageAsync(string message)
+        public async Task SendMessageAsync(string message, MessageType messageType)
         {
             if (_httpContextAccessor != null)
             {
@@ -46,7 +47,27 @@ namespace DigitalTwinsBackend.Helpers
                 HubConnection connection = new HubConnectionBuilder().WithUrl(url).Build();
                 await connection.StartAsync();
                 await connection.InvokeAsync("SendMessage", message);
+
+                switch (messageType)
+                {
+                    case MessageType.APICall:
+                        {
+                            CacheHelper.AddAPICallMessageInCache(_cache, message);
+                            break;
+                        }
+                    case MessageType.Info:
+                        {
+                            CacheHelper.AddInfoMessageInCache(_cache, message);
+                            break;
+                        }
+                }
             }
         }
+    }
+           
+    public enum MessageType
+    {
+        Info,
+        APICall
     }
 }

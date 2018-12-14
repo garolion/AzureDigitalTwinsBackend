@@ -10,15 +10,24 @@ using DigitalTwinsBackend.Helpers;
 using DigitalTwinsBackend.Hubs;
 using DigitalTwinsBackend.Models;
 using System.Diagnostics;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace DigitalTwinsBackend.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        public HomeController(IHttpContextAccessor httpContextAccessor)
+        public HomeController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
-            FeedbackHelper.Channel.SetHttpContextAccessor(httpContextAccessor);
+            FeedbackHelper.Channel.SetHttpContextAccessor(httpContextAccessor, memoryCache);
+            _cache = memoryCache;
         }
+
+        public void ResetMessages()
+        {
+            Reset();
+            //return View();
+        }
+
 
         public IActionResult Index()
         {
@@ -27,8 +36,6 @@ namespace DigitalTwinsBackend.Controllers
 
         public IActionResult Spaces()
         {
-            ViewData["Message"] = "The page to manage your Spaces from Digital Twins.";
-
             return View();
         }
 
@@ -54,7 +61,7 @@ namespace DigitalTwinsBackend.Controllers
                     ConfigHelper.Config.parameters = parameters;
                     ConfigHelper.SaveConfig();
 
-                    await FeedbackHelper.Channel.SendMessageAsync("Application settings have been saved.");
+                    await FeedbackHelper.Channel.SendMessageAsync("Application settings have been saved.", MessageType.Info);
                 }
                          
                 

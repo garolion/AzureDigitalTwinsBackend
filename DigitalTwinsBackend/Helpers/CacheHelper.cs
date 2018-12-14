@@ -14,7 +14,8 @@ namespace DigitalTwinsBackend.Helpers
     public static class CacheKeys
     {
         public static string Context { get { return "_Context"; } }
-        public static string Messages { get { return "_Messages"; } }
+        public static string InfoMessages { get { return "_InfoMessages"; } }
+        public static string APICallMessages { get { return "_APICallMessages"; } }
         public static string SimulatedSensorList { get { return "_SimulatedSensorList"; } }
         public static string OntologyList { get { return "_OntologyList"; } }
         public static string HttpClient { get { return "_AuthenticationToken"; } }
@@ -145,22 +146,38 @@ namespace DigitalTwinsBackend.Helpers
 
         internal static void ResetMessagesInCache(IMemoryCache memoryCache)
         {
-            DeleteFromCache(memoryCache, CacheKeys.Messages, Context.None);
+            DeleteFromCache(memoryCache, CacheKeys.APICallMessages, Context.None);
+            DeleteFromCache(memoryCache, CacheKeys.InfoMessages, Context.None);
         }
 
-        internal static void AddMessageInCache(IMemoryCache memoryCache, string message)
+        internal static void AddAPICallMessageInCache(IMemoryCache memoryCache, string message)
         {
-            List<string> messages = (List<string>)GetFromCache(memoryCache, CacheKeys.Messages, Context.None);
+            List<string> messages = (List<string>)GetFromCache(memoryCache, CacheKeys.APICallMessages, Context.None);
             if (messages == null)
                 messages = new List<string>();
 
             messages.Add(message);
-            AddInCache(memoryCache, messages, CacheKeys.Messages, Context.None);
+            AddInCache(memoryCache, messages, CacheKeys.APICallMessages, Context.None);
         }
 
-        internal static List<string> GetMessagesFromCache(IMemoryCache memoryCache)
+        internal static List<string> GetAPICallMessagesFromCache(IMemoryCache memoryCache)
         {
-            return (List<string>)GetFromCache(memoryCache, CacheKeys.Messages, Context.None);
+            return (List<string>)GetFromCache(memoryCache, CacheKeys.APICallMessages, Context.None);
+        }
+
+        internal static void AddInfoMessageInCache(IMemoryCache memoryCache, string message)
+        {
+            List<string> messages = (List<string>)GetFromCache(memoryCache, CacheKeys.InfoMessages, Context.None);
+            if (messages == null)
+                messages = new List<string>();
+
+            messages.Add(message);
+            AddInCache(memoryCache, messages, CacheKeys.InfoMessages, Context.None);
+        }
+
+        internal static List<string> GetInfoMessagesFromCache(IMemoryCache memoryCache)
+        {
+            return (List<string>)GetFromCache(memoryCache, CacheKeys.InfoMessages, Context.None);
         }
 
         internal static Object GetFromCache(IMemoryCache memoryCache, object key, Context scope)
@@ -204,6 +221,16 @@ namespace DigitalTwinsBackend.Helpers
 
             if (list != null)
                 return (IEnumerable<Space>)list;
+            else
+                return null;
+        }
+
+        public static IEnumerable<Device> GetDeviceListFromCache(IMemoryCache memoryCache)
+        {
+            var list = GetFromCache(memoryCache, Guid.Empty, Context.Device);
+
+            if (list != null)
+                return (IEnumerable<Device>)list;
             else
                 return null;
         }
@@ -278,12 +305,12 @@ namespace DigitalTwinsBackend.Helpers
                 return null;
         }
 
-        public static IEnumerable<SystemType> GetTypeListFromCache(SystemTypes listType, IMemoryCache memoryCache)
+        public static IEnumerable<Models.Type> GetTypeListFromCache(Models.Types listType, IMemoryCache memoryCache)
         {
             var types = GetFromCache(memoryCache, listType, Context.None);
 
             if (types != null)
-                return (IEnumerable<SystemType>)types;
+                return (IEnumerable<Models.Type>)types;
             else
                 return null;
         }

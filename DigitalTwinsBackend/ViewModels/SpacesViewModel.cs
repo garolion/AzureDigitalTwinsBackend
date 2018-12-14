@@ -27,7 +27,7 @@ namespace DigitalTwinsBackend.ViewModels
         public IEnumerable<Space> SpaceList { get; set; }
         public IEnumerable<Space> AncestorSpaceList { get; set; }
         public IEnumerable<Space> ChildrenSpaceList { get; set; }
-        public List<SystemType> SpaceTypeList { get; set; }
+        public List<Models.Type> SpaceTypeList { get; set; }
 
         public SpacesViewModel() { }
         public SpacesViewModel(IMemoryCache memoryCache)
@@ -35,14 +35,22 @@ namespace DigitalTwinsBackend.ViewModels
             _cache = memoryCache;
             _auth = new AuthenticationHelper();
 
-            LoadAsync().Wait();
+            try
+            {
+                LoadAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
+            }
         }
 
-        internal async Task LoadAsync()
+        private async Task LoadAsync()
         {
-            SpaceTypeList = new List<SystemType>();
-            SpaceTypeList.Add(new SystemType() { Name = "All" });
-            SpaceTypeList.AddRange(await DigitalTwinsHelper.GetTypesAsync(SystemTypes.SpaceType, _cache, Loggers.SilentLogger));
+            SpaceTypeList = new List<Models.Type>();
+            SpaceTypeList.Add(new Models.Type() { Name = "All" });
+            SpaceTypeList.AddRange(await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceType, _cache, Loggers.SilentLogger));
         }
     }
 }

@@ -53,10 +53,12 @@ namespace DigitalTwinsBackend.Models
 
     public class SensorDescription
     {
-        public string dataType { get; set; }
         public string hardwareId { get; set; }
         public string type { get; set; }
-        public string subType { get; set; }
+        public string dataType { get; set; }
+        public string dataSubType { get; set; }
+        public string dataUnitType { get; set; }
+
     }
 
     public class UserDefinedFunctionDescription
@@ -152,7 +154,7 @@ namespace DigitalTwinsBackend.Models
         public static Models.Resource ToResource(this ResourceDescription description, Guid spaceId)
             => new Models.Resource()
             {
-                SpaceId = spaceId.ToString(),
+                SpaceId = spaceId,
                 Type = description.type,
                 Region = description.region,
             };
@@ -160,9 +162,12 @@ namespace DigitalTwinsBackend.Models
         public static Models.Sensor ToSensor(this SensorDescription description, Guid deviceId)
             => new Models.Sensor()
             {
-                DataType = description.dataType,
                 DeviceId = deviceId,
                 HardwareId = description.hardwareId,
+                Type = description.type,
+                DataType = description.dataType,
+                DataSubtype = description.dataSubType,
+                DataUnitType = description.dataUnitType,
             };
 
         public static Space ToSpace(this SpaceDescription description, Guid parentId)
@@ -175,30 +180,30 @@ namespace DigitalTwinsBackend.Models
                 SubType = description.subType
             };
 
-        public static Models.UserDefinedFunction ToUserDefinedFunction(this UserDefinedFunctionDescription description, Guid Id, Guid spaceId, IEnumerable<Models.Matcher> matchers)
+        //public static Models.UserDefinedFunction ToUserDefinedFunction(this UserDefinedFunctionDescription description, Guid Id, Guid spaceId, IEnumerable<Models.Matcher> matchers)
+        //    => new Models.UserDefinedFunction()
+        //    {
+        //        Id = Id,
+        //        Name = description.name,
+        //        SpaceId = spaceId,
+        //        Matchers = matchers,
+        //    };
+
+        public static Models.UserDefinedFunction ToUserDefinedFunction(this UserDefinedFunctionDescription description, Guid spaceId, IEnumerable<Matcher> matchers)
             => new Models.UserDefinedFunction()
             {
-                Id = Id,
                 Name = description.name,
                 SpaceId = spaceId,
                 Matchers = matchers,
             };
 
-        public static Models.UserDefinedFunction ToUserDefinedFunctionCreate(this UserDefinedFunctionDescription description, Guid spaceId, IEnumerable<Matcher> matchers)
-            => new Models.UserDefinedFunction()
-            {
-                Name = description.name,
-                SpaceId = spaceId,
-                Matchers = matchers,
-            };
-
-        public static Models.UserDefinedFunction ToUserDefinedFunctionUpdate(this UserDefinedFunctionDescription description, Guid id, Guid spaceId, IEnumerable<Matcher> matchers)
-            => new Models.UserDefinedFunction()
-            {
-                Id = id,
-                Name = description.name,
-                SpaceId = spaceId,
-                Matchers = matchers,
-            };
+        //public static Models.UserDefinedFunction ToUserDefinedFunctionUpdate(this UserDefinedFunctionDescription description, Guid id, Guid spaceId, IEnumerable<Matcher> matchers)
+        //    => new Models.UserDefinedFunction()
+        //    {
+        //        Id = id,
+        //        Name = description.name,
+        //        SpaceId = spaceId,
+        //        Matchers = matchers,
+        //    };
     }
 }

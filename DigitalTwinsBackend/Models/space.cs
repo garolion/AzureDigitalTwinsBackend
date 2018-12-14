@@ -8,9 +8,8 @@ using System.Collections.Generic;
 
 namespace DigitalTwinsBackend.Models
 {
-    public class Space
+    public class Space : BaseModel
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string FriendlyName { get; set; }
         public string Type { get; set; }
@@ -30,6 +29,8 @@ namespace DigitalTwinsBackend.Models
         public IEnumerable<Sensor> Sensors { get; set; }
         public IEnumerable<string> Users { get; set; }
 
+        public override string Label { get { return Name; } }
+
         public Space()
         {
             Properties = new List<Property>();
@@ -42,7 +43,7 @@ namespace DigitalTwinsBackend.Models
             Users = new List<string>();
         }
 
-        public Dictionary<string, object> ToCreate()
+        public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();
 
@@ -57,7 +58,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 

@@ -12,3 +12,16 @@ connection.on("ReceiveMessage", function (message) {
 connection.start().catch(function (err) {
     return console.error(err.toString());
 });
+
+    function Reset() {
+
+        document.getElementById("infoMessages").innerHTML = "";
+
+    $.ajax({
+        url: '@Url.Action("ResetMessages", "Home")',
+    type: 'GET',
+    dataType: 'json',
+    cache: false,
+               success: function (results) {}
+    });
+}

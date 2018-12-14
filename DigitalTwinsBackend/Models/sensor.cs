@@ -5,34 +5,33 @@ using System.Collections.Generic;
 
 namespace DigitalTwinsBackend.Models
 {
-    public class Sensor
+    public class Sensor : BaseModel
     {
-        public Guid Id { get; set; }
-        public string DataType { get; set; }
-        public int DataTypeId { get; set; }
         public Guid DeviceId { get; set; }
         public string HardwareId { get; set; }
         public int PollRate { get; set; }
         public Guid SpaceId { get; set; }
+
+        public string Type { get; set; }
+        public int TypeId { get; set; }
+
+        public string PortType { get; set; }
         public int PortTypeId { get; set; }
-        public int DataUnitTypeId { get; set; }
+
         public string DataUnitType { get; set; }
-        public int DataSubTypeId { get; set; }
+        public int DataUnitTypeId { get; set; }
+
+        public string DataType { get; set; }
+        public int DataTypeId { get; set; }
+
         public string DataSubtype { get; set; }
+        public int DataSubTypeId { get; set; }
+
         public SpaceValue Value { get; set; }
 
-        public Sensor()
-        {
-        }
-        //    public Sensor(SensorCreate sensor)
-        //{
-        //    this.DataType = sensor.DataType;
-        //    this.DeviceId = sensor.DeviceId;
-        //    this.HardwareId = sensor.HardwareId;
-        //}
+        public override string Label { get { return HardwareId; } }
 
-
-        public Dictionary<string, object> ToCreate()
+        public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();
 
@@ -43,7 +42,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 

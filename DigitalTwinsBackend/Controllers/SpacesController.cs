@@ -15,33 +15,40 @@ using System.Net.Http;
 
 namespace DigitalTwinsBackend.Controllers
 {
-    public class SpacesController : Controller
+    public class SpacesController : BaseController
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
         private SpaceViewModel _model;
-        private IMemoryCache _cache;
+        //private IMemoryCache _cache;
 
         public SpacesController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
             _httpContextAccessor = httpContextAccessor;
             _cache = memoryCache;
-
-            //_model = new SpaceViewModel(_cache);
         }
 
         #region List (overview) / Details
         public async Task<ActionResult> List()
         {
             var model = new SpacesViewModel(_cache);
-            model.SpaceList = await DigitalTwinsHelper.GetRootSpacesAsync(_cache, Loggers.SilentLogger);
 
+            try
+            {
+                model.SpaceList = await DigitalTwinsHelper.GetRootSpacesAsync(_cache, Loggers.SilentLogger);
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+            }
+
+            //Display Error & Info messages
+            SendViewData();
             return View(model);
         }
 
-        public async Task<ActionResult> Details(Guid id)
+        public ActionResult Details(Guid id)
         {
-            _model = new SpaceViewModel(_cache);
-            await _model.LoadAsync(id);
+            _model = new SpaceViewModel(_cache, id);
             return View(_model);
         }
 
@@ -66,10 +73,10 @@ namespace DigitalTwinsBackend.Controllers
 
 
         #region Create
-        public async Task<ActionResult> Create()
+        public ActionResult Create()
         {
             _model = new SpaceViewModel(_cache);
-            await _model.LoadAsync();
+            SendViewData();
             return View(_model);
         }
 
@@ -87,7 +94,6 @@ namespace DigitalTwinsBackend.Controllers
                 try
                 {
                     var id = await DigitalTwinsHelper.CreateSpaceAsync(space, _cache, Loggers.SilentLogger);
-                    await FeedbackHelper.Channel.SendMessageAsync($"Space with id '{id}' successfully created.");
 
                     switch (createButton)
                     {
@@ -108,7 +114,7 @@ namespace DigitalTwinsBackend.Controllers
                 }
                 catch (Exception ex)
                 {
-                    await FeedbackHelper.Channel.SendMessageAsync(ex.Message);
+                    await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
                     _model = new SpaceViewModel(_cache);
                     return View(_model);
                 }
@@ -121,11 +127,9 @@ namespace DigitalTwinsBackend.Controllers
         #endregion
         
         #region Edit / Update
-        public async Task<ActionResult> Edit(Guid id)
+        public ActionResult Edit(Guid id)
         {
-            _model = new SpaceViewModel(_cache);
-            await _model.LoadAsync(id);
-
+            _model = new SpaceViewModel(_cache, id);
             return View(_model);
         }
 
@@ -133,8 +137,7 @@ namespace DigitalTwinsBackend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(SpaceViewModel model)
         {
-            _model = new SpaceViewModel(_cache);
-            await _model.LoadAsync(model.SelectedSpaceItem.Id);
+            _model = new SpaceViewModel(_cache, model.SelectedSpaceItem.Id);
             var space = ExtractSpaceFromModel(model, false);
 
             try
@@ -144,7 +147,7 @@ namespace DigitalTwinsBackend.Controllers
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.Message);
+                await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
                 model = new SpaceViewModel(_cache, model.SelectedSpaceItem.Id);
                 return View(model);
             }
@@ -152,11 +155,9 @@ namespace DigitalTwinsBackend.Controllers
         #endregion
 
         #region Delete
-        public async Task<ActionResult> Delete(Guid id)
+        public ActionResult Delete(Guid id)
         {
-            _model = new SpaceViewModel(_cache);
-            await _model.LoadAsync(id);
-
+            _model = new SpaceViewModel(_cache, id);
             return View(_model);
         }
 
@@ -172,15 +173,14 @@ namespace DigitalTwinsBackend.Controllers
                 }
                 else
                 {
-                    _model = new SpaceViewModel(_cache);
-                    await _model.LoadAsync(model.SelectedSpaceItem.Id);
+                    _model = new SpaceViewModel(_cache, model.SelectedSpaceItem.Id);
 
                     return View(_model);
                 }
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString());
+                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString(), MessageType.Info);
                 return View();
             }
         }

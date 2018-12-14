@@ -20,13 +20,23 @@ namespace DigitalTwinsBackend.ViewModels
         public List<Space> SpaceList { get; set; }
         public List<string> Messages { get; set; }
 
+        public IEnumerable<Space> CreatedSpaces { get; set; }
+
         public ProvisionViewModel() { }
         public ProvisionViewModel(IMemoryCache memoryCache)
         {
             _cache = memoryCache;
             _auth = new AuthenticationHelper();
 
-            LoadAsync().Wait();
+            try
+            {
+                LoadAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
+            }
         }
 
         internal async Task LoadAsync(Guid? id = null)

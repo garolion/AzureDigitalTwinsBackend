@@ -14,34 +14,94 @@ namespace DigitalTwinsBackend.Helpers
 {
     public partial class Api
     {
-        // Returns a device with same hardwareId and spaceId if there is exactly one.
+
+        // Returns a Device with same hardwareId and spaceId if there is exactly one.
+        // Or returns a Sensor with same hardwareId and deviceId if there is exactly one.
         // Otherwise returns null.
-        public static async Task<Models.Device> FindDevice(
+        public static async Task<T> FindElementAsync<T>(
             HttpClient httpClient,
             ILogger logger,
-            string hardwareId,
-            Guid? spaceId,
+            string idFilter,
+            string parentFilter,
             string includes = null)
         {
-            var filterHardwareIds = $"hardwareIds={hardwareId}";
-            var filterSpaceId = spaceId != null ? $"&spaceIds={spaceId.ToString()}" : "";
+            //var filterHardwareIds = $"hardwareIds={hardwareId}";
             var includesParam = includes != null ? $"&includes={includes}" : "";
-            var filter = $"{filterHardwareIds}{filterSpaceId}{includesParam}";
+            var filter = $"{idFilter}&{parentFilter}{includesParam}";
 
-            var response = await httpClient.GetAsync($"devices?{filter}");
-            if (response.IsSuccessStatusCode)
+            var response = await httpClient.GetAsync($"{typeof(T).Name.ToLower()}s?{filter}");
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var devices = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.Device>>(content);
-                var matchingDevice = devices.SingleOrDefault();
-                if (matchingDevice != null)
+                var elements = JsonConvert.DeserializeObject<IReadOnlyCollection<T>>(content);
+                var matchingElement = elements.SingleOrDefault();
+                if (matchingElement != null)
                 {
-                    logger.LogInformation($"Retrieved Unique Device using 'hardwareId' and 'spaceId': {JsonConvert.SerializeObject(matchingDevice, Formatting.Indented)}");
-                    return matchingDevice;
+                    logger.LogInformation($"Retrieved Unique {typeof(T).Name} : {JsonConvert.SerializeObject(matchingElement, Formatting.Indented)}");
+                    return matchingElement;
                 }
             }
-            return null;
+            return default(T);
         }
+
+
+
+
+        // Returns a device with same hardwareId and spaceId if there is exactly one.
+        // Otherwise returns null.
+        //public static async Task<Models.Device> FindDevice(
+        //    HttpClient httpClient,
+        //    ILogger logger,
+        //    string hardwareId,
+        //    Guid? spaceId,
+        //    string includes = null)
+        //{
+        //    var filterHardwareIds = $"hardwareIds={hardwareId}";
+        //    var filterSpaceId = spaceId != null ? $"&spaceId={spaceId.ToString()}" : "";
+        //    var includesParam = includes != null ? $"&includes={includes}" : "";
+        //    var filter = $"{filterHardwareIds}{filterSpaceId}{includesParam}";
+
+        //    var response = await httpClient.GetAsync($"devices?{filter}");
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        var content = await response.Content.ReadAsStringAsync();
+        //        var devices = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.Device>>(content);
+        //        var matchingDevice = devices.SingleOrDefault();
+        //        if (matchingDevice != null)
+        //        {
+        //            logger.LogInformation($"Retrieved Unique Device using 'hardwareId' and 'spaceId': {JsonConvert.SerializeObject(matchingDevice, Formatting.Indented)}");
+        //            return matchingDevice;
+        //        }
+        //    }
+        //    return null;
+        //}
+
+        //public static async Task<Models.Sensor> FindSensor(
+        //    HttpClient httpClient,
+        //    ILogger logger,
+        //    string hardwareId,
+        //    Guid? deviceId,
+        //    string includes = null)
+        //{
+        //    var filterHardwareIds = $"hardwareIds={hardwareId}";
+        //    var filterDeviceId = deviceId != null ? $"&deviceIds={deviceId.ToString()}" : "";
+        //    var includesParam = includes != null ? $"&includes={includes}" : "";
+        //    var filter = $"{filterHardwareIds}{filterDeviceId}{includesParam}";
+
+        //    var response = await httpClient.GetAsync($"sensors?{filter}");
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        var content = await response.Content.ReadAsStringAsync();
+        //        var sensors = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.Sensor>>(content);
+        //        var matchingSensor = sensors.SingleOrDefault();
+        //        if (matchingSensor != null)
+        //        {
+        //            logger.LogInformation($"Retrieved Unique Sensor using 'hardwareId' and 'deviceId': {JsonConvert.SerializeObject(matchingSensor, Formatting.Indented)}");
+        //            return matchingSensor;
+        //        }
+        //    }
+        //    return null;
+        //}
 
         // Returns a matcher with same name and spaceId if there is exactly one.
         // Otherwise returns null.
@@ -121,29 +181,50 @@ namespace DigitalTwinsBackend.Helpers
 
         // Returns a user defined fucntion with same name and spaceId if there is exactly one.
         // Otherwise returns null.
-        public static async Task<Models.UserDefinedFunction> FindUserDefinedFunction(
+        //public static async Task<Models.UserDefinedFunction> FindUserDefinedFunction(
+        //    HttpClient httpClient,
+        //    ILogger logger,
+        //    string name,
+        //    Guid spaceId)
+        //{
+        //    var filterNames = $"names={name}";
+        //    var filterSpaceId = $"&spaceId={spaceId.ToString()}";
+        //    var filter = $"{filterNames}{filterSpaceId}";
+
+        //    var response = await httpClient.GetAsync($"userdefinedfunctions?{filter}&includes=matchers");
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        var content = await response.Content.ReadAsStringAsync();
+        //        var userDefinedFunctions = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.UserDefinedFunction>>(content);
+        //        var userDefinedFunction = userDefinedFunctions.SingleOrDefault();
+        //        if (userDefinedFunction != null)
+        //        {
+        //            logger.LogInformation($"Retrieved Unique UserDefinedFunction using 'name' and 'spaceId': {JsonConvert.SerializeObject(userDefinedFunction, Formatting.Indented)}");
+        //            return userDefinedFunction;
+        //        }
+        //    }
+        //    return null;
+        //}
+
+
+        public static async Task<IEnumerable<Models.Sensor>> FindSensorsOfSpace(
             HttpClient httpClient,
             ILogger logger,
-            string name,
             Guid spaceId)
         {
-            var filterNames = $"names={name}";
-            var filterSpaceId = $"&spaceId={spaceId.ToString()}";
-            var filter = $"{filterNames}{filterSpaceId}";
-
-            var response = await httpClient.GetAsync($"userdefinedfunctions?{filter}&includes=matchers");
-            if (response.IsSuccessStatusCode)
+            var response = await httpClient.GetAsync($"sensors?spaceId={spaceId.ToString()}&includes=Types");
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var userDefinedFunctions = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.UserDefinedFunction>>(content);
-                var userDefinedFunction = userDefinedFunctions.SingleOrDefault();
-                if (userDefinedFunction != null)
-                {
-                    logger.LogInformation($"Retrieved Unique UserDefinedFunction using 'name' and 'spaceId': {JsonConvert.SerializeObject(userDefinedFunction, Formatting.Indented)}");
-                    return userDefinedFunction;
-                }
+                var sensors = JsonConvert.DeserializeObject<IEnumerable<Models.Sensor>>(content);
+                logger.LogInformation($"Retrieved {sensors.Count()} Sensors");
+                return sensors;
             }
-            return null;
+            else
+            {
+                return Array.Empty<Models.Sensor>();
+            }
         }
+
     }
 }

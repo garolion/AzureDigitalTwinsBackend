@@ -24,7 +24,7 @@ namespace DigitalTwinsBackend.Controllers
 
             _model = new DeviceViewModel();
 
-            ViewData["Messages"] = CacheHelper.GetMessagesFromCache(_cache);
+            //ViewData["Messages"] = CacheHelper.GetMessagesFromCache(_cache);
         }
 
         // GET: Device
@@ -68,7 +68,7 @@ namespace DigitalTwinsBackend.Controllers
             try
             {
                 var id = await DigitalTwinsHelper.CreateDeviceAsync(ExtractDeviceFromModel(model, true), _cache, Loggers.SilentLogger);
-                await FeedbackHelper.Channel.SendMessageAsync($"Device with id '{id}' successfully created.");
+                await FeedbackHelper.Channel.SendMessageAsync($"Device with id '{id}' successfully created.", MessageType.Info);
                 
                 if (CacheHelper.IsInSpaceEditMode(_cache))
                 {
@@ -83,7 +83,7 @@ namespace DigitalTwinsBackend.Controllers
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.Message);
+                await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
                 //return View();
                 return Create(model.SelectedDeviceItem.SpaceId);
             }
@@ -122,7 +122,7 @@ namespace DigitalTwinsBackend.Controllers
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString());
+                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString(), MessageType.Info);
                 return View();
             }
         }
@@ -159,7 +159,7 @@ namespace DigitalTwinsBackend.Controllers
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString());
+                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString(), MessageType.Info);
                 return View();
             }
         }

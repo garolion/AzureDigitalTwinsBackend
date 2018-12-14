@@ -58,7 +58,10 @@ namespace DigitalTwinsBackend.Helpers
                 eventMessage.Properties.Add("CreationTimeUtc", DateTime.UtcNow.ToString("o"));
                 eventMessage.Properties.Add("x-ms-client-request-id", Guid.NewGuid().ToString());
 
-                await FeedbackHelper.Channel.SendMessageAsync($"\t{DateTime.UtcNow.ToLocalTime()}> Sending message: {Encoding.UTF8.GetString(eventMessage.GetBytes())} Properties: {{ {eventMessage.Properties.Aggregate(new StringBuilder(), (sb, x) => sb.Append($"'{x.Key}': '{x.Value}',"), sb => sb.ToString())} }}");
+                await FeedbackHelper.Channel.SendMessageAsync(
+                    $"\t{DateTime.UtcNow.ToLocalTime()}> Sending message: {Encoding.UTF8.GetString(eventMessage.GetBytes())} " +
+                    $"Properties: {{ {eventMessage.Properties.Aggregate(new StringBuilder(), (sb, x) => sb.Append($"'{x.Key}': '{x.Value}',"), sb => sb.ToString())} }}"
+                    , MessageType.Info);
 
                 await deviceClient.SendEventAsync(eventMessage);
             }

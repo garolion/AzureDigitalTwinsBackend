@@ -19,7 +19,6 @@ namespace DigitalTwinsBackend.Hubs
 
         public async Task SendMessage(string message)
         {
-            CacheHelper.AddMessageInCache(_cache, message);
             await Clients.All.SendAsync("ReceiveMessage", message);
         }
     }

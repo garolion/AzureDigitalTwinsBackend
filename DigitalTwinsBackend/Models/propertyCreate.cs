@@ -3,9 +3,9 @@
 
 namespace DigitalTwinsBackend.Models
 {
-    public class PropertyCreate
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
-    }
+    //public class PropertyCreate
+    //{
+    //    public string Name { get; set; }
+    //    public string Value { get; set; }
+    //}
 }

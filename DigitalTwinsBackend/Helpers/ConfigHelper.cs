@@ -9,23 +9,26 @@ namespace DigitalTwinsBackend.Helpers
 {
     public class AppConfig
     {
-        [Display(Name = "AAD Instance")]
+        [Display(Name = "Azure AD Login service - You should not modify this parameter")]
         public string AADInstance { get; set; }
-        [Display(Name = "Client Id")]
+        [Display(Name = "Azure AD Client Id")]
         public string ClientId { get; set; }
+        [Display(Name = "Azure Digital Twins Resource Id - You should not modify this parameter")]
         public string Resource { get; set; }
         [Display(Name = "Azure Tenant")]
         public string Tenant { get; set; }
         [Display(Name = "Base Url (to your Digital Twins instance)")]
         public string BaseUrl { get; set; }
         [Display(Name = "[Cache] Maximum validity (in seconds) of business objects stored in cache")]
-        [Range(3, 300, ErrorMessage = "Time must be between 3 and 300")]
+        [Range(30, 1800, ErrorMessage = "Time must be between 30 and 1800")]
         public int CacheTime { get; set; }
         [Display(Name = "[Device Simulator] Time (in seconds) between two data sending")]
-        [Range(1, 180, ErrorMessage = "Time must be between 1 and 180")]
+        [Range(1, 300, ErrorMessage = "Time must be between 1 and 300")]
         public int SimulatorTimer { get; set; }
-        [Display(Name = "[Device Simulator] Connection String to the device on Azure Iot Hub used to send data")]
-        public string DeviceConnectionString { get; set; }
+        [Display(Name = "Trace and Display all API Calls")]
+        public bool EnableAPICallTrace { get; set; }
+        [Display(Name = "Display details about data exchange with Azure Digital Twins")]
+        public bool EnableVerboseMode { get; set; }
     }
 
     public class ConfigHelper
@@ -46,14 +49,15 @@ namespace DigitalTwinsBackend.Helpers
             }
             else
             {
-                parameters.AADInstance = "N/A";
+                parameters.AADInstance = "https://login.microsoftonline.com/";
                 parameters.ClientId = "N/A";
-                parameters.Resource = "N/A";
+                parameters.Resource = "0b07f429-9f4b-4714-9392-cc5e8e80c8b0";
                 parameters.Tenant = "N/A";
-                parameters.BaseUrl = "N/A";
-                parameters.CacheTime = 30;
+                parameters.BaseUrl = "https://<DigitalTwinsName>.<Location>.azuresmartspaces.net";
+                parameters.CacheTime = 60;
                 parameters.CacheTime = 5;
-                parameters.DeviceConnectionString = "";
+                parameters.EnableAPICallTrace = false;
+                parameters.EnableVerboseMode = false;
             }
         }
 

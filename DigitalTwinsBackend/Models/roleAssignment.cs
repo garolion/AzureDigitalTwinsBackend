@@ -8,16 +8,17 @@ using System.Collections.Generic;
 
 namespace DigitalTwinsBackend.Models
 {
-    public class RoleAssignment
+    public class RoleAssignment : BaseModel
     {
-        public Guid Id { get; set; }
         public Guid ObjectId { get; set; }
         public string ObjectIdType { get; set; }
         public string Path { get; set; }
         public Guid RoleId { get; set; }
         public Guid TenantId { get; set; }
 
-        public Dictionary<string, object> ToCreate()
+        public override string Label { get { return Id.ToString(); } }
+
+        public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();
 
@@ -28,6 +29,11 @@ namespace DigitalTwinsBackend.Models
             createFields.Add("TenantId", TenantId);
 
             return createFields;
+        }
+
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        {
+            throw new NotImplementedException();
         }
     }
 }

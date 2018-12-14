@@ -1,4 +1,5 @@
 ﻿@model DigitalTwinsBackend.ViewModels.ProvisionViewModel
+@*@await Html.PartialAsync("../Provision/Space", Model.CreatedSpaces)*@
 
 @{
     ViewData["Title"] = "Provision";
@@ -10,12 +11,67 @@
 <h4>Report</h4>
 <hr />
 <div class="row">
+    <h4>Space, Device and Sensors created (Resources, Matchers, UDF and; RoleAssigment are not showed in this list)</h4>
     <div class="col-md-12">
-        @foreach (var message in Model.Messages)
+        @if (Model.CreatedSpaces != null)
         {
-            <div class="label-group">
-                <label class="label-value">@message</label>
-            </div>
+            foreach (var space in Model.CreatedSpaces)
+            {
+                <div class="spaceEncart">
+                    <div class="label-group">
+                        <label class="label-field">Space Id</label>
+                        <label class="label-value">@space.Id</label>
+                    </div>
+                    @*<div class="label-group">
+                            <label class="label-field">Name</label>
+                            <label class="label-value">@space.Name</label>
+                        </div>
+                        <div class="label-group">
+                            <label class="label-field">Type</label>
+                            <label class="label-value">@space.Type</label>
+                        </div>*@
+                </div>
+                @if (space.Devices != null)
+                {
+                    foreach (var device in space.Devices)
+                    {
+                        <div class="deviceEncart">
+                            <div class="label-group">
+                                <label class="label-field">Device Id</label>
+                                <label class="label-value">@device.Id</label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Hardware Id</label>
+                                <label class="label-value">@device.HardwareId</label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Connection String</label>
+                                <label class="label-value">@device.ConnectionString</label>
+                            </div>
+                        </div>
+                    }
+                }
+                @if (space.Sensors != null)
+                {
+                    foreach (var sensor in space.Sensors)
+                    {
+                        <div class="sensorEncart">
+                            <div class="label-group">
+                                <label class="label-field">Sensor Id</label>
+                                <label class="label-value">@sensor.Id</label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Hardware Id</label>
+                                <label class="label-value">@sensor.HardwareId</label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Data Type</label>
+                                <label class="label-value">@sensor.DataType</label>
+                            </div>
+                        </div>
+                    }
+                }
+            }
         }
     </div>
 </div>

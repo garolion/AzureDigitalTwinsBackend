@@ -16,10 +16,10 @@ using System.Globalization;
 
 namespace DigitalTwinsBackend.Controllers
 {
-    public class DeviceSimulatorController : Controller
+    public class DeviceSimulatorController : BaseController
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private IMemoryCache _cache;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
+        //private IMemoryCache _cache;
 
         public DeviceSimulatorController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
@@ -30,13 +30,9 @@ namespace DigitalTwinsBackend.Controllers
 
         public ActionResult Index()
         {
-            // reset sensor list in Cache
-            //CacheHelper.AddSimulatedSensorListInCacheAsync(_cache, new List<SimulatedSensor>()).Wait();
-
             var simulator = new SimulatorViewModel(_cache);
-
+            SendViewData();
             return View(simulator);
-
         }
 
         public ActionResult AddSensor()
@@ -56,46 +52,60 @@ namespace DigitalTwinsBackend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SimulatorAction(SimulatorViewModel model, string action)
         {
-            if (action.Equals("Launch") && !CacheHelper.IsInSendingDataState(_cache))
+            if (model.SelectedDevice == Guid.Empty)
             {
-                if (model.DeviceConnectionString.Length == 0)
-                {
-                    await FeedbackHelper.Channel.SendMessageAsync("No connection string added to connect to Azure IoT Hub");
-                    return RedirectToAction(nameof(Index));
-                }
-
-                var list = await CacheHelper.GetSimulatedSensorListFromCacheAsync(_cache);
-
-                if (list != null && list.Count > 0)
-                {
-                    CacheHelper.SetInSendingDataState(_cache, true);
-
-                    try
-                    {
-                        await SendDataAsync(model.DeviceConnectionString);
-                    }
-                    catch (Exception)
-                    {
-                        await FeedbackHelper.Channel.SendMessageAsync("Error during sending");
-                    }
-
-                    CacheHelper.SetInSendingDataState(_cache, false);
-                }
-                else
-                {
-                    await FeedbackHelper.Channel.SendMessageAsync("No sensor defined to send data");
-                }
+                await FeedbackHelper.Channel.SendMessageAsync("No connection string added to connect to Azure IoT Hub", MessageType.Info);
+                return RedirectToAction(nameof(Index));
             }
-            else if (action.Equals("Cancel"))
+            else
             {
-                await FeedbackHelper.Channel.SendMessageAsync("Stopping sending data...");
+                var device = await DigitalTwinsHelper.GetDeviceAsync(model.SelectedDevice, _cache, Loggers.SilentLogger, false);
 
-                CacheHelper.SetInSendingDataState(_cache, false);
+                try
+                {
+                    if (action.Equals("Launch") && !CacheHelper.IsInSendingDataState(_cache))
+                    {
+
+
+                        var list = await CacheHelper.GetSimulatedSensorListFromCacheAsync(_cache);
+
+                        if (list != null && list.Count > 0)
+                        {
+                            CacheHelper.SetInSendingDataState(_cache, true);
+
+                            try
+                            {
+                                await SendDataAsync(device.ConnectionString);
+                            }
+                            catch (Exception)
+                            {
+                                await FeedbackHelper.Channel.SendMessageAsync("Error during sending", MessageType.Info);
+                            }
+
+                            CacheHelper.SetInSendingDataState(_cache, false);
+                        }
+                        else
+                        {
+                            await FeedbackHelper.Channel.SendMessageAsync("No sensor defined to send data", MessageType.Info);
+                        }
+                    }
+                    else if (action.Equals("Cancel"))
+                    {
+                        await FeedbackHelper.Channel.SendMessageAsync("Stopping sending data...", MessageType.Info);
+
+                        CacheHelper.SetInSendingDataState(_cache, false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                }
+
+                //TODO Error messages are not sent through RedirectToAction
+                SendViewData();
+                return RedirectToAction(nameof(Index));
             }
-
-            return RedirectToAction(nameof(Index));
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> AddSensor(SimulatedSensor item)
@@ -141,13 +151,13 @@ namespace DigitalTwinsBackend.Controllers
 
             if (deviceClient == null)
             {
-                await FeedbackHelper.Channel.SendMessageAsync("Failed to connect to Azure IoT Hub.");
+                await FeedbackHelper.Channel.SendMessageAsync("Failed to connect to Azure IoT Hub.", MessageType.Info);
                 return;
             }
 
             while (CacheHelper.IsInSendingDataState(_cache))
             {
-                await FeedbackHelper.Channel.SendMessageAsync("Sending Data...");
+                await FeedbackHelper.Channel.SendMessageAsync("Sending Data...", MessageType.Info);
 
                 foreach (SimulatedSensor sensor in list)
                 {
@@ -157,7 +167,7 @@ namespace DigitalTwinsBackend.Controllers
                 await Task.Delay(TimeSpan.FromSeconds(ConfigHelper.Config.parameters.SimulatorTimer));
             }
 
-            await FeedbackHelper.Channel.SendMessageAsync("Sending data stopped.");
+            await FeedbackHelper.Channel.SendMessageAsync("Sending data stopped.", MessageType.Info);
         }
     }
 }

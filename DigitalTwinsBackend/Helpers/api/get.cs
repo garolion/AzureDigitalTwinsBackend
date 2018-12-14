@@ -20,7 +20,7 @@ namespace DigitalTwinsBackend.Helpers
             ILogger logger)
         {
             var response = await httpClient.GetAsync($"ontologies");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var ontologies = JsonConvert.DeserializeObject<IEnumerable<Models.Ontology>>(content);
@@ -39,7 +39,7 @@ namespace DigitalTwinsBackend.Helpers
         int ontologyId)
         {
             var response = await httpClient.GetAsync($"ontologies/{ontologyId}?includes=types");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var ontology = JsonConvert.DeserializeObject<Models.Ontology>(content);
@@ -52,40 +52,40 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<IEnumerable<Models.PropertyKeys>> GetPropertyKeys(
+        public static async Task<IEnumerable<Models.PropertyKey>> GetPropertyKeys(
             HttpClient httpClient,
             ILogger logger)
         {
             var response = await httpClient.GetAsync($"propertykeys");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var propertyKeys = JsonConvert.DeserializeObject<IEnumerable<Models.PropertyKeys>>(content);
+                var propertyKeys = JsonConvert.DeserializeObject<IEnumerable<Models.PropertyKey>>(content);
                 logger.LogInformation($"Retrieved PropertyKeys: {JsonConvert.SerializeObject(propertyKeys, Formatting.Indented)}");
                 return propertyKeys;
             }
             else
             {
-                return Array.Empty<Models.PropertyKeys>();
+                return Array.Empty<Models.PropertyKey>();
             }
         }
 
-        public static async Task<IEnumerable<Models.PropertyKeys>> GetPropertyKeysBySpace(
+        public static async Task<IEnumerable<Models.PropertyKey>> GetPropertyKeysBySpace(
             Guid spaceId,
             HttpClient httpClient,
             ILogger logger)
         {
             var response = await httpClient.GetAsync($"propertykeys?spaceId={spaceId}&traverse=Up");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var propertyKeys = JsonConvert.DeserializeObject<IEnumerable<Models.PropertyKeys>>(content);
+                var propertyKeys = JsonConvert.DeserializeObject<IEnumerable<Models.PropertyKey>>(content);
                 logger.LogInformation($"Retrieved PropertyKeys: {JsonConvert.SerializeObject(propertyKeys, Formatting.Indented)}");
                 return propertyKeys;
             }
             else
             {
-                return Array.Empty<Models.PropertyKeys>();
+                return Array.Empty<Models.PropertyKey>();
             }
         }
 
@@ -98,7 +98,7 @@ namespace DigitalTwinsBackend.Helpers
                 throw new ArgumentException("GetResource requires a non empty guid as id");
 
             var response = await httpClient.GetAsync($"resources/{id}");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var resource = JsonConvert.DeserializeObject<Models.Resource>(content);
@@ -119,7 +119,7 @@ namespace DigitalTwinsBackend.Helpers
                 throw new ArgumentException("GetSpace requires a non empty guid as id");
 
             var response = await httpClient.GetAsync($"spaces/{id}/" + (includes != null ? $"?includes={includes}" : ""));
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var space = JsonConvert.DeserializeObject<Models.Space>(content);
@@ -140,7 +140,7 @@ namespace DigitalTwinsBackend.Helpers
                 throw new ArgumentException("GetDevice requires a non empty guid as id");
 
             var response = await httpClient.GetAsync($"devices/{id}/" + (includes != null ? $"?includes={includes}" : ""));
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var device = JsonConvert.DeserializeObject<Models.Device>(content);
@@ -161,7 +161,7 @@ namespace DigitalTwinsBackend.Helpers
                 throw new ArgumentException("GetSensor requires a non empty guid as id");
 
             var response = await httpClient.GetAsync($"sensors/{id}/" + (includes != null ? $"?includes={includes}" : ""));
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var sensor = JsonConvert.DeserializeObject<Models.Sensor>(content);
@@ -184,8 +184,8 @@ namespace DigitalTwinsBackend.Helpers
             var includesFilter = (includes != null ? $"includes={includes}" : "");
             var propertyKeyFilter = (propertyKey != null ? $"propertyKey={propertyKey}" : "");
             var topFilter = $"$top={maxNumberToGet}";
-            var response = await httpClient.GetAsync($"spaces{MakeQueryParams(new [] {navigationFilter, includesFilter, propertyKeyFilter, topFilter})}");
-            if (response.IsSuccessStatusCode)
+            var response = await httpClient.GetAsync($"spaces{MakeQueryParams(new[] { navigationFilter, includesFilter, propertyKeyFilter, topFilter })}");
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var spaces = JsonConvert.DeserializeObject<IEnumerable<Models.Space>>(content);
@@ -198,6 +198,32 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
+        public static async Task<IEnumerable<Device>> GetDevices(
+            HttpClient httpClient,
+            ILogger logger,
+            int maxNumberToGet = 100,
+            string navigation = null,
+            string includes = null,
+            string propertyKey = null)
+        {
+            var navigationFilter = (navigation != null ? $"{navigation}" : "");
+            var includesFilter = (includes != null ? $"includes={includes}" : "");
+            var propertyKeyFilter = (propertyKey != null ? $"propertyKey={propertyKey}" : "");
+            var topFilter = $"$top={maxNumberToGet}";
+            var response = await httpClient.GetAsync($"devices{MakeQueryParams(new[] { navigationFilter, includesFilter, propertyKeyFilter, topFilter })}");
+            if (await IsSuccessCall(response, logger))
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var devices = JsonConvert.DeserializeObject<IEnumerable<Models.Device>>(content);
+                logger.LogInformation($"Retrieved {devices.Count()} Spaces");
+                return devices;
+            }
+            else
+            {
+                return Array.Empty<Models.Device>();
+            }
+        }
+
         public static async Task<IEnumerable<Models.UserDefinedFunction>> GetUserDefinedFunctions(
             HttpClient httpClient,
             ILogger logger,
@@ -207,7 +233,7 @@ namespace DigitalTwinsBackend.Helpers
             var includesFilter = (includes != null ? $"includes={includes}" : "");
 
             var response = await httpClient.GetAsync($"userdefinedfunctions?spaceId={spaceId}" + (includes != null ? $"&includes={includes}" : ""));
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var userdefinedfunctions = JsonConvert.DeserializeObject<IEnumerable<Models.UserDefinedFunction>>(content);
@@ -229,7 +255,7 @@ namespace DigitalTwinsBackend.Helpers
             var includesFilter = (includes != null ? $"includes={includes}" : "");
 
             var response = await httpClient.GetAsync($"matchers?spaceId={id}" + (includes != null ? $"&includes={includes}" : ""));
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var matchers = JsonConvert.DeserializeObject<IEnumerable<Models.Matcher>>(content);
@@ -249,7 +275,7 @@ namespace DigitalTwinsBackend.Helpers
             string sensorId)
         {
             var response = await httpClient.GetAsync($"matchers/{matcherId}/evaluate/{sensorId}");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var isTrue = JsonConvert.DeserializeObject<bool>(content);
@@ -290,7 +316,7 @@ namespace DigitalTwinsBackend.Helpers
             Guid functionId)
         {
             var response = await httpClient.GetAsync($"userdefinedfunctions/{functionId}/contents");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 //var userdefinedfunctions = JsonConvert.DeserializeObject<IEnumerable<Models.UserDefinedFunction>>(content);
@@ -303,24 +329,24 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<IEnumerable<Models.Sensor>> GetSensorsOfSpace(
-            HttpClient httpClient,
-            ILogger logger,
-            Guid spaceId)
-        {
-            var response = await httpClient.GetAsync($"sensors?spaceId={spaceId.ToString()}&includes=Types");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                var sensors = JsonConvert.DeserializeObject<IEnumerable<Models.Sensor>>(content);
-                logger.LogInformation($"Retrieved {sensors.Count()} Sensors");
-                return sensors;
-            }
-            else
-            {
-                return Array.Empty<Models.Sensor>();
-            }
-        }
+        //public static async Task<IEnumerable<Models.Sensor>> GetSensorsOfSpace(
+        //    HttpClient httpClient,
+        //    ILogger logger,
+        //    Guid spaceId)
+        //{
+        //    var response = await httpClient.GetAsync($"sensors?spaceId={spaceId.ToString()}&includes=Types");
+        //    if (await IsSuccessCall(response, logger))
+        //    {
+        //        var content = await response.Content.ReadAsStringAsync();
+        //        var sensors = JsonConvert.DeserializeObject<IEnumerable<Models.Sensor>>(content);
+        //        logger.LogInformation($"Retrieved {sensors.Count()} Sensors");
+        //        return sensors;
+        //    }
+        //    else
+        //    {
+        //        return Array.Empty<Models.Sensor>();
+        //    }
+        //}
 
         private static string MakeQueryParams(IEnumerable<string> queryParams)
         {
@@ -330,7 +356,7 @@ namespace DigitalTwinsBackend.Helpers
                 .Aggregate((result, cur) => result + cur);
         }
 
-        public static async Task<IEnumerable<Models.SystemType>> GetTypes(
+        public static async Task<IEnumerable<Models.Type>> GetTypes(
             HttpClient httpClient,
             ILogger logger,
             int maxNumberToGet = 10,
@@ -339,31 +365,55 @@ namespace DigitalTwinsBackend.Helpers
         {
             var includesFilter = (includes != null ? $"includes={includes}" : "");
             var categoriesFilter = (categories != null ? $"categories={categories}" : "");
-            //var topFilter = $"$top={maxNumberToGet}";
-            //var response = await httpClient.GetAsync($"types{MakeQueryParams(new[] { includesFilter, categoriesFilter, topFilter })}");
 
             var response = await httpClient.GetAsync($"types{MakeQueryParams(new[] { includesFilter, categoriesFilter })}");
-            if (response.IsSuccessStatusCode)
+            if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var types = JsonConvert.DeserializeObject<IEnumerable<Models.SystemType>>(content);
+                var types = JsonConvert.DeserializeObject<IEnumerable<Models.Type>>(content);
                 logger.LogInformation($"Retrieved {types.Count()} Types");
                 return types;
             }
             else
             {
-                return Array.Empty<Models.SystemType>();
+                return Array.Empty<Models.Type>();
             }
         }
 
+
         private static async Task<bool> IsSuccessCall(HttpResponseMessage response, ILogger logger)
         {
+            return await IsSuccessCall(response, logger, string.Empty);
+        }
+
+        private static async Task<bool> IsSuccessCall(HttpResponseMessage response, ILogger logger, string requestBody)
+        {
+            if (ConfigHelper.Config.parameters.EnableAPICallTrace)
+            {
+                await FeedbackHelper.Channel.SendMessageAsync(
+                    $"{response.RequestMessage.Method.ToString().ToUpper()} - {response.RequestMessage.RequestUri.ToString()}", MessageType.APICall);
+
+                if (requestBody != string.Empty)
+                {
+                    await FeedbackHelper.Channel.SendMessageAsync($"Body: {requestBody}", MessageType.APICall);
+                }
+            }
+
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                if (content != null && content.Length > 0)
+                if (ConfigHelper.Config.parameters.EnableVerboseMode && content != null && content.Length > 0)
                 {
-                    await FeedbackHelper.Channel.SendMessageAsync(content);
+                    await FeedbackHelper.Channel.SendMessageAsync(
+                        $"{response.RequestMessage.Method.ToString().ToUpper()} - {response.RequestMessage.RequestUri.ToString()}", MessageType.Info);
+
+                    if (requestBody != string.Empty)
+                    {
+                        await FeedbackHelper.Channel.SendMessageAsync($"Body: {requestBody}", MessageType.Info);
+                    }
+                    
+                    await FeedbackHelper.Channel.SendMessageAsync(JsonConvert.SerializeObject(content, Formatting.Indented), MessageType.Info);
+
                     logger.LogInformation(content);
                 }
                 return true;
@@ -372,10 +422,12 @@ namespace DigitalTwinsBackend.Helpers
             {
                 var content = await response.Content.ReadAsStringAsync();
 
-                var error = JsonConvert.DeserializeObject<ErrorMessage>(content);
-                await FeedbackHelper.Channel.SendMessageAsync($"Error {error.Error.Code} - {error.Error.Message}");
-                logger.LogInformation($"Error {error.Error.Code} - {error.Error.Message}");
-
+                if (content != null && content.Length > 0)
+                {
+                    var error = JsonConvert.DeserializeObject<ErrorMessage>(content);
+                    await FeedbackHelper.Channel.SendMessageAsync($"Error {error.Error.Code} - {error.Error.Message}", MessageType.Info);
+                    logger.LogInformation($"Error {error.Error.Code} - {error.Error.Message}");
+                }
                 return false;
             }
         }

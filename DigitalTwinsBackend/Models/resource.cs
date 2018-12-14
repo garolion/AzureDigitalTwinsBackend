@@ -7,10 +7,9 @@ using System.Collections.Generic;
 
 namespace DigitalTwinsBackend.Models
 {
-    public class Resource
+    public class Resource : BaseModel
     {
-        public string Id { get; set; }
-        public string SpaceId { get; set; }
+        public Guid SpaceId { get; set; }
         public string Region { get; set; }
         public string Type { get; set; }
         public bool IsExternallyCreated { get; set; }
@@ -19,7 +18,9 @@ namespace DigitalTwinsBackend.Models
         public ResourceProperties Properties { get; set; }
         public int InstanceNum { get; set; }
 
-        public Dictionary<string, object> ToCreate()
+        public override string Label { get { return Id.ToString(); } }
+
+        public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();
 
@@ -30,7 +31,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 

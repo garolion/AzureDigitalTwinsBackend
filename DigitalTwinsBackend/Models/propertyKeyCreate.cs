@@ -5,10 +5,10 @@ using System;
 
 namespace DigitalTwinsBackend.Models
 {
-    public class PropertyKeyCreate
-    {
-        public string Name { get; set; }
-        public string Scope { get; set; }
-        public Guid SpaceId { get; set; }
-    }
+    //public class PropertyKeyCreate
+    //{
+    //    public string Name { get; set; }
+    //    public string Scope { get; set; }
+    //    public Guid SpaceId { get; set; }
+    //}
 }

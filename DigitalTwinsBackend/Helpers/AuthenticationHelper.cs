@@ -16,11 +16,11 @@ namespace DigitalTwinsBackend.Helpers
 
             httpClient = new HttpClient()
             {
-                BaseAddress = new Uri(ConfigHelper.Config.parameters.BaseUrl),
+                BaseAddress = new Uri(ConfigHelper.Config.parameters.BaseUrl + "/management/api/v1.0/"),
             };
             var accessToken = (await AuthenticationHelper.GetToken(
                 logger,
-                ConfigHelper.Config.parameters.BaseUrl,
+                ConfigHelper.Config.parameters.BaseUrl + "/management/api/v1.0/",
                 authority,
                 ConfigHelper.Config.parameters.Resource,
                 ConfigHelper.Config.parameters.ClientId));
@@ -55,7 +55,7 @@ namespace DigitalTwinsBackend.Helpers
             };
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
 
-            await FeedbackHelper.Channel.SendMessageAsync("Checking if previous access token is valid...");
+            await FeedbackHelper.Channel.SendMessageAsync("Checking if previous access token is valid...", MessageType.Info);
 
             return (await httpClient.GetAsync("ontologies")).IsSuccessStatusCode;
         }
@@ -79,7 +79,7 @@ namespace DigitalTwinsBackend.Helpers
         {
             var codeResult = await authContext.AcquireDeviceCodeAsync(resource, clientId);
 
-            await FeedbackHelper.Channel.SendMessageAsync(codeResult.Message);
+            await FeedbackHelper.Channel.SendMessageAsync(codeResult.Message, MessageType.Info);
 
             return await authContext.AcquireTokenByDeviceCodeAsync(codeResult);
         }

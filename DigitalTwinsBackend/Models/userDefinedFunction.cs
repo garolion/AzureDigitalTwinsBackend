@@ -8,19 +8,20 @@ using System.Collections.Generic;
 
 namespace DigitalTwinsBackend.Models
 {
-    public class UserDefinedFunction
+    public class UserDefinedFunction : BaseModel
     {
-        public Guid Id { get; set; }
         public IEnumerable<Matcher> Matchers { get; set; }
         public string Name { get; set; }
         public Guid SpaceId { get; set; }
+
+        public override string Label { get { return Name; } }
 
         public UserDefinedFunction()
         {
             Matchers = new List<Matcher>();
         }
 
-        public Dictionary<string, object> ToCreate()
+        public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();
 
@@ -31,7 +32,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 

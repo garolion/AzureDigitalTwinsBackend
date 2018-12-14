@@ -22,8 +22,8 @@ namespace DigitalTwinsBackend.ViewModels
 
         public Device SelectedDeviceItem { get; set; }
         public IEnumerable<Space> SpaceList { get; set; }
-        public IEnumerable<SystemType> DeviceTypeList { get; set; }
-        public IEnumerable<SystemType> DeviceSubTypeList { get; set; }
+        public IEnumerable<Models.Type> DeviceTypeList { get; set; }
+        public IEnumerable<Models.Type> DeviceSubTypeList { get; set; }
                
 
         public DeviceViewModel() { }
@@ -32,11 +32,19 @@ namespace DigitalTwinsBackend.ViewModels
             _cache = memoryCache;
             _auth = new AuthenticationHelper();
 
-            LoadAsync().Wait();
-
-            if (id != null)
+            try
             {
-                LoadSelectedSpaceItemAsync((Guid)id).Wait();
+                LoadAsync().Wait();
+
+                if (id != null)
+                {
+                    LoadSelectedSpaceItemAsync((Guid)id).Wait();
+                }
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
             }
         }
 
@@ -50,8 +58,8 @@ namespace DigitalTwinsBackend.ViewModels
         {
             SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
 
-            DeviceTypeList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.DeviceType, _cache, Loggers.SilentLogger);
-            DeviceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.DeviceSubtype, _cache, Loggers.SilentLogger);
+            DeviceTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceType, _cache, Loggers.SilentLogger);
+            DeviceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceSubtype, _cache, Loggers.SilentLogger);
         }
     }
 }

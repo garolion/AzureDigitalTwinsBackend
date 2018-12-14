@@ -4,3 +4,6 @@
 
 /.vs
 /DigitalTwinsBackend/obj
+/DigitalTwinsBackend/bin/Debug/netcoreapp2.1
+/DigitalTwinsBackend/.accesstoken
+/DigitalTwinsBackend/backend.config

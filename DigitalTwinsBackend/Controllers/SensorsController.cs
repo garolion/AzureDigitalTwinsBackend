@@ -68,7 +68,7 @@ namespace DigitalTwinsBackend.Controllers
             try
             {
                 var id = await DigitalTwinsHelper.CreateSensorAsync(ExtractSensorFromModel(model, true), _cache, Loggers.SilentLogger);
-                await FeedbackHelper.Channel.SendMessageAsync($"Sensor with id '{id}' successfully created.");
+                await FeedbackHelper.Channel.SendMessageAsync($"Sensor with id '{id}' successfully created.", MessageType.Info);
 
                 if (CacheHelper.IsInDeviceEditMode(_cache))
                 {
@@ -83,7 +83,7 @@ namespace DigitalTwinsBackend.Controllers
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.Message);
+                await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
                 return View();
             }
         }
@@ -118,7 +118,7 @@ namespace DigitalTwinsBackend.Controllers
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString());
+                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString(), MessageType.Info);
                 return View();
             }
         }
@@ -153,7 +153,7 @@ namespace DigitalTwinsBackend.Controllers
             }
             catch (Exception ex)
             {
-                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString());
+                await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString(), MessageType.Info);
                 return View();
             }
         }

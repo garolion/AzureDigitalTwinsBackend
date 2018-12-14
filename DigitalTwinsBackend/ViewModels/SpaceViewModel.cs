@@ -23,9 +23,9 @@ namespace DigitalTwinsBackend.ViewModels
 
         public Space SelectedSpaceItem { get; set; }
         public List<Space> SpaceList { get; set; }
-        public IEnumerable<SystemType> SpaceTypeList { get; set; }
-        public IEnumerable<SystemType> SpaceSubTypeList { get; set; }
-        public IEnumerable<SystemType> SpaceStatusList { get; set; }
+        public IEnumerable<Models.Type> SpaceTypeList { get; set; }
+        public IEnumerable<Models.Type> SpaceSubTypeList { get; set; }
+        public IEnumerable<Models.Type> SpaceStatusList { get; set; }
         public IEnumerable<UserDefinedFunction> UDFList { get; set; }
 
         public SpaceViewModel() { }
@@ -34,10 +34,24 @@ namespace DigitalTwinsBackend.ViewModels
             _cache = memoryCache;
             _auth = new AuthenticationHelper();
 
-            //LoadAsync(id).Wait();
+            try
+            {
+                LoadAsync(id).Wait();
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
+
+                //We create empty lists to simplify error management in Views.
+                SpaceList = new List<Space>();
+                SpaceTypeList = new List<Models.Type>();
+                SpaceSubTypeList = new List<Models.Type>();
+                SpaceStatusList = new List<Models.Type>();
+            }
         }
 
-        internal async Task LoadAsync(Guid? id = null)
+        private async Task LoadAsync(Guid? id = null)
         {
             SpaceList = new List<Space>();
             SpaceList.Add(new Space() { Id = Guid.Empty, Name = "None" });
@@ -45,9 +59,9 @@ namespace DigitalTwinsBackend.ViewModels
 
             //SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
 
-            SpaceTypeList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.SpaceType, _cache, Loggers.SilentLogger);
-            SpaceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.SpaceSubtype, _cache, Loggers.SilentLogger);
-            SpaceStatusList = await DigitalTwinsHelper.GetTypesAsync(SystemTypes.SpaceStatus, _cache, Loggers.SilentLogger);
+            SpaceTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceType, _cache, Loggers.SilentLogger);
+            SpaceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceSubtype, _cache, Loggers.SilentLogger);
+            SpaceStatusList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceStatus, _cache, Loggers.SilentLogger);
 
             if (id != null)
             {

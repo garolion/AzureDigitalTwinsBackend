@@ -8,19 +8,20 @@ using System.Collections.Generic;
 
 namespace DigitalTwinsBackend.Models
 {
-    public class Matcher
+    public class Matcher : BaseModel
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string SpaceId { get; set; }
         public IEnumerable<MatcherCondition> Conditions { get; set; }
+
+        public override string Label { get { return Name; } }
 
         public Matcher()
         {
             Conditions = new List<MatcherCondition>();
         }
 
-        public Dictionary<string, object> ToCreate()
+        public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();
 
@@ -32,7 +33,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 

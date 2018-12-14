@@ -25,32 +25,35 @@ namespace DigitalTwinsBackend.ViewModels
 
         public OntologyViewModel() { }
 
-        public OntologyViewModel(IMemoryCache memoryCache, SystemTypes? systemTypes)
+        public OntologyViewModel(IMemoryCache memoryCache, Models.Types? systemTypes)
         {
             _cache = memoryCache;
             _auth = new AuthenticationHelper();
 
-            LoadAsync(systemTypes).Wait();
-        }
-        private async Task LoadAsync(SystemTypes? systemTypes)
-        {
-            var _ontologies = await DigitalTwinsHelper.GetOntologiesWithTypes(_cache, Loggers.SilentLogger);
-
-            if (systemTypes != null)
+            try
             {
-                List<Ontology> list = new List<Ontology>();
-                Ontology ontology;
-
-                foreach (Ontology item in _ontologies)
-                {
-                    ontology = new Ontology() { Id = item.Id, Name = item.Name, Loaded = item.Loaded };
-                    ontology.types = item.types.FindAll(t => t.Category.Equals(systemTypes.ToString()));
-                    list.Add(ontology);
-                }
-                _ontologies = list;
+                LoadAsync(systemTypes).Wait();
             }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+                FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
+            }
+        }
+        private async Task LoadAsync(Models.Types? systemTypes)
+        {
+            List<Ontology> ontologies = await DigitalTwinsHelper.GetOntologiesWithTypes(_cache, Loggers.SilentLogger);
 
-            OntologyList = _ontologies;
+            List<Ontology> list = new List<Ontology>();
+            Ontology ontology;
+
+            foreach (Ontology item in ontologies)
+            {
+                ontology = new Ontology() { Id = item.Id, Name = item.Name, Loaded = item.Loaded };
+                ontology.types = item.types.FindAll(t => t.Category.Equals(systemTypes.ToString()));
+                list.Add(ontology);
+            }
+            OntologyList = list;
         }
     }
 }

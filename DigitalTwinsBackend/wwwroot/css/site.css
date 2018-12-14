@@ -37,6 +37,27 @@ body {
     }
 }
 
+.errorZone, 
+.apicallZone{
+    margin: 10px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.25;
+    color: #555;
+    text-align: left;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.errorZone {
+    background-color: lightgray;
+}
+
+.apicallZone {
+    background-color: antiquewhite;
+}
+
 .spaceEncart {
     margin: 10px 0px;
     padding: 0px 20px;

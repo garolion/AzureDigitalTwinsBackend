@@ -47,9 +47,44 @@
         @RenderBody()
         <hr />
         <div>
-            <div>&nbsp;</div>
             <div>
-                <ul>@ViewData["Messages"]</ul>
+                @{
+                    List<string> infoMessages = (List<string>)ViewData["InfoMessages"];
+
+                    if (infoMessages != null)
+                    {
+                        <div>
+                            <input type="submit" name="createButton" value="Clear messages" onclick="return Reset()" class="btn btn-default" />
+                        </div>
+                        <div id="infoMessages" class="errorZone">
+                            @foreach (string message in infoMessages)
+                            {
+                                <div>
+                                    @Html.DisplayFor(modelItem => message)
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+            <div>
+                @{
+                    List<string> APICallMessages = (List<string>)ViewData["APICallMessages"];
+
+                    if (APICallMessages != null)
+                    {
+                        <div id="APICallMessages" class="apicallZone">
+                            @foreach (string message in APICallMessages)
+                            {
+                                <div>
+                                    @Html.DisplayFor(modelItem => message)
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+            <div>
                 <ul id="messagesList"></ul>
             </div>
         </div>
