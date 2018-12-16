@@ -14,6 +14,8 @@ namespace DigitalTwinsBackend.Helpers
 {
     public class DigitalTwinsHelper
     {
+        private static List<ProvisionedSpace> spaceResults;
+
         #region Private methods related to cache management
         private static async Task RefreshCacheAsync(IMemoryCache memoryCache, Object cacheElement, object id, bool elementHasChanged, Context context)
         {
@@ -81,64 +83,78 @@ namespace DigitalTwinsBackend.Helpers
         #endregion
 
         #region Methods related to batch creation (using YAML description)
-        public static async Task<IEnumerable<Space>> CreateSpaces(
+        public static async Task<IEnumerable<ProvisionedSpace>> CreateSpaces(
              IMemoryCache memoryCache,
              ILogger logger,
              IEnumerable<SpaceDescription> descriptions,
              IEnumerable<IFormFile> udfFiles,
-             Guid parentId)
+             Guid parentId,
+             int level = 1)
         {
+            if (level == 1)
+            {
+                spaceResults = new List<ProvisionedSpace>();
+            }
+
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
-            var spaceResults = new List<Space>();
             foreach (var description in descriptions)
             {
-                var spaceId = await CreateOrPatchSpaceAsync(memoryCache, logger, parentId, description.ToSpace(parentId));
+                var space = await CreateOrPatchSpaceAsync(memoryCache, logger, parentId, description.ToSpace(parentId));
 
-                if (spaceId != Guid.Empty)
+                spaceResults.Add(new ProvisionedSpace()
+                {
+                    Space = space,
+                    MarginLeft = (level * 25).ToString() + "px"
+                });
+
+                if (space != null)
                 {
                     // This must happen before devices (or anything that could have devices like other spaces)
                     // or the device creation will fail because a resource is required on an ancestor space
                     if (description.resources != null)
-                        await CreateResources(memoryCache, logger, description.resources, spaceId);
+                        await CreateResources(memoryCache, logger, description.resources, space.Id);
 
                     var devices = description.devices != null
-                        ? await CreateDevices(memoryCache, logger, description.devices, spaceId)
+                        ? await CreateDevices(memoryCache, logger, description.devices, space.Id)
                         : Array.Empty<Models.Device>();
 
                     if (description.matchers != null)
-                        await CreateMatchers(memoryCache, logger, description.matchers, spaceId);
+                        await CreateMatchers(memoryCache, logger, description.matchers, space.Id);
 
                     if (description.userdefinedfunctions != null)
-                        await CreateUserDefinedFunctions(memoryCache, logger, description.userdefinedfunctions, udfFiles, spaceId);
+                        await CreateUserDefinedFunctions(memoryCache, logger, description.userdefinedfunctions, udfFiles, space.Id);
 
                     if (description.roleassignments != null)
-                        await CreateRoleAssignments(memoryCache, logger, description.roleassignments, spaceId);
+                        await CreateRoleAssignments(memoryCache, logger, description.roleassignments, space.Id);
 
                     var childSpacesResults = description.spaces != null
-                        ? await CreateSpaces(memoryCache, logger, description.spaces, udfFiles, spaceId)
-                        : Array.Empty<Space>();
+                        ? await CreateSpaces(memoryCache, logger, description.spaces, udfFiles, space.Id, level+1)
+                        : Array.Empty<ProvisionedSpace>();
 
-                    var sensors = await Api.FindSensorsOfSpace(httpClient, logger, spaceId);
+                    var sensors = await Api.FindSensorsOfSpace(httpClient, logger, space.Id);
 
-                    spaceResults.Add(new Space()
-                    {
-                        Id = spaceId,
-                        Devices = devices.Select(device => new Device()
-                        {
-                            ConnectionString = device.ConnectionString,
-                            HardwareId = device.HardwareId,
-                        }),
-                        Sensors = sensors.Select(sensor => new Sensor()
-                        {
-                            DataType = sensor.DataType,
-                            HardwareId = sensor.HardwareId,
-                        }),
-                        Children = childSpacesResults,
-                    });
+                    space.Devices = devices;
+                    space.Sensors = sensors;
+                    space.Children = childSpacesResults.Select(child => child.Space);
+
+                    spaceResults[spaceResults.FindIndex(ps => ps.Space.Id == space.Id)].Space = space;
+
+                    //spaceResults.Add(new ProvisionedSpace()
+                    //{
+                    //    Space = space,
+                    //    MarginLeft = (level * 25).ToString() + "px"
+                    //});
+
+                    //space.Devices = devices;
+                    //space.Sensors = sensors;
+                    //space.Children = childSpacesResults.Select(child => child.Space);
+
+
                 }
             }
 
+            //spaceResults.Reverse();
             return spaceResults;
         }
         
@@ -337,7 +353,7 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        private static async Task<Guid> CreateOrPatchSpaceAsync(IMemoryCache memoryCache, ILogger logger, Guid parentId, Space spaceToCreateOrPatch)
+        private static async Task<Space> CreateOrPatchSpaceAsync(IMemoryCache memoryCache, ILogger logger, Guid parentId, Space spaceToCreateOrPatch)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             var existingSpace = await Api.FindSpace(httpClient, logger, spaceToCreateOrPatch.Name, parentId);
@@ -351,7 +367,7 @@ namespace DigitalTwinsBackend.Helpers
                 existingSpace.SubType = spaceToCreateOrPatch.SubType;
                 await UpdateSpaceAsync(existingSpace, memoryCache, logger);
 
-                return existingSpace.Id;
+                return existingSpace;
             }
 
             return await CreateSpaceAsync(spaceToCreateOrPatch, memoryCache, logger);
@@ -540,16 +556,15 @@ namespace DigitalTwinsBackend.Helpers
             return space;
         }
 
-        public static async Task<Guid> CreateSpaceAsync(Models.Space space, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<Space> CreateSpaceAsync(Models.Space space, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-            //var spaceId = await Api.CreateSpaceAsync(httpClient, logger, space);
-            var spaceId = await Api.CreateAsync<Space>(httpClient, logger, space);
-            space.Id = spaceId; 
-            await RefreshCacheAsync(memoryCache, space, spaceId, true, Context.Space).ConfigureAwait(false);
+            space.Id = await Api.CreateAsync<Space>(httpClient, logger, space);
 
-            logger.LogInformation($"CreateSpace: {spaceId}");
-            return spaceId;
+            await RefreshCacheAsync(memoryCache, space, space.Id, true, Context.Space).ConfigureAwait(false);
+
+            logger.LogInformation($"CreateSpace: {space.Id}");
+            return space;
         }
 
         public static async Task UpdateSpaceAsync(Models.Space space, IMemoryCache memoryCache, ILogger logger)

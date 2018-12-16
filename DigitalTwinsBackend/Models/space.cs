@@ -70,11 +70,10 @@ namespace DigitalTwinsBackend.Models
 
                 if (oldValue != null)
                 {
-                    if (!Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (!FriendlyName.Equals(oldValue.FriendlyName)) changes.Add("FriendlyName", FriendlyName);
+                    if (Name!=null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
+                    if (FriendlyName != null && !FriendlyName.Equals(oldValue.FriendlyName)) changes.Add("FriendlyName", FriendlyName);
                     if (!TypeId.Equals(oldValue.TypeId)) changes.Add("TypeId", TypeId);
-                    if (ParentSpaceId != Guid.Empty)
-                        if (!ParentSpaceId.Equals(oldValue.ParentSpaceId)) changes.Add("ParentSpaceId", ParentSpaceId);
+                    if (ParentSpaceId != Guid.Empty && !ParentSpaceId.Equals(oldValue.ParentSpaceId)) changes.Add("ParentSpaceId", ParentSpaceId);
                     if (!SubTypeId.Equals(oldValue.SubTypeId)) changes.Add("SubTypeId", SubTypeId);
                     if (!StatusId.Equals(oldValue.StatusId)) changes.Add("StatusId", StatusId);
                 }

@@ -55,14 +55,13 @@ namespace DigitalTwinsBackend.Models
                 if (oldValue != null)
                 {
                     if (!DeviceId.Equals(oldValue.DeviceId)) changes.Add("DeviceId", DeviceId);
-                    if (!HardwareId.Equals(oldValue.HardwareId)) changes.Add("HardwareId", HardwareId);
+                    if (HardwareId != null && !HardwareId.Equals(oldValue.HardwareId)) changes.Add("HardwareId", HardwareId);
                     if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
                     if (!PollRate.Equals(oldValue.PollRate)) changes.Add("PollRate", PollRate);
                     if (!PortTypeId.Equals(oldValue.PortTypeId)) changes.Add("PortTypeId", PortTypeId);
                     if (!DataTypeId.Equals(oldValue.DataTypeId)) changes.Add("DataTypeId", DataTypeId);
                     if (!DataUnitTypeId.Equals(oldValue.DataUnitTypeId)) changes.Add("DataUnitTypeId", DataUnitTypeId);
                     if (!DataSubTypeId.Equals(oldValue.DataSubTypeId)) changes.Add("DataSubTypeId", DataSubTypeId);
-                    if (!Value.Equals(oldValue.Value)) changes.Add("Value", Value);
                 }
                 else
                 {
@@ -74,7 +73,6 @@ namespace DigitalTwinsBackend.Models
                     changes.Add("DataTypeId", DataTypeId);
                     changes.Add("DataUnitTypeId", DataUnitTypeId);
                     changes.Add("DataSubTypeId", DataSubTypeId);
-                    changes.Add("Value", Value);
                 }
             }
             return changes;

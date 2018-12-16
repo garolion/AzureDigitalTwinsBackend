@@ -53,8 +53,8 @@ namespace DigitalTwinsBackend.Models
 
                 if (oldValue != null)
                 {
-                    if (!Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (!HardwareId.Equals(oldValue.HardwareId)) changes.Add("HardwareId", HardwareId);
+                    if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
+                    if (HardwareId != null && !HardwareId.Equals(oldValue.HardwareId)) changes.Add("HardwareId", HardwareId);
                     if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
                     if (!TypeId.Equals(oldValue.TypeId)) changes.Add("TypeId", TypeId);
                     if (!SubTypeId.Equals(oldValue.SubTypeId)) changes.Add("SubTypeId", SubTypeId);

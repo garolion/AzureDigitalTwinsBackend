@@ -93,16 +93,16 @@ namespace DigitalTwinsBackend.Controllers
 
                 try
                 {
-                    var id = await DigitalTwinsHelper.CreateSpaceAsync(space, _cache, Loggers.SilentLogger);
+                    var spaceResult = await DigitalTwinsHelper.CreateSpaceAsync(space, _cache, Loggers.SilentLogger);
 
                     switch (createButton)
                     {
                         case "Save & Next":
                             return RedirectToAction(nameof(Create));
                         case "Save & Continue":
-                            if (id != Guid.Empty)
+                            if (spaceResult.Id != Guid.Empty)
                             {
-                                return RedirectToAction(nameof(Edit), new { id = id });
+                                return RedirectToAction(nameof(Edit), new { id = spaceResult.Id });
                             }
                             else
                             {

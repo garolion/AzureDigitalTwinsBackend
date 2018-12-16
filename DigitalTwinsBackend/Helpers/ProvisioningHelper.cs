@@ -206,4 +206,10 @@ namespace DigitalTwinsBackend.Models
         //        Matchers = matchers,
         //    };
     }
+
+    public class ProvisionedSpace
+    {
+        public Space Space { get; set; }
+        public string MarginLeft { get; set; }
+    }
 }

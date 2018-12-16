@@ -20,7 +20,7 @@ namespace DigitalTwinsBackend.ViewModels
         public List<Space> SpaceList { get; set; }
         public List<string> Messages { get; set; }
 
-        public IEnumerable<Space> CreatedSpaces { get; set; }
+        public IEnumerable<ProvisionedSpace> CreatedSpaces { get; set; }
 
         public ProvisionViewModel() { }
         public ProvisionViewModel(IMemoryCache memoryCache)

@@ -27,7 +27,6 @@ namespace DigitalTwinsBackend.Models
 
             createFields.Add("Name", Name);
             createFields.Add("SpaceId", SpaceId);
-            // should be upgraded to call Conditions.ToCreate()
             createFields.Add("Conditions", Conditions);
 
             return createFields;
@@ -41,13 +40,11 @@ namespace DigitalTwinsBackend.Models
             if (Id != Guid.Empty)
             {
                 oldValue = CacheHelper.GetMatcherFromCache(memoryCache, Id);
-                //changes.Add("Id", Id);
 
                 if (oldValue != null)
                 {
-                    if (!Name.Equals(oldValue.Name)) changes.Add("Name", Name);
+                    if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
                     if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    // should be upgraded to call Conditions.ToUpdate()
                     if (!Conditions.Equals(oldValue.Conditions)) changes.Add("Conditions", Conditions);
                 }
                 else

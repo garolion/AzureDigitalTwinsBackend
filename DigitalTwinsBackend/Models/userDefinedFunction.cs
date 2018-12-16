@@ -44,7 +44,7 @@ namespace DigitalTwinsBackend.Models
 
                 if (oldValue != null)
                 {
-                    if (!Name.Equals(oldValue.Name)) changes.Add("Name", Name);
+                    if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
                     if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
                     if (!Matchers.Equals(oldValue.Matchers)) changes.Add("Matchers", Matchers);
                 }
