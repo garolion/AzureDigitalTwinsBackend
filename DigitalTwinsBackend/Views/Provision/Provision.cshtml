@@ -17,66 +17,69 @@
         {
             foreach (var createdSpace in Model.CreatedSpaces)
             {
-                <div style="margin-left:@createdSpace.MarginLeft" class="spaceEncart">
-                    <h4>Space</h4>
-                    <div class="label-group">
-                        <label class="label-field">Id</label>
-                        <label class="label-value">@createdSpace.Space.Id</label>
-                    </div>
-                    <div class="label-group">
-                        <label class="label-field">Name</label>
-                        <label class="label-value">@createdSpace.Space.Name</label>
-                    </div>
-                    <div class="label-group">
-                        <label class="label-field">Type</label>
-                        <label class="label-value">@createdSpace.Space.Type</label>
-                    </div>
-                    @if (createdSpace.Space.Devices != null)
+        <div style="margin-left:@createdSpace.MarginLeft" class="spaceEncart">
+            <h4>Space</h4>
+            <div class="label-group">
+                <label class="label-field">Id</label>
+                <label class="label-value">@createdSpace.Space.Id</label>
+            </div>
+            <div class="label-group">
+                <label class="label-field">Name</label>
+                <label class="label-value">@createdSpace.Space.Name</label>
+            </div>
+            <div class="label-group">
+                <label class="label-field">Type</label>
+                <label class="label-value">@createdSpace.Space.Type</label>
+            </div>
+            <div class="label-group">
+                <a asp-controller="Spaces" asp-action="Details" asp-route-id="@createdSpace.Space.Id" class="ButtonDetails">Details</a>
+            </div>
+                @if (createdSpace.Space.Devices != null)
+                {
+                    foreach (var device in createdSpace.Space.Devices)
                     {
-                        foreach (var device in createdSpace.Space.Devices)
-                        {
-                            <div class="deviceEncart">
-                                <h4>Device</h4>
-                                <div class="label-group">
-                                    <label class="label-field">Id</label>
-                                    <label class="label-value">@device.Id</label>
-                                </div>
-                                <div class="label-group">
-                                    <label class="label-field">Hardware Id</label>
-                                    <label class="label-value">@device.HardwareId</label>
-                                </div>
-                                <div class="label-group">
-                                    <label class="label-field">Connection String</label>
-                                    <label class="label-value">@device.ConnectionString</label>
-                                </div>
+                        <div class="deviceEncart">
+                            <h4>Device</h4>
+                            <div class="label-group">
+                                <label class="label-field">Id</label>
+                                <label class="label-value">@device.Id</label>
                             </div>
-                        }
+                            <div class="label-group">
+                                <label class="label-field">Hardware Id</label>
+                                <label class="label-value">@device.HardwareId</label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Connection String</label>
+                                <label class="label-value">@device.ConnectionString</label>
+                            </div>
+                        </div>
                     }
-                    @if (createdSpace.Space.Sensors != null)
+                }
+                @if (createdSpace.Space.Sensors != null)
+                {
+                    foreach (var sensor in createdSpace.Space.Sensors)
                     {
-                        foreach (var sensor in createdSpace.Space.Sensors)
-                        {
-                            <div class="sensorEncart">
-                                <h4>Sensor</h4>
-                                <div class="label-group">
-                                    <label class="label-field">Id</label>
-                                    <label class="label-value">@sensor.Id</label>
-                                </div>
-                                <div class="label-group">
-                                    <label class="label-field">Hardware Id</label>
-                                    <label class="label-value">@sensor.HardwareId</label>
-                                </div>
-                                <div class="label-group">
-                                    <label class="label-field">Data Type</label>
-                                    <label class="label-value">@sensor.DataType</label>
-                                </div>
+                        <div class="sensorEncart">
+                            <h4>Sensor</h4>
+                            <div class="label-group">
+                                <label class="label-field">Id</label>
+                                <label class="label-value">@sensor.Id</label>
                             </div>
-                        }
+                            <div class="label-group">
+                                <label class="label-field">Hardware Id</label>
+                                <label class="label-value">@sensor.HardwareId</label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Data Type</label>
+                                <label class="label-value">@sensor.DataType</label>
+                            </div>
+                        </div>
                     }
-                </div>
+                }
+            </div>
             }
-         }
-    </div>
+            }
+        </div>
 </div>
 
 <div class="row">
