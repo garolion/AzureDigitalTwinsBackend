@@ -5,16 +5,20 @@ using DigitalTwinsBackend.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DigitalTwinsBackend.Models
 {
     public class Space : BaseModel
     {
         public string Name { get; set; }
+        [Display(Name = "Friendy Name")]
         public string FriendlyName { get; set; }
         public string Type { get; set; }
         public int TypeId { get; set; }
+        [Display(Name = "Parent space")]
         public Guid ParentSpaceId { get; set; }
+        [Display(Name = "Sub Type")]
         public string SubType { get; set; }
         public int SubTypeId { get; set; }
         public string Status { get; set; }

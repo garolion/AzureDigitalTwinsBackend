@@ -5,6 +5,7 @@ using DigitalTwinsBackend.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DigitalTwinsBackend.Models
 {
@@ -12,6 +13,7 @@ namespace DigitalTwinsBackend.Models
     {
         public IEnumerable<Matcher> Matchers { get; set; }
         public string Name { get; set; }
+        [Display(Name = "Space Id")]
         public Guid SpaceId { get; set; }
 
         public override string Label { get { return Name; } }

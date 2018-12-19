@@ -5,20 +5,26 @@ using DigitalTwinsBackend.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DigitalTwinsBackend.Models
 {
     public class Device : BaseModel
     {
         public string Name { get; set; }
+        [Display(Name = "Hardware Id")]
         public string HardwareId { get; set; }
+        [Display(Name = "Space Id")]
         public Guid SpaceId { get; set; }
+        public Space Space { get; set; }
         public int TypeId { get; set; }
         public string Type { get; set; }
         public int SubTypeId { get; set; }
+        [Display(Name = "Sub Type")]
         public string SubType { get; set; }
         public string Status { get; set; }
         public string ConnectionString { get; set; }
+        public IEnumerable<Property> Properties { get; set; }
         public IEnumerable<Sensor> Sensors { get; set; }
 
         public override string Label { get { return Name; } }

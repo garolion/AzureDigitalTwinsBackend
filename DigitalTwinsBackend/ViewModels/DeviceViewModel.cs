@@ -24,7 +24,6 @@ namespace DigitalTwinsBackend.ViewModels
         public IEnumerable<Space> SpaceList { get; set; }
         public IEnumerable<Models.Type> DeviceTypeList { get; set; }
         public IEnumerable<Models.Type> DeviceSubTypeList { get; set; }
-               
 
         public DeviceViewModel() { }
         public DeviceViewModel(IMemoryCache memoryCache, Guid? id = null)

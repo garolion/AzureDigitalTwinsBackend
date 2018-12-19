@@ -2,16 +2,23 @@ using DigitalTwinsBackend.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DigitalTwinsBackend.Models
 {
     public class Sensor : BaseModel
     {
+        [Display(Name = "Device Id")]
         public Guid DeviceId { get; set; }
+        public Device Device { get; set; }
+        [Display(Name = "Hardware Id")]
         public string HardwareId { get; set; }
+        [Display(Name = "Poll rate")]
         public int PollRate { get; set; }
+        [Display(Name = "Space Id")]
         public Guid SpaceId { get; set; }
-
+        public Space Space { get; set; }
+        public IEnumerable<Property> Properties { get; set; }
         public string Type { get; set; }
         public int TypeId { get; set; }
 

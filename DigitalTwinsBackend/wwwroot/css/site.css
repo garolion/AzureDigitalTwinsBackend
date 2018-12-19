@@ -146,7 +146,10 @@ body {
 .ButtonNew,
 .ButtonDelete,
 .ButtonEdit,
-.ButtonDetails,
+.ButtonSpaceDetails,
+.ButtonDeviceDetails,
+.ButtonSensorDetails,
+.ButtonUDFDetails,
 .ButtonNavigate {
     display: inline-block;
     padding: 4px 8px;
@@ -176,8 +179,17 @@ body {
 .ButtonEdit {
     background-color: #267F00;
 }
-.ButtonDetails {
+.ButtonSpaceDetails {
     background-color: #FF8800;
+}
+.ButtonDeviceDetails {
+    background-color: #19D619;
+}
+.ButtonSensorDetails {
+    background-color: #1B1BF9;
+}
+.ButtonUDFDetails {
+    background-color: #CE5D12;
 }
 .ButtonDelete {
     background-color: red;

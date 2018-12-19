@@ -22,4 +22,10 @@
     <PackageReference Include="YamlDotNet" Version="5.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Device\Details.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -23,23 +23,20 @@ namespace DigitalTwinsBackend.Controllers
             _cache = memoryCache;
 
             _model = new DeviceViewModel();
-
-            //ViewData["Messages"] = CacheHelper.GetMessagesFromCache(_cache);
         }
 
-        // GET: Device
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET: Device/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid id)
         {
-            return View();
+            _model = new DeviceViewModel(_cache, id);
+
+            return View(_model);
         }
 
-        // GET: Device/Create
         public ActionResult Create(Guid spaceId)
         {
             _model = new DeviceViewModel(_cache);

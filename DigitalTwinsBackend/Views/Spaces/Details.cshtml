@@ -12,9 +12,13 @@
     <div class="col-md-8">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
+            <label asp-for="SelectedSpaceItem.Id" class="control-label"></label>
+            <input asp-for="SelectedSpaceItem.Id" class="form-control" disabled="disabled" />
+            <span asp-validation-for="SelectedSpaceItem.Id" class="text-danger"></span>
+        </div>
+        <div class="form-group">
             <label asp-for="SelectedSpaceItem.Name" class="control-label"></label>
             <input asp-for="SelectedSpaceItem.Name" class="form-control" disabled="disabled" />
-            @*<label asp-for="SelectedSpaceItem.Name" class="form-control" />*@
             <span asp-validation-for="SelectedSpaceItem.Name" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -43,10 +47,8 @@
             <span asp-validation-for="SelectedSpaceItem.Status" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <a asp-area="" asp-controller="Spaces" asp-action="Edit" asp-route-id="@Model.SelectedSpaceItem.Id">Edit Space</a>
+            <a asp-area="" asp-controller="Spaces" asp-action="Edit" asp-route-id="@Model.SelectedSpaceItem.Id" class="ButtonEdit">Edit Space</a>
         </div>
-
-
     </div>
 
     <div class="col-md-4">
@@ -146,8 +148,6 @@
             </tbody>
         </table>
     </div>
-
-
 </div>
 
 <div class="row">
@@ -156,12 +156,18 @@
         <div class="spaceEncart">
             <h3>Space</h3>
             <div class="label-group">
+                <label asp-for="SelectedSpaceItem.Parent.Id" class="label-field"></label>
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <label class="label-value">@Model.SelectedSpaceItem.Parent.Id</label>
+                    }
+                }
+            </div>
+            <div class="label-group">
                 <label asp-for="SelectedSpaceItem.Parent.Name" class="label-field"></label>
                 @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
                     {
                         <label class="label-value">@Model.SelectedSpaceItem.Parent.Name</label>
-
-                        @*<input asp-for="SelectedSpaceItem.Parent.Name" disabled="disabled" />*@
                     }
                 }
             </div>
@@ -197,18 +203,10 @@
                     }
                 }
             </div>
-            <div class="label-group">
-                <label asp-for="SelectedSpaceItem.Parent.Status" class="label-field"></label>
-                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
-                    {
-                        <label class="label-value">@Model.SelectedSpaceItem.Parent.Status</label>
-                    }
-                }
-            </div>
             <div class="form-group">
                 @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
                     {
-                        @Html.ActionLink("<== Navigate to Parent", "Details", new { id = Model.SelectedSpaceItem.ParentSpaceId }) <br />
+                        <a asp-action="Details" asp-route-id="@Model.SelectedSpaceItem.ParentSpaceId" class="ButtonSpaceDetails">Navigate to Parent</a>
                     }
                 }
             </div>
@@ -246,7 +244,7 @@
                     <label class="label-value">@child.Status</label>
                 </div>
                 <div class="form-group">
-                    @Html.ActionLink("==> Navigate to this Child", "Details", new { id = child.Id }) <br />
+                    <a asp-action="Details" asp-route-id="@child.Id" class="ButtonSpaceDetails">Navigate to this child</a>
                 </div>
             </div>
         }
@@ -281,7 +279,7 @@
                     <label class="label-value">@device.Status</label>
                 </div>
                 <div class="form-group">
-                    <a asp-area="" asp-controller="Devices" asp-action="Details" asp-route-id="@device.Id">Details</a>
+                    <a asp-controller="Device" asp-action="Details" asp-route-id="@device.Id" class="ButtonDeviceDetails">Details</a>
                 </div>
             </div>
         }
@@ -310,7 +308,7 @@
                     <label class="label-value">@sensor.PortTypeId</label>
                 </div>
                 <div class="form-group">
-                    <a asp-area="" asp-controller="Sensors" asp-action="Details" asp-route-id="@sensor.Id">Details</a>
+                    <a asp-controller="Sensors" asp-action="Details" asp-route-id="@sensor.Id" class="ButtonSensorDetails">Details</a>
                 </div>
             </div>
         }
@@ -331,7 +329,7 @@
                     <label class="label-value">@udf.Name</label>
                 </div>
                 <div class="form-group">
-                    <a asp-area="" asp-controller="UDF" asp-action="Details" asp-route-id="@udf.Id">Details</a>
+                    <a asp-controller="UDF" asp-action="Details" asp-route-id="@udf.Id" class="ButtonUDFDetails">Details</a>
                 </div>
             </div>
         }

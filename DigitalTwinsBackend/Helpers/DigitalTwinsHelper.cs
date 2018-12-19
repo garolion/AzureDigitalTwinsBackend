@@ -546,7 +546,7 @@ namespace DigitalTwinsBackend.Helpers
                 // get space element from Digital Twins API
                 space = await Api.GetSpace(
                     httpClient, logger,
-                    spaceId, includes: "types,values,parent,childspaces,childspacestypes,properties,devices,sensors,users");
+                    spaceId, includes: "types,values,parent,parenttypes,childspaces,childspacestypes,properties,devices,sensors,users");
 
                 // Add the Space element in cache & refresh Space list in cache
                 await RefreshCacheAsync(memoryCache, space, spaceId, false, Context.Space).ConfigureAwait(false);
@@ -639,7 +639,7 @@ namespace DigitalTwinsBackend.Helpers
 
                 device = await Api.GetDevice(
                     httpClient, logger,
-                    deviceId, includes: "sensors, sensorsvalues, ConnectionString");
+                    deviceId, includes: "sensors,sensorstypes,sensorsvalues,ConnectionString,properties,space,spacetypes");
 
                 await RefreshCacheAsync(memoryCache, device, deviceId, false, Context.Device).ConfigureAwait(false);
             }
@@ -688,7 +688,7 @@ namespace DigitalTwinsBackend.Helpers
             if (sensor == null)
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-                sensor = await Api.GetSensor(httpClient, logger, id, includes: "value");
+                sensor = await Api.GetSensor(httpClient, logger, id, includes: "value,properties,space,spacetypes,types,device,devicetypes");
                 await RefreshCacheAsync(memoryCache, sensor, id, false, Context.Sensor).ConfigureAwait(false);
             }
 
@@ -834,7 +834,7 @@ namespace DigitalTwinsBackend.Helpers
 
                 types = await Api.GetTypes(
                     httpClient, logger,
-                    maxNumberToGet: 100, categories: listType.ToString());
+                    maxNumberToGet: 1000, categories: listType.ToString());
 
                 logger.LogInformation($"GetSpaceTypes: {JsonConvert.SerializeObject(types, Formatting.Indented)}");
 
