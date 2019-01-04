@@ -13,7 +13,7 @@ namespace DigitalTwinsBackend.Models
         public string Name { get; set; }
         public string SpaceId { get; set; }
         public IEnumerable<MatcherCondition> Conditions { get; set; }
-
+        public IEnumerable<UserDefinedFunction> UserDefinedFunctions { get; set; }
         public override string Label { get { return Name; } }
 
         public Matcher()
@@ -46,12 +46,14 @@ namespace DigitalTwinsBackend.Models
                     if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
                     if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
                     if (!Conditions.Equals(oldValue.Conditions)) changes.Add("Conditions", Conditions);
+                    if (!UserDefinedFunctions.Equals(oldValue.UserDefinedFunctions)) changes.Add("UserDefinedFunctions", UserDefinedFunctions);
                 }
                 else
                 {
                     changes.Add("Name", Name);
                     changes.Add("SpaceId", SpaceId);
                     changes.Add("Conditions", Conditions);
+                    changes.Add("UserDefinedFunctions", UserDefinedFunctions);
                 }
             }
             return changes;

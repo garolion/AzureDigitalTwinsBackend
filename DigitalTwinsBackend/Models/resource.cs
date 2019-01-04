@@ -15,7 +15,6 @@ namespace DigitalTwinsBackend.Models
         public bool IsExternallyCreated { get; set; }
         public string Status { get; set; }
         public DateTime LastUpdatedUtc { get; set; }
-        public ResourceProperties Properties { get; set; }
         public int InstanceNum { get; set; }
 
         public override string Label { get { return Id.ToString(); } }

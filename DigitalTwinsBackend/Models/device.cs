@@ -24,7 +24,6 @@ namespace DigitalTwinsBackend.Models
         public string SubType { get; set; }
         public string Status { get; set; }
         public string ConnectionString { get; set; }
-        public IEnumerable<Property> Properties { get; set; }
         public IEnumerable<Sensor> Sensors { get; set; }
 
         public override string Label { get { return Name; } }

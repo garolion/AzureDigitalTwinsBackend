@@ -16,7 +16,39 @@ namespace DigitalTwinsBackend.Helpers
 {
     public partial class Api
     {
-        public static async Task<bool> UpdateUserDefinedFunction(
+        public static async Task<bool> UpdateAsync<T>(IMemoryCache memoryCache, ILogger logger, T element) where T : BaseModel
+        {
+            bool updateWasASuccess = true;
+            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+
+            logger.LogInformation($"Updating {typeof(T).Name} with Id: {element.Id}");
+            var content = JsonConvert.SerializeObject(element.ToUpdate(memoryCache));
+
+            if (content.Length > 2)
+            {
+                var response = await httpClient.PatchAsync($"{typeof(T).Name.ToLower()}s/{element.Id}", new StringContent(content, Encoding.UTF8, "application/json"));
+                updateWasASuccess = await IsSuccessCall(response, logger);
+            }
+
+            if (updateWasASuccess & element.PropertiesHasChanged)
+            {
+                return await UpdatePropertyValuesAsync(memoryCache, logger, element);
+            }
+            return false;
+        }
+
+        public static async Task<bool> UpdatePropertyValuesAsync<T>(IMemoryCache memoryCache, ILogger logger, T element) where T : BaseModel
+        {
+            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+
+            logger.LogInformation($"Adding properties for {typeof(T).Name} with Id: {element.Id}");
+            var content = JsonConvert.SerializeObject(element.Properties);
+            var response = await httpClient.PutAsync($"{typeof(T).Name.ToLower()}s/{element.Id}/properties", new StringContent(content, Encoding.UTF8, "application/json"));
+
+            return await IsSuccessCall(response, logger);
+        }
+
+        public static async Task<bool> UpdateUserDefinedFunctionAsync(
             IMemoryCache memoryCache,
             ILogger logger,
             Models.UserDefinedFunction userDefinedFunction,
@@ -38,59 +70,5 @@ namespace DigitalTwinsBackend.Helpers
 
             return await IsSuccessCall(response, logger);
         }
-
-        public static async Task<bool> UpdateAsync<T>(IMemoryCache memoryCache, ILogger logger, T element) where T : BaseModel
-        {
-            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-
-            logger.LogInformation($"Updating {typeof(T).Name} with Id: {element.Id}");
-            var content = JsonConvert.SerializeObject(element.ToUpdate(memoryCache));
-            var response = await httpClient.PatchAsync($"{typeof(T).Name.ToLower()}s/{element.Id}", new StringContent(content, Encoding.UTF8, "application/json"));
-
-            return await IsSuccessCall(response, logger);
-        }
-               
-
-        //public static async Task<bool> UpdateSpaceAsync(
-        //    IMemoryCache memoryCache,
-        //    ILogger logger,
-        //    Models.Space space)
-        //{
-        //    var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-
-        //    logger.LogInformation($"Updating Space with Id: {space.Id}");
-        //    var content = JsonConvert.SerializeObject(space.ToUpdate(memoryCache));
-        //    var response = await httpClient.PatchAsync($"spaces/{space.Id}", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    return await IsSuccessCall(response, logger);
-        //}
-
-        //public static async Task<bool> UpdateDeviceAsync(
-        //    IMemoryCache memoryCache,
-        //    ILogger logger,
-        //    Models.Device device)
-        //{
-        //    var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-
-        //    logger.LogInformation($"Updating Device with Id: {device.Id}");
-        //    var content = JsonConvert.SerializeObject(device);
-        //    var response = await httpClient.PatchAsync($"devices/{device.Id}", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    return await IsSuccessCall(response, logger);
-        //}
-
-        //public static async Task<bool> UpdateSensorAsync(
-        //    IMemoryCache memoryCache,
-        //    ILogger logger,
-        //    Models.Sensor sensor)
-        //{
-        //    var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-
-        //    logger.LogInformation($"Updating Sensor with Id: {sensor.Id}");
-        //    var content = JsonConvert.SerializeObject(sensor);
-        //    var response = await httpClient.PatchAsync($"sensors/{sensor.Id}", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    return await IsSuccessCall(response, logger);
-        //}
     }
 }

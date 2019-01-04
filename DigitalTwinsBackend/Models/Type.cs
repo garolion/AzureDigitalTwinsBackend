@@ -9,7 +9,7 @@ namespace DigitalTwinsBackend.Models
     {
         DeviceType,
         DeviceSubtype,
-        DeviceBlobtype,
+        DeviceBlobType,
         DeviceBlobSubtype,
         SensorDataType,
         SensorDataSubtype,

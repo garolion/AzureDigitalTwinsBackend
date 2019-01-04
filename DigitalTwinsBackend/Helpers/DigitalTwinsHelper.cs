@@ -117,7 +117,7 @@ namespace DigitalTwinsBackend.Helpers
 
                     var devices = description.devices != null
                         ? await CreateDevices(memoryCache, logger, description.devices, space.Id)
-                        : Array.Empty<Models.Device>();
+                        : Array.Empty<Device>();
 
                     if (description.matchers != null)
                         await CreateMatchers(memoryCache, logger, description.matchers, space.Id);
@@ -129,7 +129,7 @@ namespace DigitalTwinsBackend.Helpers
                         await CreateRoleAssignments(memoryCache, logger, description.roleassignments, space.Id);
 
                     var childSpacesResults = description.spaces != null
-                        ? await CreateSpaces(memoryCache, logger, description.spaces, udfFiles, space.Id, level+1)
+                        ? await CreateSpaces(memoryCache, logger, description.spaces, udfFiles, space.Id, level + 1)
                         : Array.Empty<ProvisionedSpace>();
 
                     var sensors = await Api.FindSensorsOfSpace(httpClient, logger, space.Id);
@@ -157,7 +157,7 @@ namespace DigitalTwinsBackend.Helpers
             //spaceResults.Reverse();
             return spaceResults;
         }
-        
+
         private static async Task CreateResources(
             IMemoryCache memoryCache,
             ILogger logger,
@@ -228,7 +228,7 @@ namespace DigitalTwinsBackend.Helpers
                 await CreateOrPatchSensorAsync(memoryCache, logger, deviceId, description.ToSensor(deviceId));
             }
         }
-                              
+
         private static async Task CreateMatchers(
             IMemoryCache memoryCache,
             ILogger logger,
@@ -357,7 +357,7 @@ namespace DigitalTwinsBackend.Helpers
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             var existingSpace = await Api.FindSpace(httpClient, logger, spaceToCreateOrPatch.Name, parentId);
-            
+
             if (existingSpace != null)
             {
                 await FeedbackHelper.Channel.SendMessageAsync($"Updating the space {existingSpace.Id} that already exist.", MessageType.Info);
@@ -423,7 +423,7 @@ namespace DigitalTwinsBackend.Helpers
             {
                 await FeedbackHelper.Channel.SendMessageAsync($"Updating the matcher {existingMatcher.Id} that already exist.", MessageType.Info);
 
-                foreach(var condition in matcherToCreateOrPatch.Conditions)
+                foreach (var condition in matcherToCreateOrPatch.Conditions)
                 {
                     var existingCondition = existingMatcher.Conditions.FirstOrDefault(c => c.Target.Equals(condition.Target));
                     if (existingCondition != null)
@@ -458,7 +458,7 @@ namespace DigitalTwinsBackend.Helpers
             {
                 await FeedbackHelper.Channel.SendMessageAsync($"Updating the UserDefinedFunction {existingUserDefinedFunction.Id} that already exist.", MessageType.Info);
 
-                await Api.UpdateUserDefinedFunction(
+                await Api.UpdateUserDefinedFunctionAsync(
                     memoryCache,
                     logger,
                     existingUserDefinedFunction,
@@ -476,7 +476,7 @@ namespace DigitalTwinsBackend.Helpers
         #endregion
 
         #region Space management
-        public static async Task<IEnumerable<Models.Space>> SearchSpacesAsync(IMemoryCache memoryCache, ILogger logger, String searchString, int typeId = -1)
+        public static async Task<IEnumerable<Space>> SearchSpacesAsync(IMemoryCache memoryCache, ILogger logger, String searchString, int typeId = -1)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
@@ -484,12 +484,12 @@ namespace DigitalTwinsBackend.Helpers
         }
 
 
-        public static async Task<IEnumerable<Models.Space>> GetSpacesAsync(IMemoryCache memoryCache, ILogger logger)
+        public static async Task<IEnumerable<Space>> GetSpacesAsync(IMemoryCache memoryCache, ILogger logger)
         {
             return await GetSpacesAsync(memoryCache, logger, false);
         }
 
-        private static async Task<IEnumerable<Models.Space>> GetSpacesAsync(IMemoryCache memoryCache, ILogger logger, bool bypassCache)
+        private static async Task<IEnumerable<Space>> GetSpacesAsync(IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
             IEnumerable<Space> spaces = null;
 
@@ -513,7 +513,7 @@ namespace DigitalTwinsBackend.Helpers
             return spaces;
         }
 
-        public static async Task<IEnumerable<Models.Space>> GetRootSpacesAsync(IMemoryCache memoryCache, ILogger logger)
+        public static async Task<IEnumerable<Space>> GetRootSpacesAsync(IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
@@ -528,7 +528,7 @@ namespace DigitalTwinsBackend.Helpers
             return spaces;
         }
 
-        public static async Task<Models.Space> GetSpaceAsync(Guid spaceId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
+        public static async Task<Space> GetSpaceAsync(Guid spaceId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
             Space space = null;
 
@@ -556,7 +556,7 @@ namespace DigitalTwinsBackend.Helpers
             return space;
         }
 
-        public static async Task<Space> CreateSpaceAsync(Models.Space space, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<Space> CreateSpaceAsync(Space space, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             space.Id = await Api.CreateAsync<Space>(httpClient, logger, space);
@@ -567,7 +567,7 @@ namespace DigitalTwinsBackend.Helpers
             return space;
         }
 
-        public static async Task UpdateSpaceAsync(Models.Space space, IMemoryCache memoryCache, ILogger logger)
+        public static async Task UpdateSpaceAsync(Space space, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             if (await Api.UpdateAsync<Space>(memoryCache, logger, space))
@@ -577,7 +577,7 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<bool> DeleteSpaceAsync(Models.Space space, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<bool> DeleteSpaceAsync(Space space, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             if (await Api.DeleteAsync<Space>(httpClient, logger, space))
@@ -625,7 +625,7 @@ namespace DigitalTwinsBackend.Helpers
         }
 
 
-        public static async Task<Models.Device> GetDeviceAsync(Guid deviceId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
+        public static async Task<Device> GetDeviceAsync(Guid deviceId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
             Device device = null;
             if (!bypassCache)
@@ -660,7 +660,7 @@ namespace DigitalTwinsBackend.Helpers
             return device;
         }
 
-        public static async Task UpdateDeviceAsync(Models.Device device, IMemoryCache memoryCache, ILogger logger)
+        public static async Task UpdateDeviceAsync(Device device, IMemoryCache memoryCache, ILogger logger)
         {
             await Api.UpdateAsync<Device>(memoryCache, logger, device);
             await RefreshCacheAsync(memoryCache, device, device.Id, true, Context.Device).ConfigureAwait(false);
@@ -668,7 +668,7 @@ namespace DigitalTwinsBackend.Helpers
             logger.LogInformation($"UpdateDevice: {device.Id}");
         }
 
-        public static async Task DeleteDeviceAsync(Models.Device device, IMemoryCache memoryCache, ILogger logger)
+        public static async Task DeleteDeviceAsync(Device device, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             await Api.DeleteAsync<Device>(httpClient, logger, device);
@@ -677,7 +677,7 @@ namespace DigitalTwinsBackend.Helpers
             logger.LogInformation($"DeleteDevice: {device.Id}");
         }
 
-        public static async Task<Models.Sensor> GetSensorAsync(Guid id, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
+        public static async Task<Sensor> GetSensorAsync(Guid id, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
             Sensor sensor = null;
             if (!bypassCache)
@@ -696,7 +696,7 @@ namespace DigitalTwinsBackend.Helpers
             return sensor;
         }
 
-        public static async Task<Guid> CreateSensorAsync(Models.Sensor sensor, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<Guid> CreateSensorAsync(Sensor sensor, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             var sensorId = await Api.CreateAsync<Sensor>(httpClient, logger, sensor);
@@ -707,7 +707,7 @@ namespace DigitalTwinsBackend.Helpers
             logger.LogInformation($"CreateSensor: {sensorId}");
             return sensorId;
         }
-        public static async Task UpdateSensorAsync(Models.Sensor sensor, IMemoryCache memoryCache, ILogger logger)
+        public static async Task UpdateSensorAsync(Sensor sensor, IMemoryCache memoryCache, ILogger logger)
         {
             await Api.UpdateAsync<Sensor>(memoryCache, logger, sensor);
             await RefreshCacheAsync(memoryCache, sensor, sensor.Id, true, Context.Device).ConfigureAwait(false);
@@ -715,7 +715,7 @@ namespace DigitalTwinsBackend.Helpers
             logger.LogInformation($"UpdateSensor: {sensor.Id}");
         }
 
-        public static async Task DeleteSensorAsync(Models.Sensor sensor, IMemoryCache memoryCache, ILogger logger)
+        public static async Task DeleteSensorAsync(Sensor sensor, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             await Api.DeleteAsync<Sensor>(httpClient, logger, sensor);
@@ -726,9 +726,9 @@ namespace DigitalTwinsBackend.Helpers
 
 
         #region Matcher & UDF management
-        public static async Task<IEnumerable<Models.Matcher>> GetMatchersBySpaceId(Guid spaceId, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<IEnumerable<Matcher>> GetMatchersBySpaceId(Guid spaceId, IMemoryCache memoryCache, ILogger logger)
         {
-            IEnumerable<Models.Matcher> matchers = CacheHelper.GetMatchersFromCache(memoryCache, Context.Matcher, spaceId);
+            IEnumerable<Matcher> matchers = CacheHelper.GetMatchersFromCache(memoryCache, Context.Matcher, spaceId);
 
             if (matchers == null)
             {
@@ -746,7 +746,7 @@ namespace DigitalTwinsBackend.Helpers
             return matchers;
         }
 
-        public static async Task<Guid> CreateMatcherAsync(Models.Matcher matcher, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<Guid> CreateMatcherAsync(Matcher matcher, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             var matcherId = await Api.CreateAsync<Matcher>(httpClient, logger, matcher);
@@ -757,7 +757,7 @@ namespace DigitalTwinsBackend.Helpers
             return matcherId;
         }
 
-        public static async Task UpdateMatcherAsync(Models.Matcher matcher, IMemoryCache memoryCache, ILogger logger)
+        public static async Task UpdateMatcherAsync(Matcher matcher, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             if (await Api.UpdateAsync<Matcher>(memoryCache, logger, matcher))
@@ -767,7 +767,7 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<bool> DeleteMatcherAsync(Models.Matcher matcher, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<bool> DeleteMatcherAsync(Matcher matcher, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             if (await Api.DeleteAsync<Matcher>(httpClient, logger, matcher))
@@ -782,7 +782,7 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<IEnumerable<Models.UserDefinedFunction>> GetUDFsBySpaceId(Guid spaceId, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<IEnumerable<UserDefinedFunction>> GetUDFsBySpaceId(Guid spaceId, IMemoryCache memoryCache, ILogger logger)
         {
             var userDefinedFunctions = CacheHelper.GetUDFsFromCache(memoryCache, Context.UDF, spaceId);
 
@@ -824,7 +824,7 @@ namespace DigitalTwinsBackend.Helpers
         }
         #endregion
 
-        public static async Task<IEnumerable<Models.Type>> GetTypesAsync(Models.Types listType, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<IEnumerable<Models.Type>> GetTypesAsync(Types listType, IMemoryCache memoryCache, ILogger logger)
         {
             IEnumerable<Models.Type> types = CacheHelper.GetTypeListFromCache(listType, memoryCache);
 
@@ -844,7 +844,7 @@ namespace DigitalTwinsBackend.Helpers
             return types;
         }
 
-        public static async Task<List<Models.Ontology>> GetOntologiesWithTypes(IMemoryCache memoryCache, ILogger logger)
+        public static async Task<List<Ontology>> GetOntologiesWithTypes(IMemoryCache memoryCache, ILogger logger)
         {
             var cache = CacheHelper.GetOntologyListFromCache(memoryCache);
             List<Ontology> ontologies;
@@ -855,7 +855,7 @@ namespace DigitalTwinsBackend.Helpers
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
                 var _ontologies = await Api.GetOntologies(httpClient, logger);
-                for (int i=0; i< _ontologies.Count(); i++)
+                for (int i = 0; i < _ontologies.Count(); i++)
                 {
                     var item = await Api.GetOntologyWithTypes(httpClient, logger, _ontologies.ElementAt(i).Id);
                     ontologies.Add(item);
@@ -871,6 +871,14 @@ namespace DigitalTwinsBackend.Helpers
             }
 
             return ontologies;
+        }
+
+        public static async Task<IEnumerable<PropertyKey>> GetPropertyKeysForSpace(Guid spaceId, IMemoryCache memoryCache, ILogger logger)
+        {
+            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+            var propertyKeys = await Api.FindPropertyKeys(spaceId, httpClient, logger, Scope.Spaces);
+            logger.LogInformation($"GetPropertyKeysForSpace: {JsonConvert.SerializeObject(propertyKeys, Formatting.Indented)}");
+            return propertyKeys;
         }
     }
 }

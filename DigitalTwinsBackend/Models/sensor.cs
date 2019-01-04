@@ -18,7 +18,6 @@ namespace DigitalTwinsBackend.Models
         [Display(Name = "Space Id")]
         public Guid SpaceId { get; set; }
         public Space Space { get; set; }
-        public IEnumerable<Property> Properties { get; set; }
         public string Type { get; set; }
         public int TypeId { get; set; }
 
@@ -37,7 +36,7 @@ namespace DigitalTwinsBackend.Models
         public SpaceValue Value { get; set; }
 
         public override string Label { get { return HardwareId; } }
-
+               
         public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();

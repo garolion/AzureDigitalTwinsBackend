@@ -24,7 +24,6 @@ namespace DigitalTwinsBackend.Models
         public string Status { get; set; }
         public int StatusId { get; set; }
         public Space Parent { get; set; }
-        public IEnumerable<Property> Properties { get; set; }
         public IEnumerable<Space> Children { get; set; }
         public IEnumerable<string> SpacePaths { get; set; }
         public IEnumerable<SpaceValue> Values { get; set; }
@@ -37,7 +36,7 @@ namespace DigitalTwinsBackend.Models
 
         public Space()
         {
-            Properties = new List<Property>();
+            //Properties = new List<Property>();
             Children = new List<Space>();
             SpacePaths = new List<string>();
             Values = new List<SpaceValue>();

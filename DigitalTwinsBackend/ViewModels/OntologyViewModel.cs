@@ -40,20 +40,26 @@ namespace DigitalTwinsBackend.ViewModels
                 FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
             }
         }
-        private async Task LoadAsync(Models.Types? systemTypes)
+        private async Task LoadAsync(Models.Types? filterType)
         {
             List<Ontology> ontologies = await DigitalTwinsHelper.GetOntologiesWithTypes(_cache, Loggers.SilentLogger);
-
-            List<Ontology> list = new List<Ontology>();
+            List<Ontology> filteredOntologies = new List<Ontology>();
             Ontology ontology;
 
             foreach (Ontology item in ontologies)
             {
                 ontology = new Ontology() { Id = item.Id, Name = item.Name, Loaded = item.Loaded };
-                ontology.types = item.types.FindAll(t => t.Category.Equals(systemTypes.ToString()));
-                list.Add(ontology);
+                if (filterType != null)
+                {
+                    ontology.types = item.types.FindAll(t => t.Category.Equals(filterType.ToString()));
+                }
+                else
+                {
+                    ontology.types = item.types;
+                }
+                filteredOntologies.Add(ontology);
             }
-            OntologyList = list;
+            OntologyList = filteredOntologies;
         }
     }
 }

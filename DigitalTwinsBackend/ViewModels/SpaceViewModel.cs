@@ -20,15 +20,16 @@ namespace DigitalTwinsBackend.ViewModels
     {
         private IMemoryCache _cache;
         private AuthenticationHelper _auth;
-
         public Space SelectedSpaceItem { get; set; }
         public List<Space> SpaceList { get; set; }
         public IEnumerable<Models.Type> SpaceTypeList { get; set; }
         public IEnumerable<Models.Type> SpaceSubTypeList { get; set; }
         public IEnumerable<Models.Type> SpaceStatusList { get; set; }
         public IEnumerable<UserDefinedFunction> UDFList { get; set; }
+        public IEnumerable<PropertyKey> AvailableProperties { get; set; }
 
         public SpaceViewModel() { }
+
         public SpaceViewModel(IMemoryCache memoryCache, Guid? id = null)
         {
             _cache = memoryCache;
@@ -67,6 +68,8 @@ namespace DigitalTwinsBackend.ViewModels
             {
                 this.SelectedSpaceItem = await DigitalTwinsHelper.GetSpaceAsync((Guid)id, _cache, Loggers.SilentLogger, false);
                 this.UDFList = await DigitalTwinsHelper.GetUDFsBySpaceId((Guid)id, _cache, Loggers.SilentLogger);
+
+                this.AvailableProperties = await DigitalTwinsHelper.GetPropertyKeysForSpace((Guid)id, _cache, Loggers.SilentLogger);
             }
         }
     }

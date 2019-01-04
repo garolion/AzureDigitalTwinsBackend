@@ -70,25 +70,6 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<IEnumerable<Models.PropertyKey>> GetPropertyKeysBySpace(
-            Guid spaceId,
-            HttpClient httpClient,
-            ILogger logger)
-        {
-            var response = await httpClient.GetAsync($"propertykeys?spaceId={spaceId}&traverse=Up");
-            if (await IsSuccessCall(response, logger))
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                var propertyKeys = JsonConvert.DeserializeObject<IEnumerable<Models.PropertyKey>>(content);
-                logger.LogInformation($"Retrieved PropertyKeys: {JsonConvert.SerializeObject(propertyKeys, Formatting.Indented)}");
-                return propertyKeys;
-            }
-            else
-            {
-                return Array.Empty<Models.PropertyKey>();
-            }
-        }
-
         public static async Task<Models.Resource> GetResource(
             HttpClient httpClient,
             ILogger logger,

@@ -142,6 +142,8 @@ namespace DigitalTwinsBackend.Controllers
 
             try
             {
+                space.Properties.Add(new Property() { Name = "capacity", Value = "20", DataType="int" });
+
                 await DigitalTwinsHelper.UpdateSpaceAsync(space, _cache, Loggers.SilentLogger);
                 return RedirectToAction(nameof(List));
             }

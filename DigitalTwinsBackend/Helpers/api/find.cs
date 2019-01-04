@@ -44,65 +44,6 @@ namespace DigitalTwinsBackend.Helpers
             return default(T);
         }
 
-
-
-
-        // Returns a device with same hardwareId and spaceId if there is exactly one.
-        // Otherwise returns null.
-        //public static async Task<Models.Device> FindDevice(
-        //    HttpClient httpClient,
-        //    ILogger logger,
-        //    string hardwareId,
-        //    Guid? spaceId,
-        //    string includes = null)
-        //{
-        //    var filterHardwareIds = $"hardwareIds={hardwareId}";
-        //    var filterSpaceId = spaceId != null ? $"&spaceId={spaceId.ToString()}" : "";
-        //    var includesParam = includes != null ? $"&includes={includes}" : "";
-        //    var filter = $"{filterHardwareIds}{filterSpaceId}{includesParam}";
-
-        //    var response = await httpClient.GetAsync($"devices?{filter}");
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        var content = await response.Content.ReadAsStringAsync();
-        //        var devices = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.Device>>(content);
-        //        var matchingDevice = devices.SingleOrDefault();
-        //        if (matchingDevice != null)
-        //        {
-        //            logger.LogInformation($"Retrieved Unique Device using 'hardwareId' and 'spaceId': {JsonConvert.SerializeObject(matchingDevice, Formatting.Indented)}");
-        //            return matchingDevice;
-        //        }
-        //    }
-        //    return null;
-        //}
-
-        //public static async Task<Models.Sensor> FindSensor(
-        //    HttpClient httpClient,
-        //    ILogger logger,
-        //    string hardwareId,
-        //    Guid? deviceId,
-        //    string includes = null)
-        //{
-        //    var filterHardwareIds = $"hardwareIds={hardwareId}";
-        //    var filterDeviceId = deviceId != null ? $"&deviceIds={deviceId.ToString()}" : "";
-        //    var includesParam = includes != null ? $"&includes={includes}" : "";
-        //    var filter = $"{filterHardwareIds}{filterDeviceId}{includesParam}";
-
-        //    var response = await httpClient.GetAsync($"sensors?{filter}");
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        var content = await response.Content.ReadAsStringAsync();
-        //        var sensors = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.Sensor>>(content);
-        //        var matchingSensor = sensors.SingleOrDefault();
-        //        if (matchingSensor != null)
-        //        {
-        //            logger.LogInformation($"Retrieved Unique Sensor using 'hardwareId' and 'deviceId': {JsonConvert.SerializeObject(matchingSensor, Formatting.Indented)}");
-        //            return matchingSensor;
-        //        }
-        //    }
-        //    return null;
-        //}
-
         // Returns a matcher with same name and spaceId if there is exactly one.
         // Otherwise returns null.
         public static async Task<IEnumerable<Models.Matcher>> FindMatchers(
@@ -179,35 +120,8 @@ namespace DigitalTwinsBackend.Helpers
             return new List<Space>();
         }
 
-        // Returns a user defined fucntion with same name and spaceId if there is exactly one.
-        // Otherwise returns null.
-        //public static async Task<Models.UserDefinedFunction> FindUserDefinedFunction(
-        //    HttpClient httpClient,
-        //    ILogger logger,
-        //    string name,
-        //    Guid spaceId)
-        //{
-        //    var filterNames = $"names={name}";
-        //    var filterSpaceId = $"&spaceId={spaceId.ToString()}";
-        //    var filter = $"{filterNames}{filterSpaceId}";
-
-        //    var response = await httpClient.GetAsync($"userdefinedfunctions?{filter}&includes=matchers");
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        var content = await response.Content.ReadAsStringAsync();
-        //        var userDefinedFunctions = JsonConvert.DeserializeObject<IReadOnlyCollection<Models.UserDefinedFunction>>(content);
-        //        var userDefinedFunction = userDefinedFunctions.SingleOrDefault();
-        //        if (userDefinedFunction != null)
-        //        {
-        //            logger.LogInformation($"Retrieved Unique UserDefinedFunction using 'name' and 'spaceId': {JsonConvert.SerializeObject(userDefinedFunction, Formatting.Indented)}");
-        //            return userDefinedFunction;
-        //        }
-        //    }
-        //    return null;
-        //}
-
-
-        public static async Task<IEnumerable<Models.Sensor>> FindSensorsOfSpace(
+ 
+        public static async Task<IEnumerable<Sensor>> FindSensorsOfSpace(
             HttpClient httpClient,
             ILogger logger,
             Guid spaceId)
@@ -226,5 +140,27 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
+
+        public static async Task<IEnumerable<PropertyKey>> FindPropertyKeys(
+            Guid spaceId,
+            HttpClient httpClient,
+            ILogger logger,
+            Scope scope = Scope.None)
+        {
+            var scopeParam = scope != Scope.None ? $"&scope={scope}" : "";
+            var response = await httpClient.GetAsync($"propertykeys?spaceId={spaceId.ToString()}&includes=description&traverse=up{scopeParam}");
+
+            if (await IsSuccessCall(response, logger))
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var propertyKeys = JsonConvert.DeserializeObject<IEnumerable<PropertyKey>>(content);
+                logger.LogInformation($"Retrieved {propertyKeys.Count()} PropertyKeys");
+                return propertyKeys;
+            }
+            else
+            {
+                return Array.Empty<PropertyKey>();
+            }
+        }
     }
 }
