@@ -1,0 +1,188 @@
+﻿@model DigitalTwinsBackend.ViewModels.SpaceViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Space</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div>
+                <h3>Core Properties</h3>
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="SelectedSpaceItem.Id" type="hidden" />
+                <div class="form-group">
+                    <label asp-for="SelectedSpaceItem.Id" class="control-label"></label>
+                    <input asp-for="SelectedSpaceItem.Id" class="form-control" disabled="disabled" />
+                    <span asp-validation-for="SelectedSpaceItem.Id" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SelectedSpaceItem.Name" class="control-label"></label>
+                    <input asp-for="SelectedSpaceItem.Name" class="form-control" />
+                    <span asp-validation-for="SelectedSpaceItem.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SelectedSpaceItem.FriendlyName" class="control-label"></label>
+                    <input asp-for="SelectedSpaceItem.FriendlyName" class="form-control" />
+                    <span asp-validation-for="SelectedSpaceItem.FriendlyName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SelectedSpaceItem.ParentSpaceId" class="control-label"></label>
+                    <select asp-for="SelectedSpaceItem.ParentSpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList, "Id", "Name"))"></select>
+                    <span asp-validation-for="SelectedSpaceItem.ParentSpaceId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SelectedSpaceItem.Type" class="control-label"></label>
+                    <select asp-for="SelectedSpaceItem.Type" class="form-control" asp-items="@(new SelectList(Model.SpaceTypeList, "Name", "Name"))"></select>
+                    <span asp-validation-for="SelectedSpaceItem.Type" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SelectedSpaceItem.SubType" class="control-label"></label>
+                    <select asp-for="SelectedSpaceItem.SubType" class="form-control" asp-items="@(new SelectList(Model.SpaceSubTypeList, "Name", "Name"))"></select>
+                    <span asp-validation-for="SelectedSpaceItem.SubType" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SelectedSpaceItem.Status" class="control-label"></label>
+                    <select asp-for="SelectedSpaceItem.Status" class="form-control" asp-items="@(new SelectList(Model.SpaceStatusList, "Name", "Name"))"></select>
+                    <span asp-validation-for="SelectedSpaceItem.Status" class="text-danger"></span>
+                </div>
+            </div>
+            <div>
+                <hr />
+                <h3>Extended Properties</h3>
+                <hr />
+                <a asp-controller="PropertyKey" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Create a new Property</a>
+                <a asp-controller="PropertyKey" asp-action="Add" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add an existing Property</a>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                DataType
+                            </th>
+                            <th>
+                                Value
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.SelectedSpaceItem.Properties.Count; i++)
+                        {
+                            @Html.HiddenFor(m => Model.SelectedSpaceItem.Properties[i].Name)
+                            @Html.HiddenFor(m => Model.SelectedSpaceItem.Properties[i].DataType)
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(m => Model.SelectedSpaceItem.Properties[i].Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => Model.SelectedSpaceItem.Properties[i].DataType)
+                                </td>
+                                <td>
+                                    @if (Model.SelectedSpaceItem.Properties[i].DataType.Equals("bool"))
+                                    {
+                                        @Html.DropDownListFor(m => Model.SelectedSpaceItem.Properties[i].Value, new SelectList(new List<string>() { "true", "false" }))
+                                    }
+                                    else
+                                    {
+                                        @Html.TextBoxFor(m => Model.SelectedSpaceItem.Properties[i].Value)
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-controller="PropertyKey" 
+                                        asp-action="Remove" 
+                                        asp-route-spaceId="@Model.SelectedSpaceItem.Id" 
+                                        asp-route-name="@Model.SelectedSpaceItem.Properties[i].Name" 
+                                        class="ButtonDelete">Remove</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <hr />
+                <div class="form-group">
+                    <input type="submit" value="Save" class="ButtonEdit" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <h4>Blob</h4>
+        <a asp-controller="Blob" asp-action="Create" asp-route-parentid="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add File</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Blobs)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            <a asp-controller="Blob" asp-action="Edit" asp-route-blobId="@item.Id" class="ButtonEdit">Edit</a>
+                            <a asp-controller="Blob" asp-action="Delete" asp-route-blobId="@item.Id" class="ButtonDelete">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4">
+        <h4>Devices</h4>
+        <a asp-controller="Device" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add a new Device</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Hardware Id
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SelectedSpaceItem.Devices)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.HardwareId)
+                        </td>
+                        <td>
+                            <a asp-controller="Device" asp-action="Edit" asp-route-id="@item.Id" class="ButtonEdit">Edit</a>
+                            <a asp-controller="Device" asp-action="Delete" asp-route-id="@item.Id" class="ButtonDelete">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

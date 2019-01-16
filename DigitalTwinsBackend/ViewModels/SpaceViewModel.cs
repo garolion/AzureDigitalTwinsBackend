@@ -28,6 +28,8 @@ namespace DigitalTwinsBackend.ViewModels
         public IEnumerable<UserDefinedFunction> UDFList { get; set; }
         public IEnumerable<PropertyKey> AvailableProperties { get; set; }
 
+        public IEnumerable<BlobContent> Blobs { get; set; }
+
         public SpaceViewModel() { }
 
         public SpaceViewModel(IMemoryCache memoryCache, Guid? id = null)
@@ -68,7 +70,7 @@ namespace DigitalTwinsBackend.ViewModels
             {
                 this.SelectedSpaceItem = await DigitalTwinsHelper.GetSpaceAsync((Guid)id, _cache, Loggers.SilentLogger, false);
                 this.UDFList = await DigitalTwinsHelper.GetUDFsBySpaceId((Guid)id, _cache, Loggers.SilentLogger);
-
+                this.Blobs = await DigitalTwinsHelper.GetBlobsAsync((Guid)id, _cache, Loggers.SilentLogger, true);
                 this.AvailableProperties = await DigitalTwinsHelper.GetPropertyKeysForSpace((Guid)id, _cache, Loggers.SilentLogger);
             }
         }

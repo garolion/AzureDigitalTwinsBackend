@@ -135,7 +135,7 @@
             <div class="form-group">
                 @{ if (Model.SelectedDeviceItem.SpaceId != Guid.Empty)
                     {
-                        <a asp-controller="Spaces" asp-action="Details" asp-route-id="@Model.SelectedDeviceItem.SpaceId" class="ButtonSpaceDetails">Back to Space</a>
+                        <a asp-controller="Space" asp-action="Details" asp-route-id="@Model.SelectedDeviceItem.SpaceId" class="ButtonSpaceDetails">Back to Space</a>
                     }
                 }
             </div>
@@ -165,7 +165,7 @@
                     <label class="label-value">@sensor.PortTypeId</label>
                 </div>
                 <div class="form-group">
-                    <a asp-controller="Sensors" asp-action="Details" asp-route-id="@sensor.Id" class="ButtonSensorDetails">Details</a>
+                    <a asp-controller="Sensor" asp-action="Details" asp-route-id="@sensor.Id" class="ButtonSensorDetails">Details</a>
                 </div>
             </div>
         }

@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DigitalTwinsBackend.Models.PropertyKey>
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Select Properties to Add to the Space</h2>
+
+<h4>Property key</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Add" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @*<input asp-for="spaceId" type="hidden" />
+            <input asp-for="PropertyKeys" type="hidden" />
+            <input asp-for="Properties" type="hidden" />*@
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Add to space
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Description
+                        </th>
+                        <th>
+                            Data type
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @Html.EditorForModel()
+                    @*@foreach (var property in Model)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox" value="pk.Item2" />
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => property.PropertyName)
+                            </td>
+                        </tr>
+                    }
+                </tbody>*@
+            </table>
+
+            <div class="form-group">
+                <input type="submit" value="Add" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

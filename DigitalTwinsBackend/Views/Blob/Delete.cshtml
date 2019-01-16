@@ -1,0 +1,51 @@
+﻿@model DigitalTwinsBackend.ViewModels.BlobContentViewModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h4>Blob Content</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Delete" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="SelectedBlobContentItem.Id" type="hidden" />
+            <input asp-for="SelectedBlobContentItem.ParentId" type="hidden" />
+            <input asp-for="SelectedBlobContentItem.ParentType" type="hidden" />
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Id" class="control-label"></label>
+                <input asp-for="SelectedBlobContentItem.Id" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Name" class="control-label"></label>
+                <input asp-for="SelectedBlobContentItem.Name" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Description" class="control-label"></label>
+                <input asp-for="SelectedBlobContentItem.Description" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.ParentId" class="control-label"></label>
+                <input asp-for="SelectedBlobContentItem.ParentId" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Type" class="control-label"></label>
+                <select asp-for="SelectedBlobContentItem.Type" class="form-control" asp-items="@(new SelectList(Model.BlobContentTypeList,"Name","Name"))" disabled></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Subtype" class="control-label"></label>
+                <select asp-for="SelectedBlobContentItem.Subtype" class="form-control" asp-items="@(new SelectList(Model.BlobContentSubTypeList,"Name","Name"))" disabled></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Remove from Blob" class="ButtonDelete" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

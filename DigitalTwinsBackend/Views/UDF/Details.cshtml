@@ -11,24 +11,31 @@
     <h4>User Defined Function</h4>
     <hr />
     <div class="row">
-        <div>
-            <div class="form-group">
-                <label asp-for="UDF.Id" class="control-label"></label>
-                <input asp-for="UDF.Id" class="form-control" disabled="disabled" />
-            </div>
-            <div class="form-group">
-                <label asp-for="UDF.Name" class="control-label"></label>
-                <input asp-for="UDF.Name" class="form-control" disabled="disabled" />
-            </div>
-            <div class="form-group">
-                <label asp-for="UDF.SpaceId" class="control-label"></label>
-                <input asp-for="UDF.SpaceId" class="form-control" disabled="disabled" />
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" class="form-control" rows="25" cols="1"></textarea>
-            </div>
+        <div class="col-md-12">
+            <form asp-action="Details">
+                <input asp-for="UDF.Id" type="hidden" />                
+                <div class="form-group">
+                    <label asp-for="UDF.Id" class="control-label"></label>
+                    <input asp-for="UDF.Id" class="form-control" disabled="disabled" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="UDF.Name" class="control-label"></label>
+                    <input asp-for="UDF.Name" class="form-control" disabled="disabled" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="UDF.SpaceId" class="control-label"></label>
+                    <input asp-for="UDF.SpaceId" class="form-control" disabled="disabled" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Content" class="control-label"></label>
+                    <textarea asp-for="Content" class="form-control" rows="25" cols="1"></textarea>
+                </div>
+                <div class="form-group">
+                    <input name="updateButton" type="submit" value="Update Content" class="ButtonEdit" />
+                </div>
+            </form>
         </div>
+        
     </div>
 </div>
 
@@ -86,5 +93,5 @@
  </div>
 
 <div>
-    <a asp-controller="Spaces" asp-action="List">Back to List</a>
+    <a asp-controller="Space" asp-action="List">Back to List</a>
 </div>

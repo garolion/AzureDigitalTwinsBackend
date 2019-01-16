@@ -89,7 +89,7 @@ namespace DigitalTwinsBackend.Controllers
                             await FeedbackHelper.Channel.SendMessageAsync("No sensor defined to send data", MessageType.Info);
                         }
                     }
-                    else if (action.Equals("Cancel"))
+                    else if (action.Equals("Stop"))
                     {
                         await FeedbackHelper.Channel.SendMessageAsync("Stopping sending data...", MessageType.Info);
 

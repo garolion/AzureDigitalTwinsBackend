@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -15,6 +16,80 @@ namespace DigitalTwinsBackend.Helpers
 {
     public partial class Api
     {
+        public static async Task<T> GetAsync<T>(HttpClient httpClient, ILogger logger, object id, string includes) where T : BaseModel
+        {
+            string domain = typeof(T).Name.ToLower() + "s";
+            var includesParam = includes != null ? $"?includes={includes}" : "";
+
+            var response = await httpClient.GetAsync($"{domain}/{id}{includesParam}");
+            if (await IsSuccessCall(response, logger))
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var element = JsonConvert.DeserializeObject<T>(content);
+                logger.LogInformation($"Retrieved Element: {JsonConvert.SerializeObject(element, Formatting.Indented)}");
+                return element;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
+        public static async Task<IEnumerable<BlobContent>> GetBlobsAsync(
+            HttpClient httpClient,
+            ILogger logger,
+            Guid spaceId,
+            string includes = null)
+        {
+            var includesFilter = (includes != null ? $"includes={includes}" : "");
+            var spaceFilter = (includes != null ? $"spaceId={spaceId}" : "");
+            var response = await httpClient.GetAsync($"spaces/blobs{MakeQueryParams(new[] { includesFilter, spaceFilter })}");
+            if (await IsSuccessCall(response, logger))
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IEnumerable<BlobContent>>(content);
+            }
+            else
+            {
+                return Array.Empty<BlobContent>();
+            }
+        }
+
+        public static async Task<BlobContent> GetBlobAsync(
+            HttpClient httpClient,
+            ILogger logger,
+            Guid blobId,
+            string includes = null)
+        {
+            var includesFilter = (includes != null ? $"?includes={includes}" : "");
+            var response = await httpClient.GetAsync($"spaces/blobs/{blobId}{includesFilter}");
+            if (await IsSuccessCall(response, logger))
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<BlobContent>(content);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static async Task<Stream> GetLatestBlobContent(HttpClient httpClient, ILogger logger, Guid blobId)
+        {
+            if (blobId == Guid.Empty)
+                throw new ArgumentException("GetLatestBlobContent requires a non empty guid as id");
+
+            var response = await httpClient.GetAsync($"spaces/blobs/{blobId}/contents/latest");
+            if (await IsSuccessCall(response, logger))
+            {
+                var blobContent = await response.Content.ReadAsStreamAsync();
+                logger.LogInformation($"Retrieved Latest Blob content");
+                return blobContent;
+            }
+
+            return null;
+        }
+
         public static async Task<IEnumerable<Models.Ontology>> GetOntologies(
             HttpClient httpClient,
             ILogger logger)
@@ -269,7 +344,7 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<UserDefinedFunction> GetUserDefinedFunctionsById(
+        public static async Task<UserDefinedFunction> GetUserDefinedFunction(
             HttpClient httpClient,
             ILogger logger,
             Guid id,
@@ -392,9 +467,12 @@ namespace DigitalTwinsBackend.Helpers
                     {
                         await FeedbackHelper.Channel.SendMessageAsync($"Body: {requestBody}", MessageType.Info);
                     }
-                    
-                    await FeedbackHelper.Channel.SendMessageAsync(JsonConvert.SerializeObject(content, Formatting.Indented), MessageType.Info);
 
+                    try
+                    {
+                        await FeedbackHelper.Channel.SendMessageAsync(JsonConvert.SerializeObject(content, Formatting.Indented), MessageType.Info);
+                    }
+                    catch { }
                     logger.LogInformation(content);
                 }
                 return true;

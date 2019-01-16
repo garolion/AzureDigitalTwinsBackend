@@ -1,0 +1,59 @@
+﻿@model DigitalTwinsBackend.ViewModels.PropertyKeyViewModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create</h2>
+
+<h4>Property key</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="SelectedPropertyKey.SpaceId" type="hidden" />
+            <div class="form-group">
+                <label asp-for="SelectedPropertyKey.SpaceId" class="control-label"></label>
+                <input asp-for="SelectedPropertyKey.SpaceId" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedPropertyKey.Name" class="control-label"></label>
+                <input asp-for="SelectedPropertyKey.Name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedPropertyKey.Description" class="control-label"></label>
+                <input asp-for="SelectedPropertyKey.Description" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedPropertyKey.Category" class="control-label"></label>
+                <input asp-for="SelectedPropertyKey.Category" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedPropertyKey.PrimitiveDataType" class="control-label"></label>
+                <select id="PrimitiveDataType" asp-for="SelectedPropertyKey.PrimitiveDataType" class="form-control" asp-items="@(new SelectList(Model.PrimitiveDataTypeList))" onchange="UpdatePropertyKeyFields()"></select>
+            </div>
+            <div class="form-group">
+                <label id="ValidationDataLabel" asp-for="SelectedPropertyKey.ValidationData" class="control-label"></label>
+                <input id="ValidationData" asp-for="SelectedPropertyKey.ValidationData" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label id="MinLabel" asp-for="SelectedPropertyKey.Min" class="control-label"></label>
+                <input id="Min" asp-for="SelectedPropertyKey.Min" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label id="MaxLabel" asp-for="SelectedPropertyKey.Max" class="control-label"></label>
+                <input id="Max" asp-for="SelectedPropertyKey.Max" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

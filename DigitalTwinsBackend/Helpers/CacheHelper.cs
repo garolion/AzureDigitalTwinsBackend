@@ -13,6 +13,7 @@ namespace DigitalTwinsBackend.Helpers
 {
     public static class CacheKeys
     {
+        public static string SpaceId { get { return "_WorkingSpaceId"; } }
         public static string Context { get { return "_Context"; } }
         public static string InfoMessages { get { return "_InfoMessages"; } }
         public static string APICallMessages { get { return "_APICallMessages"; } }
@@ -29,7 +30,9 @@ namespace DigitalTwinsBackend.Helpers
         Device,
         Sensor,
         Matcher,
-        UDF
+        UDF,
+        PropertyKey,
+        Blob
     }
 
     public class CacheHelper
@@ -102,6 +105,17 @@ namespace DigitalTwinsBackend.Helpers
         }
         #endregion
 
+        internal static void SetSpaceId(IMemoryCache memoryCache, Guid spaceId)
+        {
+            memoryCache.Set(CacheKeys.SpaceId, spaceId);
+        }
+
+        internal static Guid GetSpaceId(IMemoryCache memoryCache)
+        {
+            Guid spaceId;
+            memoryCache.TryGetValue(CacheKeys.SpaceId, out spaceId);
+            return spaceId;
+        }
 
         internal static void SetContext(IMemoryCache memoryCache, Context context)
         {
@@ -139,7 +153,6 @@ namespace DigitalTwinsBackend.Helpers
 
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSlidingExpiration(TimeSpan.FromSeconds(ConfigHelper.Config.parameters.CacheTime));
-            //var cacheKey = (scope == Context.None) ? key : key + "_" + scope; 
             
             memoryCache.Set(cacheKey, cacheElement, cacheEntryOptions);
         }
@@ -184,7 +197,6 @@ namespace DigitalTwinsBackend.Helpers
         {
             context = scope;
             id = key.ToString();
-            //var cacheKey = (scope == Context.None) ? key : key + "_" + scope;
 
             Object cacheElement = null;
             memoryCache.TryGetValue(cacheKey, out cacheElement);
@@ -196,7 +208,6 @@ namespace DigitalTwinsBackend.Helpers
         {
             context = scope;
             id = key.ToString();
-            //var cacheKey = (scope == Context.None) ? key : key + "_" + scope;
             memoryCache.Remove(cacheKey);
         }
 
@@ -217,112 +228,92 @@ namespace DigitalTwinsBackend.Helpers
 
         public static IEnumerable<Space> GetSpaceListFromCache(IMemoryCache memoryCache)
         {
-            var list = GetFromCache(memoryCache, Guid.Empty, Context.Space);
-
-            if (list != null)
-                return (IEnumerable<Space>)list;
-            else
-                return null;
+            var spaces = GetFromCache(memoryCache, Guid.Empty, Context.Space);
+            return spaces != null ? (IEnumerable<Space>)spaces : null;
         }
 
         public static IEnumerable<Device> GetDeviceListFromCache(IMemoryCache memoryCache)
         {
-            var list = GetFromCache(memoryCache, Guid.Empty, Context.Device);
-
-            if (list != null)
-                return (IEnumerable<Device>)list;
-            else
-                return null;
+            var devices = GetFromCache(memoryCache, Guid.Empty, Context.Device);
+            return devices != null ? (IEnumerable<Device>)devices : null;
         }
 
         public static Space GetSpaceFromCache(IMemoryCache memoryCache, Guid id)
         {
             var space = GetFromCache(memoryCache, id, Context.Space);
-
-            if (space != null)
-                return (Space)space;
-            else
-                return null;
+            return space != null ? (Space)space : null;
         }
 
         public static IEnumerable<Matcher> GetMatchersFromCache(IMemoryCache memoryCache, Context context, Guid id)
         {
             var matchers = GetFromCache(memoryCache, id, context);
-
-            if (matchers != null)
-                return (IEnumerable<Matcher>)matchers;
-            else
-                return null;
+            return matchers != null ? (IEnumerable<Matcher>)matchers : null;
         }
                
         public static Matcher GetMatcherFromCache(IMemoryCache memoryCache, Guid id)
         {
             var matcher = GetFromCache(memoryCache, id, Context.Matcher);
-
-            if (matcher != null)
-                return (Matcher)matcher;
-            else
-                return null;
+            return matcher != null ? (Matcher)matcher : null;
         }
 
         public static IEnumerable<UserDefinedFunction> GetUDFsFromCache(IMemoryCache memoryCache, Context context, Guid id)
         {
             var udfs = GetFromCache(memoryCache, id, context);
-
-            if (udfs != null)
-                return (IEnumerable<UserDefinedFunction>)udfs;
-            else
-                return null;
+            return udfs != null ? (IEnumerable<UserDefinedFunction>)udfs : null;
         }
 
         public static UserDefinedFunction GetUDFFromCache(IMemoryCache memoryCache, Guid id)
         {
             var udf = GetFromCache(memoryCache, id, Context.UDF);
-
-            if (udf != null)
-                return (UserDefinedFunction)udf;
-            else
-                return null;
+            return udf != null ? (UserDefinedFunction)udf : null;
         }
 
         public static Device GetDeviceFromCache(IMemoryCache memoryCache, Guid id)
         {
             var device = GetFromCache(memoryCache, id, Context.Device);
-
-            if (device != null)
-                return (Device)device;
-            else
-                return null;
+            return device != null ? (Device)device : null;
         }
 
         public static Sensor GetSensorFromCache(IMemoryCache memoryCache, Guid id)
         {
             var sensor = GetFromCache(memoryCache, id, Context.Sensor);
-
-            if (sensor != null)
-                return (Sensor)sensor;
-            else
-                return null;
+            return sensor != null ? (Sensor)sensor : null;
         }
 
         public static IEnumerable<Models.Type> GetTypeListFromCache(Models.Types listType, IMemoryCache memoryCache)
         {
             var types = GetFromCache(memoryCache, listType, Context.None);
-
-            if (types != null)
-                return (IEnumerable<Models.Type>)types;
-            else
-                return null;
+            return types != null ? (IEnumerable<Models.Type>)types : null;
         }
 
         public static IEnumerable<Ontology> GetOntologyListFromCache(IMemoryCache memoryCache)
         {
             var ontologies = GetFromCache(memoryCache, CacheKeys.OntologyList, Context.None);
+            return ontologies != null ? (IEnumerable<Ontology>)ontologies : null;
+        }
 
-            if (ontologies != null)
-                return (IEnumerable<Ontology>)ontologies;
-            else
-                return null;
+        public static IEnumerable<PropertyKey> GetPropertyKeysFromCache(IMemoryCache memoryCache, Context context, Guid spaceId)
+        {
+            var propertyKeys = GetFromCache(memoryCache, id, context);
+            return propertyKeys != null ? (IEnumerable<PropertyKey>)propertyKeys : null;
+        }
+
+        public static PropertyKey GetPropertyKeyFromCache(IMemoryCache memoryCache, string id)
+        {
+            var propertyKey = GetFromCache(memoryCache, id, Context.PropertyKey);
+            return propertyKey != null ? (PropertyKey)propertyKey : null;
+        }
+
+        public static IEnumerable<BlobContent> GetBlobContentsFromCache(IMemoryCache memoryCache, Guid spaceId)
+        {
+            var blobs = GetFromCache(memoryCache, spaceId, Context.Blob);
+            return blobs != null ? (IEnumerable<BlobContent>)blobs : null;
+        }
+        
+        public static BlobContent GetBlobContentFromCache(IMemoryCache memoryCache, Guid id)
+        {
+            var blob = GetFromCache(memoryCache, id, Context.Blob);
+            return blob != null ? (BlobContent)blob : null;
         }
     }
 }

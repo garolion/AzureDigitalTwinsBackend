@@ -34,7 +34,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
@@ -48,7 +48,7 @@ namespace DigitalTwinsBackend.Models
                 {
                     if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
                     if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (!Matchers.Equals(oldValue.Matchers)) changes.Add("Matchers", Matchers);
+                    if (Matchers!= null && !Matchers.Equals(oldValue.Matchers)) changes.Add("Matchers", Matchers);
                 }
                 else
                 {
@@ -57,6 +57,7 @@ namespace DigitalTwinsBackend.Models
                     changes.Add("Matchers", GetMatchersIds());
                 }
             }
+            updatedElement = null;
             return changes;
         }
 

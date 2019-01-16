@@ -1,0 +1,54 @@
+﻿@model DigitalTwinsBackend.ViewModels.BlobContentViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Blob Content</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="SelectedBlobContentItem.ParentId" type="hidden" />
+            <input asp-for="SelectedBlobContentItem.ParentType" type="hidden" />
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Name" class="control-label"></label>
+                <input asp-for="SelectedBlobContentItem.Name" class="form-control" />
+                <span asp-validation-for="SelectedBlobContentItem.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Description" class="control-label"></label>
+                <input asp-for="SelectedBlobContentItem.Description" class="form-control" />
+                <span asp-validation-for="SelectedBlobContentItem.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.ParentId" class="control-label"></label>
+                <input asp-for="SelectedBlobContentItem.ParentId" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Type" class="control-label"></label>
+                <select asp-for="SelectedBlobContentItem.Type" class="form-control" asp-items="@(new SelectList(Model.BlobContentTypeList,"Name","Name"))"></select>
+                <span asp-validation-for="SelectedBlobContentItem.Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedBlobContentItem.Subtype" class="control-label"></label>
+                <select asp-for="SelectedBlobContentItem.Subtype" class="form-control" asp-items="@(new SelectList(Model.BlobContentSubTypeList,"Name","Name"))"></select>
+                <span asp-validation-for="SelectedBlobContentItem.Subtype" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Add file (only images are supported for the moment)</label>
+                <input type="file" asp-for="File" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add to Blob" class="ButtonNew" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

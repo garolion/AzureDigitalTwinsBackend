@@ -2,11 +2,14 @@
 // Licensed under the MIT License.
 
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using DigitalTwinsBackend.Models;
+using DigitalTwinsBackend.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -16,8 +19,10 @@ namespace DigitalTwinsBackend.Helpers
     {
         public static async Task<Guid> CreateAsync<T>(HttpClient httpClient, ILogger logger, T element) where T : BaseModel
         {
-            logger.LogInformation($"Creating Device: {JsonConvert.SerializeObject(element.ToCreate(), Formatting.Indented)}");
-            var content = JsonConvert.SerializeObject(element.ToCreate());
+            var fields = element.ToCreate();
+
+            logger.LogInformation($"Creating {element.GetType().Name}: {JsonConvert.SerializeObject(fields, Formatting.Indented)}");
+            var content = JsonConvert.SerializeObject(fields);
             string domain = element.GetType().Name.ToLower() + "s";
 
             var response = await httpClient.PostAsync(domain, new StringContent(content, Encoding.UTF8, "application/json"));
@@ -28,127 +33,6 @@ namespace DigitalTwinsBackend.Helpers
             return id;
         }
                           
-        //public static async Task<Guid> CreateDeviceAsync(HttpClient httpClient, ILogger logger, Device device)
-        //{
-        //    logger.LogInformation($"Creating Device: {JsonConvert.SerializeObject(device.ToCreate(), Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(device.ToCreate());
-        //    var response = await httpClient.PostAsync("devices", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"device '{device.Name}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreateEndpointAsync(HttpClient httpClient, ILogger logger, Endpoint endpointCreate)
-        //{
-        //    logger.LogInformation($"Creating Endpoint: {JsonConvert.SerializeObject(endpointCreate, Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(endpointCreate);
-        //    var response = await httpClient.PostAsync("endpoints", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"endpoint '{endpointCreate.Type}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreateKeyStoreAsync(HttpClient httpClient, ILogger logger, KeyStore keyStoreCreate)
-        //{
-        //    logger.LogInformation($"Creating KeyStore: {JsonConvert.SerializeObject(keyStoreCreate, Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(keyStoreCreate);
-        //    var response = await httpClient.PostAsync("keystores", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"keyStore '{keyStoreCreate.Name}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreateMatcherAsync(HttpClient httpClient, ILogger logger, Matcher matcher)
-        //{
-        //    logger.LogInformation($"Creating Matcher: {JsonConvert.SerializeObject(matcher.ToCreate(), Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(matcher.ToCreate());
-        //    var response = await httpClient.PostAsync("matchers", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"matcher '{matcher.Name}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreateResourceAsync(HttpClient httpClient, ILogger logger, Resource resource)
-        //{
-        //    logger.LogInformation($"Creating Resource: {JsonConvert.SerializeObject(resource.ToCreate(), Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(resource.ToCreate());
-        //    var response = await httpClient.PostAsync("resources", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"resource '{resource.Type}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreateRoleAssignmentAsync(HttpClient httpClient, ILogger logger, RoleAssignment roleAssignment)
-        //{
-        //    logger.LogInformation($"Creating RoleAssignment: {JsonConvert.SerializeObject(roleAssignment.ToCreate(), Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(roleAssignment.ToCreate());
-        //    var response = await httpClient.PostAsync("roleassignments", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"roleAssignment for RoleId '{roleAssignment.RoleId}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreateSensorAsync(HttpClient httpClient, ILogger logger, Sensor sensor)
-        //{
-        //    logger.LogInformation($"Creating Sensor: {JsonConvert.SerializeObject(sensor.ToCreate(), Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(sensor.ToCreate());
-        //    var response = await httpClient.PostAsync("sensors", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"Sensor '{sensor.HardwareId}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreateSpaceAsync(HttpClient httpClient, ILogger logger, Space space)
-        //{
-        //    logger.LogInformation($"Creating Space: {JsonConvert.SerializeObject(space.ToCreate(), Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(space.ToCreate());
-        //    var response = await httpClient.PostAsync("spaces", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"Space '{space.Name}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
-        //public static async Task<Guid> CreatePropertyAsync(HttpClient httpClient, ILogger logger, Guid spaceId, PropertyCreate propertyCreate)
-        //{
-        //    logger.LogInformation($"Creating Property: {JsonConvert.SerializeObject(propertyCreate, Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(propertyCreate);
-        //    var response = await httpClient.PostAsync($"spaces/{spaceId.ToString()}/properties", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"Property '{propertyCreate.Name}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-
-        //}
-
-        //public static async Task<Guid> CreatePropertyKeyAsync(HttpClient httpClient, ILogger logger, PropertyKeyCreate propertyKeyCreate)
-        //{
-        //    logger.LogInformation($"Creating PropertyKey: {JsonConvert.SerializeObject(propertyKeyCreate, Formatting.Indented)}");
-        //    var content = JsonConvert.SerializeObject(propertyKeyCreate);
-        //    var response = await httpClient.PostAsync($"propertykeys", new StringContent(content, Encoding.UTF8, "application/json"));
-
-        //    var id = await GetIdFromResponse(response, logger, content);
-        //    if (id != Guid.Empty)
-        //        await FeedbackHelper.Channel.SendMessageAsync($"PropertyKey '{propertyKeyCreate.Name}' successfully created with the ID {id}", MessageType.Info);
-        //    return id;
-        //}
-
         public static async Task<Guid> CreateUserDefinedFunctionAsync(HttpClient httpClient, ILogger logger, UserDefinedFunction userDefinedFunction, string js)
         {
             logger.LogInformation($"Creating UserDefinedFunction with Metadata: {JsonConvert.SerializeObject(userDefinedFunction.ToCreate(), Formatting.Indented)}");
@@ -166,6 +50,53 @@ namespace DigitalTwinsBackend.Helpers
             var id = await GetIdFromResponse(response, logger, multipartContent.ToString());
             if (id!= Guid.Empty)
                 await FeedbackHelper.Channel.SendMessageAsync($"UserDefinedFunction '{userDefinedFunction.Name}' successfully created with the ID {id}", MessageType.Info);
+            return id;
+        }
+
+        public static async Task<int> CreatePropertyKeyAsync(HttpClient httpClient, ILogger logger, PropertyKey propertyKey)
+        {
+            var fields = propertyKey.ToCreate();
+
+            logger.LogInformation($"Creating PropertyKey: {JsonConvert.SerializeObject(fields, Formatting.Indented)}");
+            var content = JsonConvert.SerializeObject(fields);
+
+            var response = await httpClient.PostAsync("propertykeys", new StringContent(content, Encoding.UTF8, "application/json"));
+                        
+            if (await IsSuccessCall(response, logger, content))
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!int.TryParse(responseContent, out var createdId))
+                {
+                    logger.LogError($"Returned value from POST did not parse into a int: {responseContent}");
+                }
+
+                await FeedbackHelper.Channel.SendMessageAsync($"PropertyKey '{propertyKey.Label}' successfully created with the ID {createdId}", MessageType.Info);
+                return createdId;
+            }
+            
+            return 0;
+        }
+
+        public static async Task<Guid> CreateBlobAsync(HttpClient httpClient, ILogger logger, ParentType blobType, BlobContent blobContent, IFormFile file)
+        {
+            var metadataContent = new StringContent(JsonConvert.SerializeObject(blobContent.ToCreate()), Encoding.UTF8, "application/json");
+            metadataContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json; charset=utf-8");
+
+            var reader = new StreamReader(file.OpenReadStream());
+            var subContent = new StreamContent(reader.BaseStream);
+            subContent.Headers.ContentType = MediaTypeHeaderValue.Parse(file.ContentType);
+
+            var multipartContent = new MultipartFormDataContent("blobBoundary")
+                {
+                    { metadataContent, "metadata" },
+                    { subContent, "blob" }
+                };
+
+            var response = await httpClient.PostAsync($"{blobType}s/blobs", multipartContent);
+            var id = await GetIdFromResponse(response, logger, multipartContent.ToString());
+            if (id != Guid.Empty)
+                await FeedbackHelper.Channel.SendMessageAsync($"{blobType} blob successfully created with the ID {id}", MessageType.Info);
             return id;
         }
 

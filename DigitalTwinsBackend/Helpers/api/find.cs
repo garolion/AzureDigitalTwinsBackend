@@ -108,10 +108,11 @@ namespace DigitalTwinsBackend.Helpers
         {
             var filterName = $"substringof('{name}', Name)";
             var filterTypeId = typeId != -1 ? $"and TypeId eq {typeId}" : "";
+            var includesFilter = $"&includes=types";
 
             var odataFilter = $"$filter={filterName} {filterTypeId}";
 
-            var response = await httpClient.GetAsync($"spaces?{odataFilter}");
+            var response = await httpClient.GetAsync($"spaces?{odataFilter}{includesFilter}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();

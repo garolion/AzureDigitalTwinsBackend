@@ -28,12 +28,11 @@ namespace DigitalTwinsBackend.Controllers
             return View();
         }
 
-        // GET: UDF/Details/5
         public async Task<ActionResult> Details(Guid id)
         {
             var viewModel = new UDFViewModel();
 
-            var udf = await DigitalTwinsHelper.GetUserDefinedFunctionsByFunctionId(id, _cache, Loggers.SilentLogger);
+            var udf = await DigitalTwinsHelper.GetUserDefinedFunction(id, _cache, Loggers.SilentLogger);
 
             if (udf != null)
             {
@@ -53,68 +52,21 @@ namespace DigitalTwinsBackend.Controllers
             return View(viewModel);
         }
 
-        // GET: UDF/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UDF/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Details(UDFViewModel model, string updateButton)
         {
             try
             {
-                // TODO: Add insert logic here
+                if (updateButton.Equals("Update Content"))
+                {
+                    var udf = await DigitalTwinsHelper.GetUserDefinedFunction(model.UDF.Id, _cache, Loggers.SilentLogger);
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
+                    await DigitalTwinsHelper.UpdateUserDefinedFunction(udf, model.Content, _cache, Loggers.SilentLogger);
+                    return await Details(model.UDF.Id);
+                }
+
                 return View();
-            }
-        }
-
-        // GET: UDF/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: UDF/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: UDF/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: UDF/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
             }
             catch
             {

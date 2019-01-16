@@ -31,7 +31,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             throw new NotImplementedException();
         }

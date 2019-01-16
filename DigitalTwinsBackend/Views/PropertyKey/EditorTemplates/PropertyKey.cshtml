@@ -1,0 +1,21 @@
+﻿@model DigitalTwinsBackend.Models.PropertyKey
+
+@Html.HiddenFor(x => x.Name)
+@Html.HiddenFor(x => x.PrimitiveDataType)
+<tr>
+    <td>
+        @Html.CheckBoxFor(x => x.Add)
+    </td>
+    <td>
+        @Html.DisplayFor(x => x.Category)
+    </td>
+    <td>
+        @Html.DisplayFor(x => x.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(x => x.Description)
+    </td>
+    <td>
+        @Html.DisplayFor(x => x.PrimitiveDataType)
+    </td>
+</tr>

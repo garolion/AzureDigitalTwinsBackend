@@ -61,36 +61,72 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
-            Space oldValue = null;
+            Space refInCache = null;
+
             if (Id != Guid.Empty)
             {
-                oldValue = CacheHelper.GetSpaceFromCache(memoryCache, Id);
+                refInCache = CacheHelper.GetSpaceFromCache(memoryCache, Id);
                 //changes.Add("Id", Id);
 
-                if (oldValue != null)
+                if (refInCache != null)
                 {
-                    if (Name!=null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (FriendlyName != null && !FriendlyName.Equals(oldValue.FriendlyName)) changes.Add("FriendlyName", FriendlyName);
-                    if (!TypeId.Equals(oldValue.TypeId)) changes.Add("TypeId", TypeId);
-                    if (ParentSpaceId != Guid.Empty && !ParentSpaceId.Equals(oldValue.ParentSpaceId)) changes.Add("ParentSpaceId", ParentSpaceId);
-                    if (!SubTypeId.Equals(oldValue.SubTypeId)) changes.Add("SubTypeId", SubTypeId);
-                    if (!StatusId.Equals(oldValue.StatusId)) changes.Add("StatusId", StatusId);
+                    if (Name != null && !Name.Equals(refInCache.Name))
+                    {
+                        changes.Add("Name", Name);
+                        refInCache.Name = Name;
+                    }
+                    if (FriendlyName != null && !FriendlyName.Equals(refInCache.FriendlyName))
+                    {
+                        changes.Add("FriendlyName", FriendlyName);
+                        refInCache.FriendlyName = FriendlyName;
+                    }
+                    if (!TypeId.Equals(refInCache.TypeId))
+                    {
+                        changes.Add("TypeId", TypeId);
+                        refInCache.TypeId = TypeId;
+                        refInCache.Type = Type;
+                    }
+                    if (!SubTypeId.Equals(refInCache.SubTypeId))
+                    {
+                        changes.Add("SubTypeId", SubTypeId);
+                        refInCache.SubTypeId = SubTypeId;
+                        refInCache.SubType = SubType;
+                    }
+                    if (ParentSpaceId != Guid.Empty && !ParentSpaceId.Equals(refInCache.ParentSpaceId))
+                    {
+                        changes.Add("ParentSpaceId", ParentSpaceId);
+                        refInCache.ParentSpaceId = ParentSpaceId;
+                        // ToDo update Parent ?
+                    }
+
+                    if (!StatusId.Equals(refInCache.StatusId))
+                    {
+                        changes.Add("StatusId", StatusId);
+                        refInCache.StatusId = StatusId;
+                        refInCache.Status = Status;
+                    }
+                    if (PropertiesHasChanged)
+                    {
+                        changes.Add("Properties", Properties);
+                        refInCache.Properties = Properties;
+                    }
                 }
                 else
                 {
                     changes.Add("Name", Name);
                     changes.Add("FriendlyName", FriendlyName);
                     changes.Add("TypeId", TypeId);
-                    if (ParentSpaceId != Guid.Empty)
-                        changes.Add("ParentSpaceId", ParentSpaceId);
+                    if (ParentSpaceId != Guid.Empty) changes.Add("ParentSpaceId", ParentSpaceId);
                     changes.Add("SubType", SubType);
                     changes.Add("Status", Status);
+                    if (PropertiesHasChanged) changes.Add("Properties", Properties);
                 }
             }
+            updatedElement = refInCache;
             return changes;
         }
     }

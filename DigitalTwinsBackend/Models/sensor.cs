@@ -48,7 +48,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
@@ -81,6 +81,7 @@ namespace DigitalTwinsBackend.Models
                     changes.Add("DataSubTypeId", DataSubTypeId);
                 }
             }
+            updatedElement = null;
             return changes;
         }
     }

@@ -1,0 +1,411 @@
+﻿@*http://bernholdtech.blogspot.com/2013/04/very-simple-pure-css-collapsible-list.html
+    https://codepen.io/peternguyen/pen/hICga/
+    https://codepen.io/simoberny/pen/vNYavm
+        C:\Users\arfontai\Documents\IoTWorkbenchProjects\examples\RM2Test\Device*@
+
+@model DigitalTwinsBackend.ViewModels.SpaceViewModel
+
+@{
+    ViewData["Title"] = "Space details";
+}
+
+<h2>Details</h2>
+
+<h4>Space</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="SelectedSpaceItem.Id" class="control-label"></label>
+            <input asp-for="SelectedSpaceItem.Id" class="form-control" disabled="disabled" />
+            <span asp-validation-for="SelectedSpaceItem.Id" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SelectedSpaceItem.Name" class="control-label"></label>
+            <input asp-for="SelectedSpaceItem.Name" class="form-control" disabled="disabled" />
+            <span asp-validation-for="SelectedSpaceItem.Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SelectedSpaceItem.FriendlyName" class="control-label"></label>
+            <input asp-for="SelectedSpaceItem.FriendlyName" class="form-control" disabled="disabled" />
+            <span asp-validation-for="SelectedSpaceItem.FriendlyName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SelectedSpaceItem.ParentSpaceId" class="control-label"></label>
+            <select asp-for="SelectedSpaceItem.ParentSpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList,"Id","Name"))" disabled="disabled"></select>
+            <span asp-validation-for="SelectedSpaceItem.ParentSpaceId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SelectedSpaceItem.Type" class="control-label"></label>
+            <select asp-for="SelectedSpaceItem.Type" class="form-control" asp-items="@(new SelectList(Model.SpaceTypeList,"Name","Name"))" disabled="disabled"></select>
+            <span asp-validation-for="SelectedSpaceItem.Type" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SelectedSpaceItem.SubType" class="control-label"></label>
+            <select asp-for="SelectedSpaceItem.SubType" class="form-control" asp-items="@(new SelectList(Model.SpaceSubTypeList,"Name","Name"))" disabled="disabled"></select>
+            <span asp-validation-for="SelectedSpaceItem.SubType" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SelectedSpaceItem.Status" class="control-label"></label>
+            <select asp-for="SelectedSpaceItem.Status" class="form-control" asp-items="@(new SelectList(Model.SpaceStatusList,"Name","Name"))" disabled="disabled"></select>
+            <span asp-validation-for="SelectedSpaceItem.Status" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <a asp-area="" asp-controller="Space" asp-action="Edit" asp-route-id="@Model.SelectedSpaceItem.Id" class="ButtonEdit">Edit Space</a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <h4>Blob</h4>
+        <a asp-controller="Blob" asp-action="Create" asp-route-blobType="Space" asp-route-parentid="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add File</a>
+        @foreach (var blob in Model.Blobs)
+        {
+            <div class="defaultEncart">
+                <h4>@blob.Name</h4>
+                <div class="label-group">
+                    <label class="label-field">Description</label>
+                    <label class="label-value">@blob.Description</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">Type</label>
+                    <label class="label-value">@blob.Type</label>
+                </div>
+                <img src="@blob.ContentInfos[0].FilePath" alt="Image" style="padding-bottom:15px" />
+            </div>
+        }
+
+        <h4>Properties</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        DataType
+                    </th>
+                    <th>
+                        Value
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var property in Model.SelectedSpaceItem.Properties)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => property.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => property.DataType)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => property.Value)
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-4">
+        <h4>Values</h4>
+        @foreach (var value in Model.SelectedSpaceItem.Values)
+        {
+            <div class="defaultEncart">
+                <h4>@value.Type</h4>
+                @*<div class="label-group">
+                        <label class="label-field">Id</label>
+                        <label class="label-value">@value.Type</label>
+                    </div>*@
+                <div class="label-group">
+                    <label class="label-field">Time stamp</label>
+                    <label class="label-value">@value.Timestamp</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">Value</label>
+                    <label class="label-value">@value.Value </label>
+                </div>
+                <hr />
+                @if (value.HistoricalValues != null)
+                {
+                    <div>
+                        <h4>Historical values</h4>
+                        @foreach (var historicalValue in value.HistoricalValues)
+                        {
+                            <div class="label-group">
+                                <label class="label-field">Value</label>
+                                <label class="label-value">@historicalValue.Value </label>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        @*<table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Type
+                        </th>
+                        <th>
+                            Time
+                        </th>
+                        <th>
+                            Value
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.SelectedSpaceItem.Values)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Type)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Timestamp)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Value)
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <h4>Historical values</h4>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Value
+                            </td>
+                            <td>
+                                Description
+                            </td>
+                        </tr>
+
+                        @foreach (var value in item.HistoricalValues)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => value.Value)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => value.Description)
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>*@
+    </div>
+</div><div class="row">
+    <div class="col-md-6">
+        <h2>Parent</h2>
+        <div class="spaceEncart">
+            <h3>Space</h3>
+            <div class="label-group">
+                <label asp-for="SelectedSpaceItem.Parent.Id" class="label-field"></label>
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <label class="label-value">@Model.SelectedSpaceItem.Parent.Id</label>
+                    }
+                }
+            </div>
+            <div class="label-group">
+                <label asp-for="SelectedSpaceItem.Parent.Name" class="label-field"></label>
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <label class="label-value">@Model.SelectedSpaceItem.Parent.Name</label>
+                    }
+                }
+            </div>
+            <div class="label-group">
+                <label asp-for="SelectedSpaceItem.Parent.FriendlyName" class="label-field"></label>
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <label class="label-value">@Model.SelectedSpaceItem.Parent.FriendlyName</label>
+                    }
+                }
+            </div>
+            <div class="label-group">
+                <label asp-for="SelectedSpaceItem.Parent.ParentSpaceId" class="label-field"></label>
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <label class="label-value">@Model.SelectedSpaceItem.Parent.ParentSpaceId</label>
+                    }
+                }
+            </div>
+            <div class="label-group">
+                <label asp-for="SelectedSpaceItem.Parent.Type" class="label-field"></label>
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <label class="label-value">@Model.SelectedSpaceItem.Parent.Type</label>
+                    }
+                }
+            </div>
+            <div class="label-group">
+                <label asp-for="SelectedSpaceItem.Parent.SubType" class="label-field"></label>
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <label class="label-value">@Model.SelectedSpaceItem.Parent.SubType</label>
+                    }
+                }
+            </div>
+            <div class="form-group">
+                @{ if (Model.SelectedSpaceItem.ParentSpaceId != Guid.Empty)
+                    {
+                        <a asp-action="Details" asp-route-id="@Model.SelectedSpaceItem.ParentSpaceId" class="ButtonSpaceDetails">Navigate to Parent</a>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <h2>Children</h2>
+        @foreach (var child in Model.SelectedSpaceItem.Children)
+        {
+            <div class="spaceEncart">
+                <h3>Space</h3>
+                <div class="label-group">
+                    <label asp-for="SelectedSpaceItem.Name" class="label-field"></label>
+                    <label class="label-value">@child.Name</label>
+                </div>
+                <div class="label-group">
+                    <label asp-for="SelectedSpaceItem.FriendlyName" class="label-field"></label>
+                    <label class="label-value">@child.FriendlyName</label>
+                </div>
+                <div class="label-group">
+                    <label asp-for="SelectedSpaceItem.ParentSpaceId" class="label-field"></label>
+                    <label class="label-value">@child.ParentSpaceId</label>
+                </div>
+                <div class="label-group">
+                    <label asp-for="SelectedSpaceItem.Type" class="label-field"></label>
+                    <label class="label-value">@child.Type</label>
+                </div>
+                <div class="label-group">
+                    <label asp-for="SelectedSpaceItem.SubType" class="label-field"></label>
+                    <label class="label-value">@child.SubType</label>
+                </div>
+                <div class="label-group">
+                    <label asp-for="SelectedSpaceItem.Status" class="label-field"></label>
+                    <label class="label-value">@child.Status</label>
+                </div>
+                <div class="form-group">
+                    <a asp-action="Details" asp-route-id="@child.Id" class="ButtonSpaceDetails">Navigate to this child</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <h4>Devices</h4>
+        @foreach (var device in Model.SelectedSpaceItem.Devices)
+        {
+            <div class="deviceEncart">
+                <h3>Device</h3>
+                <div class="label-group">
+                    <label class="label-field">Id</label>
+                    <label class="label-value">@device.Id</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">Name</label>
+                    <label class="label-value">@device.Name</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">HardwareId</label>
+                    <label class="label-value">@device.HardwareId</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">Type</label>
+                    <label class="label-value">@device.Type</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">Status</label>
+                    <label class="label-value">@device.Status</label>
+                </div>
+                <div class="form-group">
+                    <a asp-controller="Device" asp-action="Details" asp-route-id="@device.Id" class="ButtonDeviceDetails">Details</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-3">
+        <h4>Sensors</h4>
+        @foreach (var sensor in Model.SelectedSpaceItem.Sensors)
+        {
+            <div class="sensorEncart">
+                <h3>Sensor</h3>
+                <div class="label-group">
+                    <label class="label-field">Id</label>
+                    <label class="label-value">@sensor.Id</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">HardwareId</label>
+                    <label class="label-value">@sensor.HardwareId</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">PollRate</label>
+                    <label class="label-value">@sensor.PollRate</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">PortTypeId</label>
+                    <label class="label-value">@sensor.PortTypeId</label>
+                </div>
+                <div class="form-group">
+                    <a asp-controller="Sensor" asp-action="Details" asp-route-id="@sensor.Id" class="ButtonSensorDetails">Details</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-3">
+        <h4>User Defined Fonctions</h4>
+        @foreach (var udf in Model.UDFList)
+        {
+            <div class="udfEncart">
+                <h3>UDF</h3>
+                <div class="label-group">
+                    <label class="label-field">Id</label>
+                    <label class="label-value">@udf.Id</label>
+                </div>
+                <div class="label-group">
+                    <label class="label-field">HardwareId</label>
+                    <label class="label-value">@udf.Name</label>
+                </div>
+                <div class="form-group">
+                    <a asp-controller="UDF" asp-action="Details" asp-route-id="@udf.Id" class="ButtonUDFDetails">Details</a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-3">
+        <h4>Users</h4>
+        @foreach (var user in Model.SelectedSpaceItem.Users)
+        {
+            <div class="userEncart">
+                <div class="label-group">
+                    <label class="label-field">Name</label>
+                    <label class="label-value">@user</label>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <a asp-area="" asp-controller="Home" asp-action="Spaces">Back to home</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -22,28 +22,37 @@ namespace DigitalTwinsBackend.Helpers
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
             logger.LogInformation($"Updating {typeof(T).Name} with Id: {element.Id}");
-            var content = JsonConvert.SerializeObject(element.ToUpdate(memoryCache));
+            BaseModel updatedElement = null;
+            var content = JsonConvert.SerializeObject(element.ToUpdate(memoryCache, out updatedElement));
+
+            if (updatedElement != null) CacheHelper.AddInCache(
+                memoryCache, 
+                updatedElement, 
+                updatedElement.Id, (Context)Enum.Parse(typeof(Context), typeof(T).Name));
 
             if (content.Length > 2)
             {
-                var response = await httpClient.PatchAsync($"{typeof(T).Name.ToLower()}s/{element.Id}", new StringContent(content, Encoding.UTF8, "application/json"));
+                var response = await httpClient.PatchAsync($"{typeof(T).Name.ToLower()}s/{element.Id}", 
+                    new StringContent(content, Encoding.UTF8, "application/json"));
                 updateWasASuccess = await IsSuccessCall(response, logger);
             }
 
             if (updateWasASuccess & element.PropertiesHasChanged)
             {
-                return await UpdatePropertyValuesAsync(memoryCache, logger, element);
+                return await UpdatePropertiesAsync(memoryCache, logger, updatedElement);
             }
             return false;
         }
 
-        public static async Task<bool> UpdatePropertyValuesAsync<T>(IMemoryCache memoryCache, ILogger logger, T element) where T : BaseModel
+        public static async Task<bool> UpdatePropertiesAsync<T>(IMemoryCache memoryCache, ILogger logger, T element) where T : BaseModel
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
             logger.LogInformation($"Adding properties for {typeof(T).Name} with Id: {element.Id}");
             var content = JsonConvert.SerializeObject(element.Properties);
-            var response = await httpClient.PutAsync($"{typeof(T).Name.ToLower()}s/{element.Id}/properties", new StringContent(content, Encoding.UTF8, "application/json"));
+            var response = await httpClient.PutAsync(
+                $"{typeof(T).Name.ToLower()}s/{element.Id}/properties", 
+                new StringContent(content, Encoding.UTF8, "application/json"));
 
             return await IsSuccessCall(response, logger);
         }
@@ -54,11 +63,15 @@ namespace DigitalTwinsBackend.Helpers
             Models.UserDefinedFunction userDefinedFunction,
             string js)
         {
-            logger.LogInformation($"Updating UserDefinedFunction with Metadata: {JsonConvert.SerializeObject(userDefinedFunction.ToUpdate(memoryCache), Formatting.Indented)}");
+            Dictionary<string, object> updates = new Dictionary<string, object>();
+            BaseModel updatedUDF = null;
+            updates = userDefinedFunction.ToUpdate(memoryCache, out updatedUDF);
+            logger.LogInformation($"Updating UserDefinedFunction with Metadata: {JsonConvert.SerializeObject(updates, Formatting.Indented)}");
+
             var displayContent = js.Length > 100 ? js.Substring(0, 100) + "..." : js;
             logger.LogInformation($"Updating UserDefinedFunction with Content: {displayContent}");
 
-            var metadataContent = new StringContent(JsonConvert.SerializeObject(userDefinedFunction.ToUpdate(memoryCache)), Encoding.UTF8, "application/json");
+            var metadataContent = new StringContent(JsonConvert.SerializeObject(updates), Encoding.UTF8, "application/json");
             metadataContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json; charset=utf-8");
 
             var multipartContent = new MultipartFormDataContent("userDefinedFunctionBoundary");

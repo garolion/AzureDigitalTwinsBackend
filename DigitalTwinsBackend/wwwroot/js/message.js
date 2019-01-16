@@ -13,15 +13,15 @@ connection.start().catch(function (err) {
     return console.error(err.toString());
 });
 
-    function Reset() {
+function Reset() {
 
-        document.getElementById("infoMessages").innerHTML = "";
+    document.getElementById("infoMessages").innerHTML = "";
 
     $.ajax({
         url: '@Url.Action("ResetMessages", "Home")',
-    type: 'GET',
-    dataType: 'json',
-    cache: false,
-               success: function (results) {}
+        type: 'GET',
+        dataType: 'json',
+        cache: false,
+        success: function (results) {}
     });
 }

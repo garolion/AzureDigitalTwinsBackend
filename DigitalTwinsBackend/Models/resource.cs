@@ -30,7 +30,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
@@ -39,6 +39,7 @@ namespace DigitalTwinsBackend.Models
             changes.Add("Region", Region);
             changes.Add("Properties", Properties);
 
+            updatedElement = null;
             return changes;
         }
     }

@@ -28,6 +28,9 @@ function process(telemetry, executionContext) {
         // Get parent space
         var parentSpace = sensor.Space();
 
+        // clone the sensor value to the parent space
+        setSpaceValue(parentSpace.Id, sensor.DataType, parseReading.SensorValue);
+
         // Get children sensors from the same space
         var otherSensors = parentSpace.ChildSensors();
 

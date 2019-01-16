@@ -84,14 +84,14 @@
                             @Html.DisplayFor(modelItem => item.HardwareId)
                         </td>
                         <td>
-                            @Html.ActionLink("Edit", "Edit", "Sensors", new { id = item.Id })
-                            @Html.ActionLink("Delete", "Delete", "Sensors", new { id = item.Id })
+                            @Html.ActionLink("Edit", "Edit", "Sensor", new { id = item.Id })
+                            @Html.ActionLink("Delete", "Delete", "Sensor", new { id = item.Id })
                         </td>
                     </tr>
                 }
                 <tr>
                     <td rowspan="2">
-                        <a asp-controller="Sensors" asp-action="Create" asp-route-deviceId="@Model.SelectedDeviceItem.Id">Create a new Sensor</a>
+                        <a asp-controller="Sensor" asp-action="Create" asp-route-deviceId="@Model.SelectedDeviceItem.Id">Create a new Sensor</a>
                     </td>
                 </tr>
             </tbody>

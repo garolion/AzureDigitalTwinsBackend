@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using DigitalTwinsBackend.Models;
+using DigitalTwinsBackend.ViewModels;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -22,37 +23,12 @@ namespace DigitalTwinsBackend.Helpers
             return await IsSuccessCall(response, logger);
         }
 
-        //public static async Task<bool> DeleteSpaceAsync(
-        //    HttpClient httpClient,
-        //    ILogger logger,
-        //    Models.Space space)
-        //{
-        //    logger.LogInformation($"Deleting Space with Id: {space.Id}");
-        //    var response = await httpClient.DeleteAsync($"spaces/{space.Id}");
+        public static async Task<bool> DeleteBlobAsync(HttpClient httpClient, ILogger logger, ParentType blobType, Guid id)
+        {
+            logger.LogInformation($"Deleting Blob with Id: {id}");
+            var response = await httpClient.DeleteAsync($"{blobType}s/blobs/{id}");
 
-        //    return await IsSuccessCall(response, logger);
-        //}
-
-        //public static async Task<bool> DeleteDeviceAsync(
-        //    HttpClient httpClient,
-        //    ILogger logger,
-        //    Models.Device device)
-        //{
-        //    logger.LogInformation($"Deleting Device with Id: {device.Id}");
-        //    var response = await httpClient.DeleteAsync($"devices/{device.Id}");
-
-        //    return await IsSuccessCall(response, logger);
-        //}
-
-        //public static async Task<bool> DeleteSensorAsync(
-        //    HttpClient httpClient,
-        //    ILogger logger,
-        //    Models.Sensor sensor)
-        //{
-        //    logger.LogInformation($"Deleting Sensor with Id: {sensor.Id}");
-        //    var response = await httpClient.DeleteAsync($"sensors/{sensor.Id}");
-
-        //    return await IsSuccessCall(response, logger);
-        //}
+            return await IsSuccessCall(response, logger);
+        }
     }
 }

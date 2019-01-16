@@ -70,7 +70,7 @@ namespace DigitalTwinsBackend.Controllers
                 if (CacheHelper.IsInSpaceEditMode(_cache))
                 {
                     CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Spaces", new { id = model.SelectedDeviceItem.SpaceId });
+                    return RedirectToAction("Edit", "Space", new { id = model.SelectedDeviceItem.SpaceId });
                 }
                 else
                 {
@@ -110,7 +110,7 @@ namespace DigitalTwinsBackend.Controllers
                 if (CacheHelper.IsInSpaceEditMode(_cache))
                 {
                     CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Spaces", new { id = model.SelectedDeviceItem.SpaceId });
+                    return RedirectToAction("Edit", "Space", new { id = model.SelectedDeviceItem.SpaceId });
                 }
                 else
                 {
@@ -147,7 +147,7 @@ namespace DigitalTwinsBackend.Controllers
                 if (CacheHelper.IsInSpaceEditMode(_cache))
                 {
                     CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Spaces", new { id = model.SelectedDeviceItem.SpaceId });
+                    return RedirectToAction("Edit", "Space", new { id = model.SelectedDeviceItem.SpaceId });
                 }
                 else
                 {

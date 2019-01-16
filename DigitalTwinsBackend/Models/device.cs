@@ -33,7 +33,6 @@ namespace DigitalTwinsBackend.Models
             Sensors = new List<Sensor>();
         }
 
-        //public Dictionary<string, object> ToCreate()
         public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();
@@ -45,8 +44,7 @@ namespace DigitalTwinsBackend.Models
             return createFields;
         }
 
-        //public Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
-        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache)
+        public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
@@ -54,7 +52,6 @@ namespace DigitalTwinsBackend.Models
             if (Id != Guid.Empty)
             {
                 oldValue = CacheHelper.GetDeviceFromCache(memoryCache, Id);
-                //changes.Add("Id", Id);
 
                 if (oldValue != null)
                 {
@@ -73,6 +70,7 @@ namespace DigitalTwinsBackend.Models
                     changes.Add("SubType", SubType);
                 }
             }
+            updatedElement = null;
             return changes;
         }
     }
