@@ -9,7 +9,7 @@
 <h4>Space</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -17,11 +17,6 @@
                 <input asp-for="SelectedSpaceItem.Name" class="form-control" />
                 <span asp-validation-for="SelectedSpaceItem.Name" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-            <label asp-for="SelectedSpaceItem.FriendlyName" class="control-label"></label>
-            <input asp-for="SelectedSpaceItem.FriendlyName" class="form-control" />
-            <span asp-validation-for="SelectedSpaceItem.FriendlyName" class="text-danger"></span>
-        </div>*@
             <div class="form-group">
                 <label asp-for="SelectedSpaceItem.Type" class="control-label"></label>
                 <select asp-for="SelectedSpaceItem.Type" class="form-control" asp-items="@(new SelectList(Model.SpaceTypeList,"Name","Name"))"></select>
@@ -32,41 +27,19 @@
                 <select asp-for="SelectedSpaceItem.ParentSpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList,"Id","Name"))"></select>
                 <span asp-validation-for="SelectedSpaceItem.ParentSpaceId" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-            <label asp-for="SelectedSpaceItem.TypeId" class="control-label"></label>
-            <input asp-for="SelectedSpaceItem.TypeId" class="form-control" />
-            <span asp-validation-for="SelectedSpaceItem.TypeId" class="text-danger"></span>
-        </div>*@
             <div class="form-group">
                 <label asp-for="SelectedSpaceItem.SubType" class="control-label"></label>
                 <select asp-for="SelectedSpaceItem.SubType" class="form-control" asp-items="@(new SelectList(Model.SpaceSubTypeList,"Name","Name"))"></select>
                 <span asp-validation-for="SelectedSpaceItem.SubType" class="text-danger"></span>
             </div>
-            @*<div class="form-group">
-            <label asp-for="SelectedSpaceItem.SubtypeId" class="control-label"></label>
-            <input asp-for="SelectedSpaceItem.SubtypeId" class="form-control" />
-            <span asp-validation-for="SelectedSpaceItem.SubtypeId" class="text-danger"></span>
-        </div>*@
-            @*<div class="form-group">
-            <label asp-for="SelectedSpaceItem.Status" class="control-label"></label>
-            <select asp-for="SelectedSpaceItem.Status" class="form-control" asp-items="@(new SelectList(Model.SpaceStatusList,"Name","Name"))"></select>
-            <span asp-validation-for="SelectedSpaceItem.Status" class="text-danger"></span>
-        </div>*@
-            @*<div class="form-group">
-            <label asp-for="SelectedSpaceItem.StatusId" class="control-label"></label>
-            <input asp-for="SelectedSpaceItem.StatusId" class="form-control" />
-            <span asp-validation-for="SelectedSpaceItem.StatusId" class="text-danger"></span>
-        </div>*@
             <div class="form-group">
-                <input type="submit" name="createButton" value="Save & Next" class="btn btn-default" />
-                <input type="submit" name="createButton" value="Save & Continue" class="btn btn-default" />
+                <input type="submit" name="createButton" value="Save & Close" class="ButtonNew" />
+                <input type="submit" name="createButton" value="Save & Create another" class="ButtonNew" />
+                <input type="submit" name="createButton" value="Save & Edit" class="ButtonNew" />
+                <input type="submit" onclick="history.go(-1)" value="Cancel" class="ButtonCancel" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-area="" asp-controller="Space" asp-action="List">Back to List</a>
 </div>
 
 @section Scripts {

@@ -69,37 +69,39 @@ namespace DigitalTwinsBackend.Models
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
-            PropertyKey oldValue = null;
+            PropertyKey refInCache = null;
             if (Id != string.Empty)
             {
-                oldValue = CacheHelper.GetPropertyKeyFromCache(memoryCache, Id);
+                refInCache = CacheHelper.GetPropertyKeyFromCache(memoryCache, Id);
 
-                if (oldValue != null)
+                if (refInCache != null)
                 {
-                    if (!Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (!PrimitiveDataType.Equals(oldValue.PrimitiveDataType)) changes.Add("PrimitiveDataType", this.PrimitiveDataType.ToString());
-                    if (!Category.Equals(oldValue.Category)) changes.Add("Category", Category);
-                    if (!Description.Equals(oldValue.Description)) changes.Add("Description", Description);
-                    if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (!Scope.Equals(oldValue.Scope)) changes.Add("Scope", Scope.ToString());
-                    if (!ValidationData.Equals(oldValue.ValidationData)) changes.Add("ValidationData", ValidationData);
-                    if (!Min.Equals(oldValue.Min)) changes.Add("Min", Min);
-                    if (!Max.Equals(oldValue.Max)) changes.Add("Max", Max);
+                    if (!Name.Equals(refInCache.Name)) changes.Add("Name", Name);
+                    if (!PrimitiveDataType.Equals(refInCache.PrimitiveDataType)) changes.Add("PrimitiveDataType", this.PrimitiveDataType.ToString());
+                    if (!Category.Equals(refInCache.Category)) changes.Add("Category", Category);
+                    if (!Description.Equals(refInCache.Description)) changes.Add("Description", Description);
+                    if (!SpaceId.Equals(refInCache.SpaceId)) changes.Add("SpaceId", SpaceId);
+                    if (!Scope.Equals(refInCache.Scope)) changes.Add("Scope", Scope.ToString());
+                    if (!ValidationData.Equals(refInCache.ValidationData)) changes.Add("ValidationData", ValidationData);
+                    if (!Min.Equals(refInCache.Min)) changes.Add("Min", Min);
+                    if (!Max.Equals(refInCache.Max)) changes.Add("Max", Max);
                 }
                 else
                 {
-                    changes.Add("Name", Name);
+                    refInCache = this;
+
+                    if (Name != null) changes.Add("Name", Name);
                     changes.Add("PrimitiveDataType", this.PrimitiveDataType.ToString());
-                    changes.Add("Category", Category);
-                    changes.Add("Description", Description);
-                    changes.Add("SpaceId", SpaceId);
+                    if (Category != null)  changes.Add("Category", Category);
+                    if (Description != null)  changes.Add("Description", Description);
+                    if (SpaceId != null)  changes.Add("SpaceId", SpaceId);
                     changes.Add("Scope", Scope.ToString());
-                    changes.Add("ValidationData", ValidationData);
-                    changes.Add("Min", Min);
-                    changes.Add("Max", Max);
+                    if (ValidationData != null)  changes.Add("ValidationData", ValidationData);
+                    if (Min != null) changes.Add("Min", Min);
+                    if (Max != null) changes.Add("Max", Max);
                 }
             }
-            updatedElement = null;
+            updatedElement = refInCache;
             return changes;
         }
     }

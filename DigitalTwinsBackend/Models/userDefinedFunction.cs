@@ -38,26 +38,27 @@ namespace DigitalTwinsBackend.Models
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
-            UserDefinedFunction oldValue = null;
+            UserDefinedFunction refInCache = null;
             if (Id != Guid.Empty)
             {
-                oldValue = CacheHelper.GetUDFFromCache(memoryCache, Id);
-                //changes.Add("Id", Id);
+                refInCache = CacheHelper.GetUDFFromCache(memoryCache, Id);
 
-                if (oldValue != null)
+                if (refInCache != null)
                 {
-                    if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (Matchers!= null && !Matchers.Equals(oldValue.Matchers)) changes.Add("Matchers", Matchers);
+                    if (Name != null && !Name.Equals(refInCache.Name)) changes.Add("Name", Name);
+                    if (!SpaceId.Equals(refInCache.SpaceId)) changes.Add("SpaceId", SpaceId);
+                    if (Matchers!= null && !Matchers.Equals(refInCache.Matchers)) changes.Add("Matchers", Matchers);
                 }
                 else
                 {
-                    changes.Add("Name", Name);
-                    changes.Add("SpaceId", SpaceId);
-                    changes.Add("Matchers", GetMatchersIds());
+                    refInCache = this;
+
+                    if (Name != null) changes.Add("Name", Name);
+                    if (SpaceId != null) changes.Add("SpaceId", SpaceId);
+                    if (Matchers != null) changes.Add("Matchers", GetMatchersIds());
                 }
             }
-            updatedElement = null;
+            updatedElement = refInCache;
             return changes;
         }
 

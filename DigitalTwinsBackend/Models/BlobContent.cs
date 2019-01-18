@@ -59,32 +59,32 @@ namespace DigitalTwinsBackend.Models
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
-            BlobContent oldValue = null;
+            BlobContent refInCache = null;
             if (Id != Guid.Empty)
             {
-                oldValue = CacheHelper.GetBlobContentFromCache(memoryCache, Id);
+                refInCache = CacheHelper.GetBlobContentFromCache(memoryCache, Id);
 
-                if (oldValue != null)
+                if (refInCache != null)
                 {
-                    if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (Description != null && !Description.Equals(oldValue.Description)) changes.Add("Description", Description);
-                    if (!Sharing.Equals(oldValue.Sharing)) changes.Add("Sharing", Sharing);
-                    if (!Type.Equals(oldValue.Type)) changes.Add("Type", Type);
-                    if (!Subtype.Equals(oldValue.Subtype)) changes.Add("Subtype", Subtype);
+                    if (Name != null && !Name.Equals(refInCache.Name)) changes.Add("Name", Name);
+                    if (Description != null && !Description.Equals(refInCache.Description)) changes.Add("Description", Description);
+                    if (!Sharing.Equals(refInCache.Sharing)) changes.Add("Sharing", Sharing);
+                    if (!Type.Equals(refInCache.Type)) changes.Add("Type", Type);
+                    if (!Subtype.Equals(refInCache.Subtype)) changes.Add("Subtype", Subtype);
                 }
                 else
                 {
-                    changes.Add("Name", Name);
-                    changes.Add("Description", Description);
-                    changes.Add("Sharing", Sharing);
-                    changes.Add("Type", Type);
-                    changes.Add("Subtype", Subtype);
+                    refInCache = this;
+
+                    if (Name != null) changes.Add("Name", Name);
+                    if (Description != null) changes.Add("Description", Description);
+                    if (Sharing != null) changes.Add("Sharing", Sharing);
+                    if (Type != null) changes.Add("Type", Type);
+                    if (Subtype != null) changes.Add("Subtype", Subtype);
                 }
             }
-            updatedElement = null;
+            updatedElement = refInCache;
             return changes;
         }
-
-
     }
 }

@@ -13,8 +13,8 @@ namespace DigitalTwinsBackend.Helpers
 {
     public static class CacheKeys
     {
-        public static string SpaceId { get { return "_WorkingSpaceId"; } }
-        public static string Context { get { return "_Context"; } }
+        public static string ObjectId { get { return "_WorkingObjectId"; } }
+        public static string PreviousPage { get { return "_Context"; } }
         public static string InfoMessages { get { return "_InfoMessages"; } }
         public static string APICallMessages { get { return "_APICallMessages"; } }
         public static string SimulatedSensorList { get { return "_SimulatedSensorList"; } }
@@ -26,6 +26,7 @@ namespace DigitalTwinsBackend.Helpers
     public enum Context
     {
         None,
+        RootSpaces,
         Space,
         Device,
         Sensor,
@@ -37,12 +38,12 @@ namespace DigitalTwinsBackend.Helpers
 
     public class CacheHelper
     {
-        private static Context context;
+        //private static Context context;
         private static string id;
 
-        private static string cacheKey
+        private static string CacheKey(Context context)
         {
-            get
+            //get
             {
                 return (context == Context.None) ? id : id + "_" + context;
             }
@@ -105,56 +106,49 @@ namespace DigitalTwinsBackend.Helpers
         }
         #endregion
 
-        internal static void SetSpaceId(IMemoryCache memoryCache, Guid spaceId)
+        internal static void SetPreviousPage(IMemoryCache memoryCache, string previousPage)
         {
-            memoryCache.Set(CacheKeys.SpaceId, spaceId);
+            memoryCache.Set(CacheKeys.PreviousPage, previousPage);
         }
 
-        internal static Guid GetSpaceId(IMemoryCache memoryCache)
+        internal static string GetPreviousPage(IMemoryCache memoryCache)
         {
-            Guid spaceId;
-            memoryCache.TryGetValue(CacheKeys.SpaceId, out spaceId);
-            return spaceId;
-        }
+            Object _previousPage = null;
+            memoryCache.TryGetValue(CacheKeys.PreviousPage, out _previousPage);
 
-        internal static void SetContext(IMemoryCache memoryCache, Context context)
-        {
-            memoryCache.Set(CacheKeys.Context, context);
-        }
-
-        internal static bool IsInSpaceEditMode(IMemoryCache memoryCache)
-        {
-            return IsInContext(memoryCache, Context.Space);
-        }
-
-        internal static bool IsInDeviceEditMode(IMemoryCache memoryCache)
-        {
-            return IsInContext(memoryCache, Context.Device);
-        }
-
-        private static bool IsInContext(IMemoryCache memoryCache, Context context)
-        {
-            bool isInContext = false;
-
-            Object _context = null;
-            memoryCache.TryGetValue(CacheKeys.Context, out _context);
-
-            if (_context != null && _context.ToString().Equals(context.ToString()))
+            if (_previousPage != null)
             {
-                isInContext = true;
+                return _previousPage.ToString();
             }
-            return isInContext;
+            return "";
         }
 
-        internal static void AddInCache(IMemoryCache memoryCache, Object cacheElement, object key, Context scope)
+        internal static void SetObjectId(IMemoryCache memoryCache, Guid objectId)
         {
-            context = scope;
+            memoryCache.Set(CacheKeys.ObjectId, objectId);
+        }
+
+        internal static Guid GetObjectId(IMemoryCache memoryCache)
+        {
+            Object _objectId = null;
+            memoryCache.TryGetValue(CacheKeys.ObjectId, out _objectId);
+
+            if (_objectId != null)
+            {
+                return (Guid)_objectId;
+            }
+            return Guid.Empty;
+        }
+
+        internal static void AddInCache(IMemoryCache memoryCache, Object cacheElement, object key, Context context)
+        {
+            //context = scope;
             id = key.ToString();
 
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetSlidingExpiration(TimeSpan.FromSeconds(ConfigHelper.Config.parameters.CacheTime));
             
-            memoryCache.Set(cacheKey, cacheElement, cacheEntryOptions);
+            memoryCache.Set(CacheKey(context), cacheElement, cacheEntryOptions);
         }
 
         internal static void ResetMessagesInCache(IMemoryCache memoryCache)
@@ -193,22 +187,22 @@ namespace DigitalTwinsBackend.Helpers
             return (List<string>)GetFromCache(memoryCache, CacheKeys.InfoMessages, Context.None);
         }
 
-        internal static Object GetFromCache(IMemoryCache memoryCache, object key, Context scope)
+        internal static Object GetFromCache(IMemoryCache memoryCache, object key, Context context)
         {
-            context = scope;
+            //context = scope;
             id = key.ToString();
 
             Object cacheElement = null;
-            memoryCache.TryGetValue(cacheKey, out cacheElement);
+            memoryCache.TryGetValue(CacheKey(context), out cacheElement);
 
             return cacheElement;
         }
 
-        internal static void DeleteFromCache(IMemoryCache memoryCache, object key, Context scope)
+        internal static void DeleteFromCache(IMemoryCache memoryCache, object key, Context context)
         {
-            context = scope;
+            //context = scope;
             id = key.ToString();
-            memoryCache.Remove(cacheKey);
+            memoryCache.Remove(CacheKey(context));
         }
 
         public static async Task<HttpClient> GetHttpClientFromCacheAsync(IMemoryCache memoryCache, ILogger logger)
@@ -224,6 +218,12 @@ namespace DigitalTwinsBackend.Helpers
                 memoryCache.Set(CacheKeys.HttpClient, httpClient, cacheEntryOptions);
             }
             return httpClient;
+        }
+
+        public static IEnumerable<Space> GetRootSpaceListFromCache(IMemoryCache memoryCache)
+        {
+            var spaces = GetFromCache(memoryCache, Guid.Empty, Context.RootSpaces);
+            return spaces != null ? (IEnumerable<Space>)spaces : null;
         }
 
         public static IEnumerable<Space> GetSpaceListFromCache(IMemoryCache memoryCache)

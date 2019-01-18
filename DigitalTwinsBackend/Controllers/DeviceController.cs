@@ -11,51 +11,34 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace DigitalTwinsBackend.Controllers
 {
-    public class DeviceController : Controller
+    public class DeviceController : BaseController
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private IMemoryCache _cache;
-        private DeviceViewModel _model;
-
         public DeviceController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
             _httpContextAccessor = httpContextAccessor;
             _cache = memoryCache;
-
-            _model = new DeviceViewModel();
         }
 
-        public ActionResult Index()
-        {
-            return View();
-        }
-
+        [HttpGet]
         public ActionResult Details(Guid id)
         {
-            _model = new DeviceViewModel(_cache, id);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
-            return View(_model);
+            DeviceViewModel model = new DeviceViewModel(_cache, id);
+            return View(model);
         }
 
+        [HttpGet]
         public ActionResult Create(Guid spaceId)
         {
-            _model = new DeviceViewModel(_cache);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
-            if (spaceId!=Guid.Empty)
-            {
-                _model.SelectedDeviceItem = new Device();
-                _model.SelectedDeviceItem.SpaceId = spaceId;
-                CacheHelper.SetContext(_cache, Context.Space);
-            }
-            else
-            {
-                CacheHelper.SetContext(_cache, Context.None);
-            }
-
-            return View(_model);
+            DeviceViewModel model = new DeviceViewModel(_cache);
+            model.SelectedDeviceItem = new Device();
+            model.SelectedDeviceItem.SpaceId = spaceId;
+            return View(model);
         }
 
-        // POST: Device/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(DeviceViewModel model)
@@ -64,58 +47,35 @@ namespace DigitalTwinsBackend.Controllers
 
             try
             {
-                var id = await DigitalTwinsHelper.CreateDeviceAsync(ExtractDeviceFromModel(model, true), _cache, Loggers.SilentLogger);
+                var id = await DigitalTwinsHelper.CreateDeviceAsync(model.SelectedDeviceItem, _cache, Loggers.SilentLogger);
                 await FeedbackHelper.Channel.SendMessageAsync($"Device with id '{id}' successfully created.", MessageType.Info);
-                
-                if (CacheHelper.IsInSpaceEditMode(_cache))
-                {
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Space", new { id = model.SelectedDeviceItem.SpaceId });
-                }
-                else
-                {
-                    return RedirectToAction(nameof(DeviceController.Index));
-                }
-                
+
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
                 await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
-                //return View();
                 return Create(model.SelectedDeviceItem.SpaceId);
             }
         }
 
-        // GET: Device/Edit/5
+        [HttpGet]
         public ActionResult Edit(Guid id)
         {
-            _model = new DeviceViewModel(_cache, id);
-            CacheHelper.SetContext(_cache, Context.Space);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
-            return View(_model);
+            DeviceViewModel mmodel = new DeviceViewModel(_cache, id);
+            return View(mmodel);
         }
 
-        // POST: Device/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(DeviceViewModel model)
         {
-            CacheHelper.ResetMessagesInCache(_cache);
-            var device = ExtractDeviceFromModel(model, false);
-
             try
             {
-                await DigitalTwinsHelper.UpdateDeviceAsync(device, _cache, Loggers.SilentLogger);
-
-                if (CacheHelper.IsInSpaceEditMode(_cache))
-                {
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Space", new { id = model.SelectedDeviceItem.SpaceId });
-                }
-                else
-                {
-                    return RedirectToAction(nameof(DeviceController.Index));
-                }
+                await DigitalTwinsHelper.UpdateDeviceAsync(model.SelectedDeviceItem, _cache, Loggers.SilentLogger);
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
@@ -124,16 +84,15 @@ namespace DigitalTwinsBackend.Controllers
             }
         }
 
-        // GET: Device/Delete/5
+        [HttpGet]
         public ActionResult Delete(Guid id)
         {
-            _model = new DeviceViewModel(_cache, id);
-            CacheHelper.SetContext(_cache, Context.Space);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
-            return View(_model);
+            DeviceViewModel mmodel = new DeviceViewModel(_cache, id);
+            return View(mmodel);
         }
 
-        // POST: Device/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(DeviceViewModel model)
@@ -143,35 +102,13 @@ namespace DigitalTwinsBackend.Controllers
             try
             {
                 await DigitalTwinsHelper.DeleteDeviceAsync(model.SelectedDeviceItem, _cache, Loggers.SilentLogger);
-
-                if (CacheHelper.IsInSpaceEditMode(_cache))
-                {
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Space", new { id = model.SelectedDeviceItem.SpaceId });
-                }
-                else
-                {
-                    return RedirectToAction(nameof(DeviceController.Index));
-                }
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
                 await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString(), MessageType.Info);
                 return View();
             }
-        }
-
-        private Device ExtractDeviceFromModel(DeviceViewModel model, bool isInCreate)
-        {
-            Device device = model.SelectedDeviceItem;
-
-            if (!isInCreate)
-            {
-                device.TypeId = _model.DeviceTypeList.Single(t => t.Name == device.Type).Id;
-                device.SubTypeId = _model.DeviceSubTypeList.Single(t => t.Name == device.SubType).Id;
-            }
-
-            return device;
         }
     }
 }

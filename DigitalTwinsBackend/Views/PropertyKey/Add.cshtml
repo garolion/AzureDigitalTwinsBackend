@@ -13,9 +13,6 @@
     <div class="col-md-8">
         <form asp-action="Add" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @*<input asp-for="spaceId" type="hidden" />
-            <input asp-for="PropertyKeys" type="hidden" />
-            <input asp-for="Properties" type="hidden" />*@
             <table class="table">
                 <thead>
                     <tr>
@@ -38,28 +35,14 @@
                 </thead>
                 <tbody>
                     @Html.EditorForModel()
-                    @*@foreach (var property in Model)
-                    {
-                        <tr>
-                            <td>
-                                <input type="checkbox" value="pk.Item2" />
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => property.PropertyName)
-                            </td>
-                        </tr>
-                    }
-                </tbody>*@
+                </tbody>
             </table>
 
             <div class="form-group">
-                <input type="submit" value="Add" class="btn btn-default" />
+                <input type="submit" value="Add" class="ButtonNew" />
+                <input type="submit" onclick="history.go(-1)" class="ButtonCancel" value="Cancel" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 

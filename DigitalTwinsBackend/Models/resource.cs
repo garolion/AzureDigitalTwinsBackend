@@ -34,10 +34,10 @@ namespace DigitalTwinsBackend.Models
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
-            changes.Add("SpaceId", SpaceId);
-            changes.Add("Type", Type);
-            changes.Add("Region", Region);
-            changes.Add("Properties", Properties);
+            if (SpaceId != null)  changes.Add("SpaceId", SpaceId);
+            if (Type != null) changes.Add("Type", Type);
+            if (Region != null) changes.Add("Region", Region);
+            if (Properties != null) changes.Add("Properties", Properties);
 
             updatedElement = null;
             return changes;

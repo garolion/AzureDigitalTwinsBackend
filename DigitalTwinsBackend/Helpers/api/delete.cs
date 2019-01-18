@@ -20,6 +20,8 @@ namespace DigitalTwinsBackend.Helpers
             logger.LogInformation($"Deleting {typeof(T).Name} with Id: {element.Id}");
             var response = await httpClient.DeleteAsync($"{typeof(T).Name.ToLower()}s/{element.Id}");
 
+            await FeedbackHelper.Channel.SendMessageAsync($"{element.GetType().Name} '{element.Label}' successfully deleted", MessageType.Info);
+
             return await IsSuccessCall(response, logger);
         }
 

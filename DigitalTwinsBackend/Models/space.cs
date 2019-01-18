@@ -64,13 +64,11 @@ namespace DigitalTwinsBackend.Models
         public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
-
             Space refInCache = null;
 
             if (Id != Guid.Empty)
             {
                 refInCache = CacheHelper.GetSpaceFromCache(memoryCache, Id);
-                //changes.Add("Id", Id);
 
                 if (refInCache != null)
                 {
@@ -84,29 +82,24 @@ namespace DigitalTwinsBackend.Models
                         changes.Add("FriendlyName", FriendlyName);
                         refInCache.FriendlyName = FriendlyName;
                     }
-                    if (!TypeId.Equals(refInCache.TypeId))
+                    if (Type != null && !Type.Equals(refInCache.Type))
                     {
-                        changes.Add("TypeId", TypeId);
-                        refInCache.TypeId = TypeId;
+                        changes.Add("Type", Type);
                         refInCache.Type = Type;
                     }
-                    if (!SubTypeId.Equals(refInCache.SubTypeId))
+                    if (SubType != null && !SubType.Equals(refInCache.SubType))
                     {
-                        changes.Add("SubTypeId", SubTypeId);
-                        refInCache.SubTypeId = SubTypeId;
+                        changes.Add("SubType", SubType);
                         refInCache.SubType = SubType;
                     }
                     if (ParentSpaceId != Guid.Empty && !ParentSpaceId.Equals(refInCache.ParentSpaceId))
                     {
                         changes.Add("ParentSpaceId", ParentSpaceId);
                         refInCache.ParentSpaceId = ParentSpaceId;
-                        // ToDo update Parent ?
                     }
-
-                    if (!StatusId.Equals(refInCache.StatusId))
+                    if (Status != null && !Status.Equals(refInCache.Status))
                     {
-                        changes.Add("StatusId", StatusId);
-                        refInCache.StatusId = StatusId;
+                        changes.Add("Status", Status);
                         refInCache.Status = Status;
                     }
                     if (PropertiesHasChanged)
@@ -117,12 +110,14 @@ namespace DigitalTwinsBackend.Models
                 }
                 else
                 {
-                    changes.Add("Name", Name);
-                    changes.Add("FriendlyName", FriendlyName);
-                    changes.Add("TypeId", TypeId);
+                    refInCache = this;
+
+                    if (Name != null) changes.Add("Name", Name);
+                    if (FriendlyName != null) changes.Add("FriendlyName", FriendlyName);
+                    if (Type != null) changes.Add("Type", Type);
                     if (ParentSpaceId != Guid.Empty) changes.Add("ParentSpaceId", ParentSpaceId);
-                    changes.Add("SubType", SubType);
-                    changes.Add("Status", Status);
+                    if (SubType != null) changes.Add("SubType", SubType);
+                    if (Status != null) changes.Add("Status", Status);
                     if (PropertiesHasChanged) changes.Add("Properties", Properties);
                 }
             }

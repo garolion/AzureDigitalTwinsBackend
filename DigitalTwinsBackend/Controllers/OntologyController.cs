@@ -29,9 +29,6 @@ namespace DigitalTwinsBackend.Controllers
         {
             _model = new OntologyViewModel(_cache, null);
 
-            //Display Error & Info messages
-            SendViewData();
-
             return View(_model);
         }
 

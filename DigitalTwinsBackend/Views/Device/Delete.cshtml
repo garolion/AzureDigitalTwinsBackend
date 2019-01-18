@@ -10,7 +10,7 @@
 <h4>Device</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Delete">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input asp-for="SelectedDeviceItem.Id" type="hidden" />
@@ -54,22 +54,25 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Delete" class="btn btn-default" />
+                <input type="submit" value="Delete" class="ButtonDelete" />
+                <input type="submit" onclick="history.go(-1)" class="ButtonCancel" value="Cancel" />
             </div>
         </form>
     </div>
 
     <div class="col-md-4">
         <h4>Sensors</h4>
+        <a asp-controller="Sensor" asp-action="Create" asp-route-spaceId="@Model.SelectedDeviceItem.Id" class="ButtonNew">Add a new Sensor</a>
         <table class="table">
             <thead>
                 <tr>
                     <th>
-                        Id
+                        Hardware Id
                     </th>
                     <th>
-                        HardwareId
+                        Data Type
                     </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -77,20 +80,18 @@
                 {
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Id)
+                            @Html.DisplayFor(modelItem => item.HardwareId)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.HardwareId)
+                            @Html.DisplayFor(modelItem => item.DataType)
+                        </td>
+                        <td>
+                            <a asp-controller="Sensor" asp-action="Edit" asp-route-id="@item.Id" class="ButtonEdit">Edit</a>
+                            <a asp-controller="Sensor" asp-action="Delete" asp-route-id="@item.Id" class="ButtonDelete">Delete</a>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-

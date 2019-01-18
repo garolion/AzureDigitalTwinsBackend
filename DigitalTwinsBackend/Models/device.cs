@@ -48,29 +48,51 @@ namespace DigitalTwinsBackend.Models
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
-            Device oldValue = null;
+            Device refInCache = null;
             if (Id != Guid.Empty)
             {
-                oldValue = CacheHelper.GetDeviceFromCache(memoryCache, Id);
+                refInCache = CacheHelper.GetDeviceFromCache(memoryCache, Id);
 
-                if (oldValue != null)
+                if (refInCache != null)
                 {
-                    if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (HardwareId != null && !HardwareId.Equals(oldValue.HardwareId)) changes.Add("HardwareId", HardwareId);
-                    if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (!TypeId.Equals(oldValue.TypeId)) changes.Add("TypeId", TypeId);
-                    if (!SubTypeId.Equals(oldValue.SubTypeId)) changes.Add("SubTypeId", SubTypeId);
+                    if (Name != null && !Name.Equals(refInCache.Name))
+                    {
+                        changes.Add("Name", Name);
+                        refInCache.Name = Name;
+                    }
+                    if (HardwareId != null && !HardwareId.Equals(refInCache.HardwareId))
+                    {
+                        changes.Add("HardwareId", HardwareId);
+                        refInCache.HardwareId = HardwareId;
+                    }
+                    if (SpaceId != null && !SpaceId.Equals(refInCache.SpaceId))
+                    {
+                        changes.Add("SpaceId", SpaceId);
+                        refInCache.SpaceId = SpaceId;
+                    }
+                    if (Type != null && !Type.Equals(refInCache.Type))
+                    {
+                        changes.Add("Type", Type);
+                        refInCache.Type = Type;
+                    }
+                    if (SubType != null && !SubType.Equals(refInCache.SubType))
+                    {
+                        changes.Add("SubType", SubType);
+                        refInCache.SubType = SubType;
+                    }
                 }
                 else
                 {
-                    changes.Add("Name", Name);
-                    changes.Add("HardwareId", HardwareId);
-                    changes.Add("SpaceId", SpaceId);
-                    changes.Add("Type", Type);
-                    changes.Add("SubType", SubType);
+                    refInCache = this;
+
+                    if (Name != null) changes.Add("Name", Name);
+                    if (HardwareId != null)  changes.Add("HardwareId", HardwareId);
+                    if (SpaceId != null)  changes.Add("SpaceId", SpaceId);
+                    if (Type != null)  changes.Add("Type", Type);
+                    if (SubType != null)  changes.Add("SubType", SubType);
                 }
             }
-            updatedElement = null;
+            updatedElement = refInCache;
             return changes;
         }
     }

@@ -156,7 +156,8 @@ body {
 .ButtonDeviceDetails,
 .ButtonSensorDetails,
 .ButtonUDFDetails,
-.ButtonNavigate {
+.ButtonNavigate,
+.ButtonCancel{
     display: inline-block;
     padding: 2px 6px;
     margin-bottom: 4px;
@@ -200,7 +201,9 @@ body {
 .ButtonDelete {
     background-color: red;
 }
-
+.ButtonCancel {
+    background-color: grey;
+}
     .ButtonNew:hover,
     .ButtonNew:focus,
     .ButtonEdit.hover,

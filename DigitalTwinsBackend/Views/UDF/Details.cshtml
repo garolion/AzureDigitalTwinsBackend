@@ -13,7 +13,8 @@
     <div class="row">
         <div class="col-md-12">
             <form asp-action="Details">
-                <input asp-for="UDF.Id" type="hidden" />                
+                <input asp-for="UDF.Id" type="hidden" />
+                <input asp-for="UDF.Matchers" type="hidden" />
                 <div class="form-group">
                     <label asp-for="UDF.Id" class="control-label"></label>
                     <input asp-for="UDF.Id" class="form-control" disabled="disabled" />
@@ -93,5 +94,5 @@
  </div>
 
 <div>
-    <a asp-controller="Space" asp-action="List">Back to List</a>
+    <input type="submit" onclick="history.go(-1)" class="ButtonDetails" value="Back to space details" />
 </div>

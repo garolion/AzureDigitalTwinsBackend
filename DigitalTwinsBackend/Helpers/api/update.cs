@@ -16,32 +16,36 @@ namespace DigitalTwinsBackend.Helpers
 {
     public partial class Api
     {
-        public static async Task<bool> UpdateAsync<T>(IMemoryCache memoryCache, ILogger logger, T element) where T : BaseModel
+        public static async Task<bool> UpdateAsync<T>(IMemoryCache memoryCache, ILogger logger, T element, bool refreshInCache = true) where T : BaseModel
         {
             bool updateWasASuccess = true;
-            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-
-            logger.LogInformation($"Updating {typeof(T).Name} with Id: {element.Id}");
             BaseModel updatedElement = null;
-            var content = JsonConvert.SerializeObject(element.ToUpdate(memoryCache, out updatedElement));
+            var updates = element.ToUpdate(memoryCache, out updatedElement);
 
-            if (updatedElement != null) CacheHelper.AddInCache(
-                memoryCache, 
-                updatedElement, 
-                updatedElement.Id, (Context)Enum.Parse(typeof(Context), typeof(T).Name));
-
-            if (content.Length > 2)
+            if (updates != null && updates.Count > 0)
             {
-                var response = await httpClient.PatchAsync($"{typeof(T).Name.ToLower()}s/{element.Id}", 
+                logger.LogInformation($"Updating {typeof(T).Name} with Id: {updatedElement.Id}");
+
+                var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+                var content = JsonConvert.SerializeObject(updates);
+
+                if (refreshInCache)
+                {
+                    CacheHelper.AddInCache(memoryCache, updatedElement, updatedElement.Id, (Context)Enum.Parse(typeof(Context), typeof(T).Name));
+                }
+
+                var response = await httpClient.PatchAsync(
+                    $"{typeof(T).Name.ToLower()}s/{element.Id}",
                     new StringContent(content, Encoding.UTF8, "application/json"));
                 updateWasASuccess = await IsSuccessCall(response, logger);
-            }
 
-            if (updateWasASuccess & element.PropertiesHasChanged)
-            {
-                return await UpdatePropertiesAsync(memoryCache, logger, updatedElement);
+                if (updateWasASuccess & element.PropertiesHasChanged)
+                {
+                    await FeedbackHelper.Channel.SendMessageAsync($"{element.GetType().Name} '{element.Label}' successfully updated", MessageType.Info);
+                    return await UpdatePropertiesAsync(memoryCache, logger, updatedElement);
+                }
             }
-            return false;
+            return updateWasASuccess;
         }
 
         public static async Task<bool> UpdatePropertiesAsync<T>(IMemoryCache memoryCache, ILogger logger, T element) where T : BaseModel

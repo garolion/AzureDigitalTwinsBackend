@@ -51,37 +51,69 @@ namespace DigitalTwinsBackend.Models
         public override Dictionary<string, object> ToUpdate(IMemoryCache memoryCache, out BaseModel updatedElement)
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
+            Sensor refInCache = null;
 
-            Sensor oldValue = null;
             if (Id != Guid.Empty)
             {
-                oldValue = CacheHelper.GetSensorFromCache(memoryCache, Id);
-                //changes.Add("Id", Id);
+                refInCache = CacheHelper.GetSensorFromCache(memoryCache, Id);
 
-                if (oldValue != null)
+                if (refInCache != null)
                 {
-                    if (!DeviceId.Equals(oldValue.DeviceId)) changes.Add("DeviceId", DeviceId);
-                    if (HardwareId != null && !HardwareId.Equals(oldValue.HardwareId)) changes.Add("HardwareId", HardwareId);
-                    if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (!PollRate.Equals(oldValue.PollRate)) changes.Add("PollRate", PollRate);
-                    if (!PortTypeId.Equals(oldValue.PortTypeId)) changes.Add("PortTypeId", PortTypeId);
-                    if (!DataTypeId.Equals(oldValue.DataTypeId)) changes.Add("DataTypeId", DataTypeId);
-                    if (!DataUnitTypeId.Equals(oldValue.DataUnitTypeId)) changes.Add("DataUnitTypeId", DataUnitTypeId);
-                    if (!DataSubTypeId.Equals(oldValue.DataSubTypeId)) changes.Add("DataSubTypeId", DataSubTypeId);
+                    if (!DeviceId.Equals(refInCache.DeviceId))
+                    {
+                        changes.Add("DeviceId", DeviceId);
+                        refInCache.DeviceId = DeviceId;
+                    }
+                    if (HardwareId != null && !HardwareId.Equals(refInCache.HardwareId))
+                    {
+                        changes.Add("HardwareId", HardwareId);
+                        refInCache.HardwareId = HardwareId;
+                    }
+                    if (SpaceId != null && !SpaceId.Equals(refInCache.SpaceId))
+                    {
+                        changes.Add("SpaceId", SpaceId);
+                        refInCache.SpaceId = SpaceId;
+                    }
+                    if (!PollRate.Equals(refInCache.PollRate))
+                    {
+                        changes.Add("PollRate", PollRate);
+                        refInCache.PollRate = PollRate;
+                    }
+                    if (PortType != null && !PortType.Equals(refInCache.PortType))
+                    {
+                        changes.Add("PortType", PortType);
+                        refInCache.PortType = PortType;
+                    }
+                    if (DataType != null && !DataType.Equals(refInCache.DataType))
+                    {
+                        changes.Add("DataType", DataType);
+                        refInCache.DataType = DataType;
+                    }
+                    if (DataUnitType != null && !DataUnitType.Equals(refInCache.DataUnitType))
+                    {
+                        changes.Add("DataUnitType", DataUnitType);
+                        refInCache.DataUnitType = DataUnitType;
+                    }
+                    if (DataSubtype != null && !DataSubtype.Equals(refInCache.DataSubtype))
+                    {
+                        changes.Add("DataSubtype", DataSubtype);
+                        refInCache.DataSubtype = DataSubtype;
+                    }
                 }
                 else
                 {
-                    changes.Add("DeviceId", DeviceId);
-                    changes.Add("HardwareId", HardwareId);
-                    changes.Add("SpaceId", SpaceId);
-                    changes.Add("PollRate", PollRate);
-                    changes.Add("PortTypeId", PortTypeId);
-                    changes.Add("DataTypeId", DataTypeId);
-                    changes.Add("DataUnitTypeId", DataUnitTypeId);
-                    changes.Add("DataSubTypeId", DataSubTypeId);
+                    refInCache = this;
+                    if (DeviceId != null) changes.Add("DeviceId", DeviceId);
+                    if (HardwareId != null) changes.Add("HardwareId", HardwareId);
+                    if (SpaceId != null) changes.Add("SpaceId", SpaceId);
+                    if (PollRate != 0) changes.Add("PollRate", PollRate);
+                    if (PortType != null) changes.Add("PortType", PortType);
+                    if (DataType != null) changes.Add("DataType", DataType);
+                    if (DataUnitType != null) changes.Add("DataUnitType", DataUnitType);
+                    if (DataSubtype != null) changes.Add("DataSubTypeId", DataSubTypeId);
                 }
             }
-            updatedElement = null;
+            updatedElement = refInCache;
             return changes;
         }
     }

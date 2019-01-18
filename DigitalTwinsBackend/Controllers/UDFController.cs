@@ -28,8 +28,16 @@ namespace DigitalTwinsBackend.Controllers
             return View();
         }
 
+        [HttpGet]
         public async Task<ActionResult> Details(Guid id)
         {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+            if (Request.Headers.Keys.Contains("Referer"))
+            {
+                CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+                //ViewData["Reffer"] = Request.Headers["Referer"].ToString();
+            }
+
             var viewModel = new UDFViewModel();
 
             var udf = await DigitalTwinsHelper.GetUserDefinedFunction(id, _cache, Loggers.SilentLogger);

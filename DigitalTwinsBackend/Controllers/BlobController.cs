@@ -25,11 +25,13 @@ namespace DigitalTwinsBackend.Controllers
             _cache = memoryCache;
         }
 
+        [HttpGet]
         public ActionResult Create(ParentType blobType, Guid parentId)
         {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
             BlobContentViewModel model = new BlobContentViewModel(blobType, _cache);
             model.SelectedBlobContentItem.ParentId = parentId;
-            SendViewData();
             return View(model);
         }
 
@@ -48,23 +50,21 @@ namespace DigitalTwinsBackend.Controllers
                     _cache, 
                     Loggers.SilentLogger);
 
-                return RedirectToAction(
-                    "Details", 
-                    model.SelectedBlobContentItem.ParentType.ToString(), 
-                    new { id = model.SelectedBlobContentItem.ParentId });
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
                 await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
-                SendViewData();
                 return View(model);
             }
         }
 
+        [HttpGet]
         public ActionResult Delete(ParentType blobType, Guid blobId)
         {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
             BlobContentViewModel model = new BlobContentViewModel(blobType, _cache, blobId);
-            SendViewData();
             return View(model);
         }
 
@@ -75,23 +75,21 @@ namespace DigitalTwinsBackend.Controllers
             try
             {
                 await DigitalTwinsHelper.DeleteBlobAsync(model.SelectedBlobContentItem, _cache, Loggers.SilentLogger);
-                return RedirectToAction(
-                    "Details", 
-                    model.SelectedBlobContentItem.ParentType.ToString(), 
-                    new { id = model.SelectedBlobContentItem.ParentId });
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
                 await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
-                SendViewData();
                 return View(model);
             }
         }
 
+        [HttpGet]
         public ActionResult Edit(ParentType blobType, Guid blobId)
         {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
             BlobContentViewModel model = new BlobContentViewModel(blobType, _cache, blobId);
-            SendViewData();
             return View(model);
         }
     }

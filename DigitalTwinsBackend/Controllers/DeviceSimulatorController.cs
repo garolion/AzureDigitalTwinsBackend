@@ -31,7 +31,6 @@ namespace DigitalTwinsBackend.Controllers
         public ActionResult Index()
         {
             var simulator = new SimulatorViewModel(_cache);
-            SendViewData();
             return View(simulator);
         }
 
@@ -101,8 +100,6 @@ namespace DigitalTwinsBackend.Controllers
                     FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
                 }
 
-                //TODO Error messages are not sent through RedirectToAction
-                SendViewData();
                 return RedirectToAction(nameof(Index));
             }
         }

@@ -180,15 +180,6 @@ namespace DigitalTwinsBackend.Models
                 SubType = description.subType
             };
 
-        //public static Models.UserDefinedFunction ToUserDefinedFunction(this UserDefinedFunctionDescription description, Guid Id, Guid spaceId, IEnumerable<Models.Matcher> matchers)
-        //    => new Models.UserDefinedFunction()
-        //    {
-        //        Id = Id,
-        //        Name = description.name,
-        //        SpaceId = spaceId,
-        //        Matchers = matchers,
-        //    };
-
         public static Models.UserDefinedFunction ToUserDefinedFunction(this UserDefinedFunctionDescription description, Guid spaceId, IEnumerable<Matcher> matchers)
             => new Models.UserDefinedFunction()
             {
@@ -196,15 +187,6 @@ namespace DigitalTwinsBackend.Models
                 SpaceId = spaceId,
                 Matchers = matchers,
             };
-
-        //public static Models.UserDefinedFunction ToUserDefinedFunctionUpdate(this UserDefinedFunctionDescription description, Guid id, Guid spaceId, IEnumerable<Matcher> matchers)
-        //    => new Models.UserDefinedFunction()
-        //    {
-        //        Id = id,
-        //        Name = description.name,
-        //        SpaceId = spaceId,
-        //        Matchers = matchers,
-        //    };
     }
 
     public class ProvisionedSpace

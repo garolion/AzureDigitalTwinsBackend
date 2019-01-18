@@ -32,9 +32,7 @@ namespace DigitalTwinsBackend.Controllers
 
         public IActionResult Index()
         {
-            //Reset();
             var model = new ProvisionViewModel(_cache);
-            SendViewData();
             return View(model);
         }
 
@@ -53,13 +51,11 @@ namespace DigitalTwinsBackend.Controllers
 
                 model.CreatedSpaces = await DigitalTwinsHelper.CreateSpaces(_cache, Loggers.SilentLogger, spaceCreateDescriptions, model.UDFFiles, model.RootParent.Id);
                 model.Messages = CacheHelper.GetInfoMessagesFromCache(_cache);
-                SendViewData();
                 return View(model);
             }
             catch (Exception ex)
             {
                 FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
-                SendViewData();
                 return RedirectToAction(nameof(Index));
             }
 

@@ -36,27 +36,29 @@ namespace DigitalTwinsBackend.Models
         {
             Dictionary<string, object> changes = new Dictionary<string, object>();
 
-            Matcher oldValue = null;
+            Matcher refInCache = null;
             if (Id != Guid.Empty)
             {
-                oldValue = CacheHelper.GetMatcherFromCache(memoryCache, Id);
+                refInCache = CacheHelper.GetMatcherFromCache(memoryCache, Id);
 
-                if (oldValue != null)
+                if (refInCache != null)
                 {
-                    if (Name != null && !Name.Equals(oldValue.Name)) changes.Add("Name", Name);
-                    if (!SpaceId.Equals(oldValue.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (!Conditions.Equals(oldValue.Conditions)) changes.Add("Conditions", Conditions);
-                    if (!UserDefinedFunctions.Equals(oldValue.UserDefinedFunctions)) changes.Add("UserDefinedFunctions", UserDefinedFunctions);
+                    if (Name != null && !Name.Equals(refInCache.Name)) changes.Add("Name", Name);
+                    if (!SpaceId.Equals(refInCache.SpaceId)) changes.Add("SpaceId", SpaceId);
+                    if (!Conditions.Equals(refInCache.Conditions)) changes.Add("Conditions", Conditions);
+                    if (!UserDefinedFunctions.Equals(refInCache.UserDefinedFunctions)) changes.Add("UserDefinedFunctions", UserDefinedFunctions);
                 }
                 else
                 {
-                    changes.Add("Name", Name);
-                    changes.Add("SpaceId", SpaceId);
-                    changes.Add("Conditions", Conditions);
-                    changes.Add("UserDefinedFunctions", UserDefinedFunctions);
+                    refInCache = this;
+
+                    if (Name != null) changes.Add("Name", Name);
+                    if (SpaceId != null) changes.Add("SpaceId", SpaceId);
+                    if (Conditions != null) changes.Add("Conditions", Conditions);
+                    if (UserDefinedFunctions != null) changes.Add("UserDefinedFunctions", UserDefinedFunctions);
                 }
             }
-            updatedElement = null;
+            updatedElement = refInCache;
             return changes;
         }
     }

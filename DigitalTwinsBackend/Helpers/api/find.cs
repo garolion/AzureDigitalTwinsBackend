@@ -22,12 +22,13 @@ namespace DigitalTwinsBackend.Helpers
             HttpClient httpClient,
             ILogger logger,
             string idFilter,
-            string parentFilter,
+            string parentFilter = null,
             string includes = null)
         {
             //var filterHardwareIds = $"hardwareIds={hardwareId}";
             var includesParam = includes != null ? $"&includes={includes}" : "";
-            var filter = $"{idFilter}&{parentFilter}{includesParam}";
+            var parentParam = parentFilter != null ? $"&{parentFilter}" : "";
+            var filter = $"{idFilter}{parentParam}{includesParam}";
 
             var response = await httpClient.GetAsync($"{typeof(T).Name.ToLower()}s?{filter}");
             if (await IsSuccessCall(response, logger))
@@ -85,7 +86,7 @@ namespace DigitalTwinsBackend.Helpers
                 : $"ParentSpaceId eq null";
             var odataFilter = $"$filter={filterName} and {filterParentSpaceId}";
 
-            var response = await httpClient.GetAsync($"spaces?{odataFilter}");
+            var response = await httpClient.GetAsync($"spaces?{odataFilter}&includes=types");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -112,7 +113,7 @@ namespace DigitalTwinsBackend.Helpers
 
             var odataFilter = $"$filter={filterName} {filterTypeId}";
 
-            var response = await httpClient.GetAsync($"spaces?{odataFilter}{includesFilter}");
+            var response = await httpClient.GetAsync($"spaces?{odataFilter}{includesFilter}&includes=types");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -127,7 +128,7 @@ namespace DigitalTwinsBackend.Helpers
             ILogger logger,
             Guid spaceId)
         {
-            var response = await httpClient.GetAsync($"sensors?spaceId={spaceId.ToString()}&includes=Types");
+            var response = await httpClient.GetAsync($"sensors?spaceId={spaceId.ToString()}&includes=types");
             if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();

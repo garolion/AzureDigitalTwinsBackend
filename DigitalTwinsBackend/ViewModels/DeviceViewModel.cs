@@ -33,12 +33,7 @@ namespace DigitalTwinsBackend.ViewModels
 
             try
             {
-                LoadAsync().Wait();
-
-                if (id != null)
-                {
-                    LoadSelectedSpaceItemAsync((Guid)id).Wait();
-                }
+                LoadAsync(id).Wait();
             }
             catch (Exception ex)
             {
@@ -47,18 +42,16 @@ namespace DigitalTwinsBackend.ViewModels
             }
         }
 
-        private async Task LoadSelectedSpaceItemAsync(Guid id)
-        {
-            this.SelectedDeviceItem = await DigitalTwinsHelper.GetDeviceAsync(id, _cache, Loggers.SilentLogger, false);
-
-        }
-
-        private async Task LoadAsync()
+        private async Task LoadAsync(Guid? id = null)
         {
             SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
-
             DeviceTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceType, _cache, Loggers.SilentLogger);
             DeviceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceSubtype, _cache, Loggers.SilentLogger);
+
+            if (id != null)
+            {
+                this.SelectedDeviceItem = await DigitalTwinsHelper.GetDeviceAsync((Guid)id, _cache, Loggers.SilentLogger, false);
+            }
         }
     }
 }

@@ -14,7 +14,6 @@ namespace DigitalTwinsBackend.Controllers
     public class SensorController : Controller
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private SensorViewModel _model;
         private IMemoryCache _cache;
 
         public SensorController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
@@ -22,62 +21,39 @@ namespace DigitalTwinsBackend.Controllers
             _httpContextAccessor = httpContextAccessor;
             _cache = memoryCache;
 
-            _model = new SensorViewModel(_cache);
+            SensorViewModel model = new SensorViewModel(_cache);
         }
 
-        // GET: Sensors
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        // GET: Sensors/Details/5
+        [HttpGet]
         public ActionResult Details(Guid id)
         {
-            _model = new SensorViewModel(_cache, id);
-
-            return View(_model);
+            SensorViewModel model = new SensorViewModel(_cache, id);
+            return View(model);
         }
 
-        // GET: Sensors/Create
+        [HttpGet]
         public ActionResult Create(Guid deviceId)
         {
-            _model = new SensorViewModel(_cache);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
+            SensorViewModel model = new SensorViewModel(_cache);
             if (deviceId != Guid.Empty)
             {
-                _model.SelectedSensor = new Sensor() { DeviceId = deviceId };
-                CacheHelper.SetContext(_cache, Context.Device);
+                model.SelectedSensor = new Sensor() { DeviceId = deviceId };
             }
-            else
-            {
-                CacheHelper.SetContext(_cache, Context.None);
-            }
-
-            return View(_model);
+            return View(model);
         }
 
-        // POST: Sensors/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(SensorViewModel model)
         {
-            //SensorCreate sensorCreate = new SensorCreate(ExtractSensorFromModel(model, true));
-
             try
             {
-                var id = await DigitalTwinsHelper.CreateSensorAsync(ExtractSensorFromModel(model, true), _cache, Loggers.SilentLogger);
+                var id = await DigitalTwinsHelper.CreateSensorAsync(model.SelectedSensor, _cache, Loggers.SilentLogger);
                 await FeedbackHelper.Channel.SendMessageAsync($"Sensor with id '{id}' successfully created.", MessageType.Info);
 
-                if (CacheHelper.IsInDeviceEditMode(_cache))
-                {
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Device", new { id = model.SelectedSensor.DeviceId });
-                }
-                else
-                {
-                    return RedirectToAction(nameof(DeviceController.Index));
-                }
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
 
             }
             catch (Exception ex)
@@ -87,33 +63,23 @@ namespace DigitalTwinsBackend.Controllers
             }
         }
 
+        [HttpGet]
         public ActionResult Edit(Guid id)
         {
-            _model = new SensorViewModel(_cache, id);
-            CacheHelper.SetContext(_cache, Context.Device);
-
-            return View(_model);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+            SensorViewModel model = new SensorViewModel(_cache, id);
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(SensorViewModel model)
         {
-            var sensor = ExtractSensorFromModel(model, false);
-
             try
             {
-                await DigitalTwinsHelper.UpdateSensorAsync(sensor, _cache, Loggers.SilentLogger);
+                await DigitalTwinsHelper.UpdateSensorAsync(model.SelectedSensor, _cache, Loggers.SilentLogger);
 
-                if (CacheHelper.IsInDeviceEditMode(_cache))
-                {
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Device", new { id = model.SelectedSensor.DeviceId });
-                }
-                else
-                {
-                    return RedirectToAction(nameof(DeviceController.Index));
-                }
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
@@ -122,16 +88,15 @@ namespace DigitalTwinsBackend.Controllers
             }
         }
 
-        // GET: Sensors/Delete/5
+        [HttpGet]
         public ActionResult Delete(Guid id)
         {
-            _model = new SensorViewModel(_cache, id);
-            CacheHelper.SetContext(_cache, Context.Device);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+            SensorViewModel model = new SensorViewModel(_cache, id);
 
-            return View(_model);
+            return View(model);
         }
 
-        // POST: Sensors/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(SensorViewModel model)
@@ -140,34 +105,13 @@ namespace DigitalTwinsBackend.Controllers
             {
                 await DigitalTwinsHelper.DeleteSensorAsync(model.SelectedSensor, _cache, Loggers.SilentLogger);
 
-                if (CacheHelper.IsInDeviceEditMode(_cache))
-                {
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Device", new { id = model.SelectedSensor.DeviceId });
-                }
-                else
-                {
-                    return RedirectToAction(nameof(DeviceController.Index));
-                }
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
                 await FeedbackHelper.Channel.SendMessageAsync(ex.InnerException.ToString(), MessageType.Info);
                 return View();
             }
-        }
-
-        private Sensor ExtractSensorFromModel(SensorViewModel model, bool isInCreate)
-        {
-            Sensor sensor = model.SelectedSensor;
-
-            if (!isInCreate)
-            {
-                sensor.DataUnitTypeId = _model.DataUnitTypeList.Single(t => t.Name == sensor.DataUnitType).Id;
-                sensor.DataSubTypeId = _model.DataSubTypeList.Single(t => t.Name == sensor.DataSubtype).Id;
-            }
-
-            return sensor;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿@*http://bernholdtech.blogspot.com/2013/04/very-simple-pure-css-collapsible-list.html
     https://codepen.io/peternguyen/pen/hICga/
     https://codepen.io/simoberny/pen/vNYavm
+    https://developer.visioglobe.com/visiomapeditor/
         C:\Users\arfontai\Documents\IoTWorkbenchProjects\examples\RM2Test\Device*@
 
 @model DigitalTwinsBackend.ViewModels.SpaceViewModel
@@ -116,10 +117,6 @@
         {
             <div class="defaultEncart">
                 <h4>@value.Type</h4>
-                @*<div class="label-group">
-                        <label class="label-field">Id</label>
-                        <label class="label-value">@value.Type</label>
-                    </div>*@
                 <div class="label-group">
                     <label class="label-field">Time stamp</label>
                     <label class="label-value">@value.Timestamp</label>
@@ -144,66 +141,10 @@
                 }
             </div>
         }
-        @*<table class="table">
-                <thead>
-                    <tr>
-                        <th>
-                            Type
-                        </th>
-                        <th>
-                            Time
-                        </th>
-                        <th>
-                            Value
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.SelectedSpaceItem.Values)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Type)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Timestamp)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Value)
+      </div>
+</div>
 
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <h4>Historical values</h4>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Value
-                            </td>
-                            <td>
-                                Description
-                            </td>
-                        </tr>
-
-                        @foreach (var value in item.HistoricalValues)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => value.Value)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => value.Description)
-
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>*@
-    </div>
-</div><div class="row">
+<div class="row">
     <div class="col-md-6">
         <h2>Parent</h2>
         <div class="spaceEncart">
@@ -307,6 +248,7 @@
 <div class="row">
     <div class="col-md-3">
         <h4>Devices</h4>
+        <a asp-controller="Device" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add a new Device</a>
         @foreach (var device in Model.SelectedSpaceItem.Devices)
         {
             <div class="deviceEncart">
@@ -369,6 +311,7 @@
 
     <div class="col-md-3">
         <h4>User Defined Fonctions</h4>
+        <a asp-controller="UDF" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add a new Function</a>
         @foreach (var udf in Model.UDFList)
         {
             <div class="udfEncart">
@@ -403,7 +346,7 @@
 </div>
 
 <div class="row">
-    <a asp-area="" asp-controller="Home" asp-action="Spaces">Back to home</a>
+    <input type="submit" onclick="history.go(-1)" class="ButtonCancel" value="Back" />
 </div>
 
 @section Scripts {

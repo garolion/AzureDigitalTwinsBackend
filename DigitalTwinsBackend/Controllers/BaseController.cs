@@ -7,6 +7,7 @@ using DigitalTwinsBackend.Models;
 using DigitalTwinsBackend.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace DigitalTwinsBackend.Controllers
@@ -16,6 +17,11 @@ namespace DigitalTwinsBackend.Controllers
         internal IHttpContextAccessor _httpContextAccessor;
         internal IMemoryCache _cache;
 
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            SendViewData();
+            base.OnActionExecuted(context);
+        }
 
         public void Reset()
         {

@@ -17,26 +17,18 @@ namespace DigitalTwinsBackend.Controllers
         {
             _httpContextAccessor = httpContextAccessor;
             _cache = memoryCache;
-
-            
         }
 
+        [HttpGet]
         public IActionResult Create(Guid spaceId)
         {
-            PropertyKeyViewModel model = new PropertyKeyViewModel(_cache);
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
+            PropertyKeyViewModel model = new PropertyKeyViewModel(_cache);
             if (spaceId != Guid.Empty)
             {
                 model.SelectedPropertyKey = new PropertyKey() { SpaceId = spaceId };
-                CacheHelper.SetContext(_cache, Context.Space);
             }
-            else
-            {
-                CacheHelper.SetContext(_cache, Context.None);
-            }
-
-            //PropertyKeyViewModel model = new PropertyKeyViewModel(_cache, id: "3");
-
             return View(model);
         }
 
@@ -49,17 +41,7 @@ namespace DigitalTwinsBackend.Controllers
                 var id = await DigitalTwinsHelper.CreatePropertyKeyAsync(model.SelectedPropertyKey, _cache, Loggers.SilentLogger);
                 await FeedbackHelper.Channel.SendMessageAsync($"PropertyKey with id '{id}' successfully created.", MessageType.Info);
 
-                if (CacheHelper.IsInSpaceEditMode(_cache))
-                {
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Space", new { id = model.SelectedPropertyKey.SpaceId });
-                }
-                else
-                {
-                    //TODO replace with default view (List) ?
-                    return RedirectToAction(nameof(PropertyKeyController.Create));
-                }
-
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
@@ -68,10 +50,14 @@ namespace DigitalTwinsBackend.Controllers
             }
         }
 
+        [HttpGet]
         public async Task<IActionResult> Add(Guid spaceId)
         {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
             if (spaceId != Guid.Empty)
             {
+                CacheHelper.SetObjectId(_cache, spaceId);
                 Space space = await DigitalTwinsHelper.GetSpaceAsync((Guid)spaceId, _cache, Loggers.SilentLogger);
                 var pksForSpace = (await DigitalTwinsHelper.GetPropertyKeysForSpace((Guid)spaceId, _cache, Loggers.SilentLogger)).ToList<PropertyKey>();
 
@@ -80,9 +66,6 @@ namespace DigitalTwinsBackend.Controllers
                     from pk in pksForSpace
                     where !space.Properties.Any(prop => prop.Name.Equals(pk.Name))
                     select pk; 
-
-                CacheHelper.SetContext(_cache, Context.Space);
-                CacheHelper.SetSpaceId(_cache, spaceId);
 
                 return View(pks);
             }
@@ -99,70 +82,54 @@ namespace DigitalTwinsBackend.Controllers
         {
             try
             {
-                // Add properties
+                Space space = await DigitalTwinsHelper.GetSpaceAsync(CacheHelper.GetObjectId(_cache), _cache, Loggers.SilentLogger);
 
-                if (CacheHelper.IsInSpaceEditMode(_cache))
+                if (space.Properties == null)
                 {
-                    Space space = await DigitalTwinsHelper.GetSpaceAsync(CacheHelper.GetSpaceId(_cache), _cache, Loggers.SilentLogger);
+                    space.Properties = new System.Collections.ObjectModel.ObservableCollection<Property>();
+                }
 
-                    if (space.Properties == null)
+                foreach (PropertyKey pk in model)
+                {
+                    if (pk.Add)
                     {
-                        space.Properties = new System.Collections.ObjectModel.ObservableCollection<Property>();
-                    }
-
-                    foreach (PropertyKey pk in model)
-                    {
-                        if (pk.Add)
+                        switch (pk.PrimitiveDataType)
                         {
-                            switch (pk.PrimitiveDataType)
-                            {
-                                case PrimitiveDataType.Bool:
+                            case PrimitiveDataType.Bool:
+                                {
+                                    space.Properties.Add(new Property()
                                     {
-                                        space.Properties.Add(new Property()
-                                        {
-                                            //DataType = pk.PrimitiveDataType.ToString(),
-                                            Name = pk.Name,
-                                            Value = "false"
-                                        });
-                                        break;
-                                    }
-                                case PrimitiveDataType.Int:
-                                case PrimitiveDataType.Long:
-                                case PrimitiveDataType.Uint:
+                                        Name = pk.Name,
+                                        Value = "false"
+                                    });
+                                    break;
+                                }
+                            case PrimitiveDataType.Int:
+                            case PrimitiveDataType.Long:
+                            case PrimitiveDataType.Uint:
+                                {
+                                    space.Properties.Add(new Property()
                                     {
-                                        space.Properties.Add(new Property()
-                                        {
-                                            //DataType = pk.PrimitiveDataType.ToString(),
-                                            Name = pk.Name,
-                                            Value = "0"
-                                        });
-                                        break;
-                                    }
-                                default:
+                                        Name = pk.Name,
+                                        Value = "0"
+                                    });
+                                    break;
+                                }
+                            default:
+                                {
+                                    space.Properties.Add(new Property()
                                     {
-                                        space.Properties.Add(new Property()
-                                        {
-                                            //DataType = pk.PrimitiveDataType.ToString(),
-                                            Name = pk.Name,
-                                            Value = ""
-                                        });
-                                        break;
-                                    }
-                            }
+                                        Name = pk.Name,
+                                        Value = ""
+                                    });
+                                    break;
+                                }
                         }
                     }
-                    
-                    await DigitalTwinsHelper.UpdateSpacePropertiesAsync(space, _cache, Loggers.SilentLogger);
-
-                    CacheHelper.SetContext(_cache, Context.None);
-                    return RedirectToAction("Edit", "Space", new { id = CacheHelper.GetSpaceId(_cache) });
-                }
-                else
-                {
-                    //TODO replace with default view (List) ?
-                    return RedirectToAction(nameof(PropertyKeyController.Create));
                 }
 
+                await DigitalTwinsHelper.UpdateSpacePropertiesAsync(space, _cache, Loggers.SilentLogger);
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
             catch (Exception ex)
             {
@@ -183,7 +150,7 @@ namespace DigitalTwinsBackend.Controllers
                     await DigitalTwinsHelper.UpdateSpaceAsync(space, _cache, Loggers.SilentLogger);
                 }
 
-                return RedirectToAction("Edit", "Space", new { id = spaceId });
+                return Redirect(Request.Headers["Referer"].ToString());
             }
             else
             {
