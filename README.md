@@ -17,4 +17,8 @@ Please use the [Issues](https://github.com/garolion/AzureDigitalTwinsBackend/iss
 
 > Search & List your Spaces 
 
-![space list](/Doc/SpaceList.jpg)
+![space list](/Doc/Search.jpg)
+
+![Devices list](/Doc/Devices.jpg)
+
+![Space Edition](/Doc/Edit.jpg)
