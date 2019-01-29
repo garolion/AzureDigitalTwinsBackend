@@ -46,15 +46,15 @@ namespace DigitalTwinsBackend.ViewModels
         private async Task LoadAsync(string id)
         {
             PrimitiveDataTypeList = new List<string>();
-            PrimitiveDataTypeList.Add("bool");
-            PrimitiveDataTypeList.Add("string");
-            PrimitiveDataTypeList.Add("long");
-            PrimitiveDataTypeList.Add("int");
-            PrimitiveDataTypeList.Add("uint");
-            PrimitiveDataTypeList.Add("datetime");
-            PrimitiveDataTypeList.Add("set");
-            PrimitiveDataTypeList.Add("enum");
-            PrimitiveDataTypeList.Add("json");
+            PrimitiveDataTypeList.Add("Bool");
+            PrimitiveDataTypeList.Add("String");
+            PrimitiveDataTypeList.Add("Long");
+            PrimitiveDataTypeList.Add("Int");
+            PrimitiveDataTypeList.Add("Uint");
+            PrimitiveDataTypeList.Add("DateTime");
+            PrimitiveDataTypeList.Add("Set");
+            PrimitiveDataTypeList.Add("Enum");
+            PrimitiveDataTypeList.Add("Json");
 
             if (id != null)
             {

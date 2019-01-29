@@ -11,8 +11,8 @@ namespace DigitalTwinsBackend.Models
     public class Matcher : BaseModel
     {
         public string Name { get; set; }
-        public string SpaceId { get; set; }
-        public IEnumerable<MatcherCondition> Conditions { get; set; }
+        public Guid SpaceId { get; set; }
+        public List<MatcherCondition> Conditions { get; set; }
         public IEnumerable<UserDefinedFunction> UserDefinedFunctions { get; set; }
         public override string Label { get { return Name; } }
 

@@ -1,0 +1,63 @@
+﻿@model IEnumerable<DigitalTwinsBackend.Models.UISpace>
+
+@{
+    ViewData["Title"] = "Provision";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Property Keys</h2>
+
+<h4>Full hierarchy</h4>
+<hr />
+<div class="row">
+    <h4>Spaces and Property Keys</h4>
+    <div class="col-md-12">
+        @foreach (var space in Model)
+        {
+        <div style="margin-left:@space.MarginLeft" class="spaceEncart">
+            <div class="label-group" style="display: inline-block;">
+                <h4 style="float:left">Space</h4>
+                <a style="position: absolute; right: 50px; margin-top:15px; margin-left:20px" asp-controller="Space" asp-action="Details" asp-route-id="@space.Space.Id" class="ButtonSpaceDetails">Details</a>
+            </div>
+            <div class="label-group">
+                <label class="label-field">Id</label>
+                <label class="label-value">@space.Space.Id</label>
+
+                <label style="margin-left:50px" class="label-field">Name</label>
+                <label class="label-value">@space.Space.Name</label>
+
+                <label style="margin-left:50px" class="label-field">Type</label>
+                <label class="label-value">@space.Space.Type</label>
+            </div>
+            @if (space.Space.PropertyKeys != null && space.Space.PropertyKeys.Count > 0)
+            {
+                <div style="margin-left:@space.MarginLeft" class="udfEncart">
+                    <div class="label-group" style="display: inline-block;">
+                        <h4 style="float:left">Property Keys</h4>
+                        @*<a style="position: absolute; right: 50px; margin-top:15px; margin-left:20px" asp-controller="UDF" asp-action="Details" asp-route-id="@udf.Id" class="ButtonUDFDetails">Details</a>*@
+                    </div>
+
+                    @foreach (var propertyKey in space.Space.PropertyKeys)
+                    {
+                    <div class="label-group">
+                        <label class="label-field">Id</label>
+                        <label class="label-value">@propertyKey.Id</label>
+
+                        <label style="margin-left:50px" class="label-field">Category</label>
+                        <label class="label-value">@propertyKey.Category</label>
+
+                        <label style="margin-left:50px" class="label-field">Data Type</label>
+                        <label class="label-value">@propertyKey.PrimitiveDataType</label>
+
+                        <label style="margin-left:50px" class="label-field">Name</label>
+                        <label class="label-value">@propertyKey.Name</label>
+
+
+                    </div>
+                    }
+                </div>
+            }
+        </div>
+        }
+    </div>
+</div>

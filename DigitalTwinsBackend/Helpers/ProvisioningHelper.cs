@@ -123,8 +123,8 @@ namespace DigitalTwinsBackend.Models
             => new Models.Matcher()
             {
                 Name = description.name,
-                SpaceId = spaceId.ToString(),
-                Conditions = new[] {
+                SpaceId = spaceId,
+                Conditions = new List<MatcherCondition>() {
                     new Models.MatcherCondition()
                     {
                         Target = "Sensor",
@@ -185,13 +185,7 @@ namespace DigitalTwinsBackend.Models
             {
                 Name = description.name,
                 SpaceId = spaceId,
-                Matchers = matchers,
+                Matchers = matchers.ToList(),
             };
-    }
-
-    public class ProvisionedSpace
-    {
-        public Space Space { get; set; }
-        public string MarginLeft { get; set; }
     }
 }

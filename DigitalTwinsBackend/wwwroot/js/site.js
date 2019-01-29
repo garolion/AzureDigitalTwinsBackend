@@ -16,7 +16,7 @@
         document.getElementById("MaxLabel").textContent = "Maximum string length";
         document.getElementById("Max").disabled = "";
     }
-    if (primitiveDataType === "Long" || primitiveDataType === "int" || primitiveDataType === "uint") {
+    if (primitiveDataType === "Long" || primitiveDataType === "Int" || primitiveDataType === "Uint") {
         document.getElementById("ValidationDataLabel").textContent = "ValidationData";
         document.getElementById("ValidationData").disabled = "disabled";
         document.getElementById("MinLabel").textContent = "Minimum allowed value";

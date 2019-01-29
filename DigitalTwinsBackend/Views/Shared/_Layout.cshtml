@@ -8,41 +8,116 @@
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
+
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
     </environment>
+
+    <script src="~/js/site.js"></script>
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/message.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">DigitalTwinsBackend</a>
+    @*<nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">DigitalTwinsBackend</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Spaces">Spaces</a></li>
+                        <li><a asp-area="" asp-controller="Ontology" asp-action="List">Ontologies</a></li>
+                        <li><a asp-area="" asp-controller="DeviceSimulator" asp-action="Index">Device Simulator</a></li>
+                        <li><a asp-area="" asp-controller="Provision" asp-action="Index">Provision</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Settings">Settings</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Spaces">Spaces</a></li>
-                    <li><a asp-area="" asp-controller="Ontology" asp-action="List">Ontologies</a></li>
-                    <li><a asp-area="" asp-controller="DeviceSimulator" asp-action="Index">Device Simulator</a></li>
-                    <li><a asp-area="" asp-controller="Provision" asp-action="Index">Provision</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Settings">Settings</a></li>
-                </ul>
-            </div>
+        </nav>*@
+
+    <div id="cont">
+        <div id="menu-fixed">
+            <a href="#cont">
+                <i class="material-icons back">&#xE314;</i>
+            </a>
+            <a href="#menu-fixed">
+                <div class="logo">
+                    <span></span>
+                    <p>Azure Digital Twins</p>
+                </div>
+                <p class="pmenu">BACKEND</p>
+            </a>
+            <hr>
+            <ul class="menu">
+                <
+                <a asp-controller="Home" asp-action="Index">
+                    <li><i class="material-icons">home</i><p>Home</p></li>
+                </a>
+
+                <a asp-controller="Space" asp-action="List">
+                    <li><i class="material-icons">&#xE8B6;</i><p>Search Space</p></li>
+                </a>
+
+                <a asp-controller="Ontology" asp-action="List">
+                    <li><i class="material-icons">&#xe7f1;</i><p>Ontologies</p></li>
+                </a>
+
+                <a asp-controller="DeviceSimulator" asp-action="Index">
+                    <li><i class="material-icons">widgets</i><p>Device Simulator</p></li>
+                </a>
+
+                <a asp-controller="Provision" asp-action="Index">
+                    <li><i class="material-icons">&#xe03b;</i><p>Provisionning</p></li>
+                </a>
+
+                <a asp-controller="Home" asp-action="Settings">
+                    <li><i class="material-icons">&#xE8B8;</i><p>Settings</p></li>
+                </a>
+
+                <hr>
+
+                <a asp-controller="Device" asp-action="List">
+                    <li><i class="material-icons">&#xe322;</i><p>Devices</p></li>
+                </a>
+                <a asp-controller="UDF" asp-action="List">
+                    <li><i class="material-icons">&#xe890;</i><p>UDFs</p></li>
+                </a>
+                <a asp-controller="PropertyKey" asp-action="List">
+                    <li><i class="material-icons">format_list_bulleted</i><p>Property Keys</p></li>
+                </a>
+
+            </ul>
         </div>
-    </nav>
-
-    <partial name="_CookieConsentPartial" />
-
+    </div>
     <div class="container body-content">
         @RenderBody()
         <hr />
@@ -94,32 +169,8 @@
         </footer>
     </div>
 
-    <environment include="Development">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
-                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
-                asp-fallback-test="window.jQuery"
-                crossorigin="anonymous"
-                integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
-        </script>
-        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
-                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
-                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                crossorigin="anonymous"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
-        </script>
-    </environment>
-
-    <script src="~/js/site.js"></script>
-
     @RenderSection("Scripts", required: false)
 </body>
 </html>
-
-<script src="~/lib/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/message.js"></script>
 
 

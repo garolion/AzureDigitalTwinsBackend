@@ -1,0 +1,41 @@
+﻿@model DigitalTwinsBackend.ViewModels.MatcherViewModel
+
+@{
+    ViewData["Title"] = "AddMatcherCondition";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Add</h2>
+
+<h4>Matcher Condition</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="AddCondition">
+            <input asp-for="SelectedMatcher.Id" type="hidden" />
+            <input asp-for="SelectedMatcher.SpaceId" type="hidden" />
+            <input asp-for="UdfId" type="hidden" />
+            <div class="form-group">
+                <label asp-for="SelectedMatcherCondition.Target" class="control-label"></label>
+                <select asp-for="SelectedMatcherCondition.Target" class="form-control" asp-items="@(new SelectList(Model.ConditionTargetList))"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedMatcherCondition.Path" class="control-label"></label>
+                <input asp-for="SelectedMatcherCondition.Path" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedMatcherCondition.Value" class="control-label"></label>
+                <select asp-for="SelectedMatcherCondition.Value" class="form-control" asp-items="@(new SelectList(Model.SensorDataTypeList,"Name","Name"))"></select>
+
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedMatcherCondition.Comparison" class="control-label"></label>
+                <select asp-for="SelectedMatcherCondition.Comparison" class="form-control" asp-items="@(new SelectList(Model.ConditionComparisonList))"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" name="createButton" value="Add" class="ButtonNew" />
+                <input type="submit" name="createButton" value="Cancel" class="ButtonCancel" />
+            </div>
+        </form>
+    </div>
+</div>

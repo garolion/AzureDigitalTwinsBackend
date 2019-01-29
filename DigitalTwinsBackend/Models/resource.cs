@@ -16,8 +16,9 @@ namespace DigitalTwinsBackend.Models
         public string Status { get; set; }
         public DateTime LastUpdatedUtc { get; set; }
         public int InstanceNum { get; set; }
+        public new ResourceProperties Properties { get; set; }
 
-        public override string Label { get { return Id.ToString(); } }
+    public override string Label { get { return Id.ToString(); } }
 
         public override Dictionary<string, object> ToCreate()
         {

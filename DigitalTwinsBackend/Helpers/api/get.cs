@@ -129,9 +129,12 @@ namespace DigitalTwinsBackend.Helpers
 
         public static async Task<IEnumerable<Models.PropertyKey>> GetPropertyKeys(
             HttpClient httpClient,
-            ILogger logger)
+            ILogger logger,
+            string includes = null)
         {
-            var response = await httpClient.GetAsync($"propertykeys");
+            var includesFilter = (includes != null ? $"?includes={includes}" : "");
+            
+            var response = await httpClient.GetAsync($"propertykeys{includesFilter}");
             if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -283,12 +286,15 @@ namespace DigitalTwinsBackend.Helpers
         public static async Task<IEnumerable<Models.UserDefinedFunction>> GetUserDefinedFunctions(
             HttpClient httpClient,
             ILogger logger,
-            Guid spaceId,
+            Guid? spaceId = null,
             string includes = null)
         {
+            var spaceidFilter = (spaceId != null && spaceId != Guid.Empty ? $"spaceId={spaceId}" : "");
             var includesFilter = (includes != null ? $"includes={includes}" : "");
+            var prefix = (spaceidFilter.Length > 0 || includesFilter.Length > 0 ? "?" : "");
+            var connector = (spaceidFilter.Length > 0 && includesFilter.Length > 0 ? "&" : "");
 
-            var response = await httpClient.GetAsync($"userdefinedfunctions?spaceId={spaceId}" + (includes != null ? $"&includes={includes}" : ""));
+            var response = await httpClient.GetAsync($"userdefinedfunctions{prefix}{spaceidFilter}{connector}{includesFilter}");
             if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();
@@ -417,12 +423,15 @@ namespace DigitalTwinsBackend.Helpers
             ILogger logger,
             int maxNumberToGet = 10,
             string includes = null,
-            string categories = null)
+            string categories = null,
+            bool onlyEnabled = false)
         {
             var includesFilter = (includes != null ? $"includes={includes}" : "");
             var categoriesFilter = (categories != null ? $"categories={categories}" : "");
+            var disabledFilter = (onlyEnabled ? $"disabled=false" : "");
 
-            var response = await httpClient.GetAsync($"types{MakeQueryParams(new[] { includesFilter, categoriesFilter })}");
+
+            var response = await httpClient.GetAsync($"types{MakeQueryParams(new[] { includesFilter, categoriesFilter, disabledFilter })}");
             if (await IsSuccessCall(response, logger))
             {
                 var content = await response.Content.ReadAsStringAsync();

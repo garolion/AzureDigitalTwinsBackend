@@ -1,5 +1,4 @@
-﻿@*http://bernholdtech.blogspot.com/2013/04/very-simple-pure-css-collapsible-list.html
-    https://codepen.io/peternguyen/pen/hICga/
+﻿@*
     https://codepen.io/simoberny/pen/vNYavm
     https://developer.visioglobe.com/visiomapeditor/
         C:\Users\arfontai\Documents\IoTWorkbenchProjects\examples\RM2Test\Device*@
@@ -60,6 +59,7 @@
     <div class="col-md-4">
         <h4>Blob</h4>
         <a asp-controller="Blob" asp-action="Create" asp-route-blobType="Space" asp-route-parentid="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add File</a>
+
         @foreach (var blob in Model.Blobs)
         {
             <div class="defaultEncart">
@@ -72,7 +72,9 @@
                     <label class="label-field">Type</label>
                     <label class="label-value">@blob.Type</label>
                 </div>
-                <img src="@blob.ContentInfos[0].FilePath" alt="Image" style="padding-bottom:15px" />
+                <div class="label-group">
+                    <img src="@blob.ContentInfos[0].FilePath" alt="Image" style="padding-bottom:15px" />
+                </div>
             </div>
         }
 
@@ -141,7 +143,7 @@
                 }
             </div>
         }
-      </div>
+    </div>
 </div>
 
 <div class="row">
@@ -212,7 +214,11 @@
         @foreach (var child in Model.SelectedSpaceItem.Children)
         {
             <div class="spaceEncart">
-                <h3>Space</h3>
+                <div class="label-group" style="display: inline-block;">
+                    <h3 style="float:left">Space</h3>
+                    <a style="float:left;margin-top:20px;margin-left:20px" asp-action="Details" asp-route-id="@child.Id" class="ButtonSpaceDetails">Navigate to this child</a>
+                </div>
+
                 <div class="label-group">
                     <label asp-for="SelectedSpaceItem.Name" class="label-field"></label>
                     <label class="label-value">@child.Name</label>
@@ -237,9 +243,9 @@
                     <label asp-for="SelectedSpaceItem.Status" class="label-field"></label>
                     <label class="label-value">@child.Status</label>
                 </div>
-                <div class="form-group">
-                    <a asp-action="Details" asp-route-id="@child.Id" class="ButtonSpaceDetails">Navigate to this child</a>
-                </div>
+                @*<div class="form-group">
+                        <a asp-action="Details" asp-route-id="@child.Id" class="ButtonSpaceDetails">Navigate to this child</a>
+                    </div>*@
             </div>
         }
     </div>

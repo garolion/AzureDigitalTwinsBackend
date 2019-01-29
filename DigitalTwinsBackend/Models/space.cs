@@ -9,6 +9,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DigitalTwinsBackend.Models
 {
+    public class UISpace
+    {
+        public Space Space { get; set; }
+        public string MarginLeft { get; set; }
+    }
+
     public class Space : BaseModel
     {
         public string Name { get; set; }
@@ -25,12 +31,13 @@ namespace DigitalTwinsBackend.Models
         public int StatusId { get; set; }
         public Space Parent { get; set; }
         public IEnumerable<Space> Children { get; set; }
-        public IEnumerable<string> SpacePaths { get; set; }
         public IEnumerable<SpaceValue> Values { get; set; }
         public IEnumerable<Resource> Resources { get; set; }
         public IEnumerable<Device> Devices { get; set; }
         public IEnumerable<Sensor> Sensors { get; set; }
         public IEnumerable<string> Users { get; set; }
+        public List<UserDefinedFunction> UDFs { get; set; }
+        public List<PropertyKey> PropertyKeys { get; set; }
 
         public override string Label { get { return Name; } }
 
@@ -44,6 +51,8 @@ namespace DigitalTwinsBackend.Models
             Devices = new List<Device>();
             Sensors = new List<Sensor>();
             Users = new List<string>();
+            UDFs = new List<UserDefinedFunction>();
+            PropertyKeys = new List<PropertyKey>();
         }
 
         public override Dictionary<string, object> ToCreate()

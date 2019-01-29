@@ -25,7 +25,36 @@ namespace DigitalTwinsBackend.Models
             get { return propertiesHasChanged; }
         }
 
-    public BaseModel()
+        public List<Guid> SpacesHierarchy { get; set; }
+        private List<string> spacePaths;
+        public List<string> SpacePaths
+        {
+            get
+            {
+                return spacePaths;
+            }
+            set
+            {
+                spacePaths = value;
+
+                if (spacePaths != null && spacePaths.Count > 0)
+                {
+                    string path = spacePaths[0];
+                    var spaceIds = path.Split('/');
+
+                    Guid id;
+                    foreach (var spaceId in spaceIds)
+                    {
+                        if (Guid.TryParse(spaceId, out id))
+                        {
+                            SpacesHierarchy.Add(id);
+                        }
+                    }
+                }
+            }
+        }
+
+        public BaseModel()
         {
             Properties = new ObservableCollection<Property>();
             Properties.CollectionChanged += Properties_CollectionChanged;

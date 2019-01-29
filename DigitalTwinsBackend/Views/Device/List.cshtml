@@ -1,0 +1,82 @@
+﻿@model IEnumerable<DigitalTwinsBackend.Models.UISpace>
+
+@{
+    ViewData["Title"] = "Provision";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Devices</h2>
+
+<h4>Full hierarchy</h4>
+<hr />
+<div class="row">
+    <h4>Spaces, Devices and Resources (IoT Hub)</h4>
+    <div class="col-md-12">
+            @foreach (var space in Model)
+            {
+        <div style="margin-left:@space.MarginLeft" class="spaceEncart">
+            <div class="label-group" style="display: inline-block;">
+                <h4 style="float:left">Space</h4>
+                <a style="position: absolute; right: 50px; margin-top:15px; margin-left:20px" asp-controller="Space" asp-action="Details" asp-route-id="@space.Space.Id" class="ButtonSpaceDetails">Details</a>
+            </div>
+            <div class="label-group">
+                <label class="label-field">Id</label>
+                <label class="label-value">@space.Space.Id</label>
+
+                <label style="margin-left:50px" class="label-field">Name</label>
+                <label class="label-value">@space.Space.Name</label>
+
+                <label style="margin-left:50px" class="label-field">Type</label>
+                <label class="label-value">@space.Space.Type</label>
+
+
+            </div>
+            @if (space.Space.Devices != null)
+            {
+                foreach (var device in space.Space.Devices)
+                {
+                    <div style="margin-left:@space.MarginLeft" class="deviceEncart">
+                        <div class="label-group" style="display: inline-block;">
+                            <h4 style="float:left">Device</h4>
+                            <a style="position: absolute; right: 50px; margin-top:15px; margin-left:20px" asp-controller="Device" asp-action="Details" asp-route-id="@device.Id" class="ButtonDeviceDetails">Details</a>
+                        </div>
+                        <div class="label-group">
+                            <label class="label-field">Id</label>
+                            <label class="label-value">@device.Id</label>
+
+                            <label style="margin-left:50px" class="label-field">Hardware Id</label>
+                            <label class="label-value">@device.HardwareId</label>
+
+                            <label style="margin-left:50px" class="label-field">Type</label>
+                            <label class="label-value">@device.Type</label>
+                        </div>
+                    </div>
+                }
+             }
+                        @if (space.Space.Resources != null)
+                        {
+                            foreach (var resource in space.Space.Resources)
+                            {
+                    <div class="sensorEncart">
+                        <div class="label-group" style="display: inline-block;">
+                            <h4 style="float:left">Resource</h4>
+                            @*<a asp-controller="Sensor" asp-action="Details" asp-route-id="@sensor.Id" class="ButtonSensorDetails">Details</a>*@
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Type</label>
+                                <label class="label-value">@resource.Type</label>
+
+                                <label style="margin-left:50px" class="label-field">Region</label>
+                                <label class="label-value">@resource.Region</label>
+
+                                <label style="margin-left:50px" class="label-field">URL</label>
+                                <label class="label-value">@resource.Properties.IothubUrl</label>
+                            </div>
+                        </div>
+                        }
+                        }
+                    </div>
+                }
+            </div>
+</div>
+

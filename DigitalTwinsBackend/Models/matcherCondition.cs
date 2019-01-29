@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace DigitalTwinsBackend.Models
     {
         public Guid Id { get; set; }
         public string Target { get; set; }
+        [Display(Name = "Path (for example '$.dataType'")]
         public string Path { get; set; }
         public string Value { get; set; }
         public string Comparison { get; set; }

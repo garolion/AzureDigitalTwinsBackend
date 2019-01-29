@@ -1,6 +1,6 @@
 ﻿function UpdatePropertyKeyFields() {
     var primitiveDataType = document.getElementById("PrimitiveDataType").value;
-    if (primitiveDataType === "bool") {
+    if (primitiveDataType === "Bool") {
         document.getElementById("ValidationDataLabel").textContent = "ValidationData";
         document.getElementById("ValidationData").disabled = "disabled";
         document.getElementById("MinLabel").textContent = "Min";
@@ -8,7 +8,7 @@
         document.getElementById("MaxLabel").textContent = "Max";
         document.getElementById("Max").disabled = "disabled";
     }
-    if (primitiveDataType === "string") {
+    if (primitiveDataType === "String") {
         document.getElementById("ValidationDataLabel").innerHTML = "ValidationData - Optional regex <br>> https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference";
         document.getElementById("ValidationData").disabled = "";
         document.getElementById("MinLabel").textContent = "Minimum string length";

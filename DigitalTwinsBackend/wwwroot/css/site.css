@@ -1,15 +1,26 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
 for details on configuring this project to bundle and minify static web assets. */
-body {
+/*body {
     padding-top: 50px;
     padding-bottom: 20px;
-}
+}*/
 
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    /*padding-left: 15px;
+    padding-right: 15px;*/
+    margin: 15px auto 15px auto ;
+    display: block;
+    position: relative;
+}
+
+#page div {
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    background: white;
+    z-index: 1;
 }
 
 /* Carousel */
@@ -80,8 +91,8 @@ body {
 }
 
 .defaultEncart {
-    margin: 10px 0px;
-    padding: 0px 20px;
+    margin: 10px 0px 10px 0px;
+    padding: 10px 0px 95px 0px;
     font-size: 14px;
     font-weight: normal;
     line-height: 1;
@@ -90,14 +101,14 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #EFEFEF;
-    float: left;
+    float: none;
 }
 
 .spaceEncart,
 .deviceEncart,
 .sensorEncart,
-.udfEncart, 
-.userEncart{
+.udfEncart,
+.userEncart {
     margin: 10px 0px;
     padding: 0px 20px;
     font-size: 14px;
@@ -110,7 +121,7 @@ body {
 }
 
 .spaceEncart {
-    background-color:antiquewhite;
+    background-color: antiquewhite;
 }
 
 .deviceEncart {
@@ -133,7 +144,7 @@ body {
     font-size: 14px;
     font-weight: bold;
     color: #555;
-    width: 120px;
+    width: 90px;
 }
 
 .label-value {
@@ -157,7 +168,7 @@ body {
 .ButtonSensorDetails,
 .ButtonUDFDetails,
 .ButtonNavigate,
-.ButtonCancel{
+.ButtonCancel {
     display: inline-block;
     padding: 2px 6px;
     margin-bottom: 4px;
@@ -235,3 +246,278 @@ body {
 .ButtonDelete.focus {
     background-color: #FFB5B2;
 }
+
+html, body {
+    margin: 0;
+    /*font-family: 'Roboto';*/
+    background: #f1f1f1;
+    overflow: auto;
+}
+
+#cont:target > menu-fixed {
+    width: 90px;
+    background: #111;
+    transition: all 0.3s;
+}
+
+    #cont:target > menu-fixed > a .material-icons.back {
+        display: none;
+    }
+
+    #cont:target > menu-fixed > .menu li {
+        text-align: center;
+        width: 40%;
+    }
+
+        #cont:target > menu-fixed > .menu li > p {
+            display: none;
+        }
+
+#menu-fixed {
+    width: 90px;
+    z-index: 2;
+    height: 100%;
+    background: #0F0F0F;
+    position: fixed;
+    transition: all 0.3s;
+    box-shadow: 10px 0px 10px rgba(0, 0, 0, 0.19), 8px 0px 10px rgba(0, 0, 0, 0.23);
+    text-align: center;
+    overflow: auto;
+}
+
+    #menu-fixed .material-icons.back {
+        display: none;
+        color: white;
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        font-size: 36px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+        #menu-fixed .material-icons.back:hover {
+            color: #009688;
+            transition: color 0.3s;
+        }
+
+    #menu-fixed:target {
+        width: 300px;
+        background: #000;
+        transition: all 0.3s ease-out;
+    }
+
+        #menu-fixed:target > .notes {
+            transition: all 0.2s;
+            z-index: 0;
+            opacity: 0;
+        }
+
+        #menu-fixed:target > a .material-icons.back {
+            display: block;
+        }
+
+        #menu-fixed:target > a > .logo {
+            width: 60%;
+            height: 70px;
+            margin: auto;
+        }
+
+            #menu-fixed:target > a > .logo > span {
+                display: none;
+            }
+
+            #menu-fixed:target > a > .logo > p {
+                display: block;
+            }
+
+        #menu-fixed:target > .menu li {
+            text-align: left;
+            width: 60%;
+        }
+
+            #menu-fixed:target > .menu li:hover::after {
+                content: '';
+                display: block;
+                position: absolute;
+                background: rgba(38, 166, 154, 0.1);
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                border-radius: 4px;
+            }
+
+            #menu-fixed:target > .menu li:hover > p {
+                color: white;
+            }
+
+            #menu-fixed:target > .menu li > p {
+                display: inline-block;
+            }
+
+    #menu-fixed .logo {
+        width: 100%;
+        height: 70px;
+        position: relative;
+        cursor: pointer;
+    }
+
+        #menu-fixed .logo p {
+            display: none;
+            color: #999;
+            font-size: 23px;
+            padding-bottom: 0;
+            font-weight: 300;
+        }
+
+        #menu-fixed .logo span {
+            width: 10px;
+            height: 10px;
+            background: #0A0A0A;
+            position: absolute;
+            margin: auto;
+            left: 0;
+            right: 0;
+            top: 25px;
+            transform: rotateZ(45deg);
+            -webkit-transform: rotateZ(45deg);
+            border: 8px solid white;
+            transition: all 0.2s;
+        }
+
+        #menu-fixed .logo:hover ~ p {
+            color: white;
+            transition: all 0.3s;
+        }
+
+        #menu-fixed .logo:hover > span {
+            width: 0;
+            height: 0;
+            border-left: 15px solid white;
+            border-right: 15px solid rgba(0, 0, 0, 0);
+            border-top: 15px solid rgba(0, 0, 0, 0);
+            border-bottom: 15px solid rgba(0, 0, 0, 0);
+            transition: all 0.2s;
+            transform: rotateZ(0deg) translateX(10px);
+            -webkit-transform: rotateZ(0deg) translateX(10px);
+        }
+
+            #menu-fixed .logo:hover > span::after {
+                content: '';
+                display: block;
+                width: 0;
+                height: 0;
+                border-left: 8px solid #111;
+                border-right: 8px solid rgba(0, 0, 0, 0);
+                border-top: 8px solid rgba(0, 0, 0, 0);
+                border-bottom: 8px solid rgba(0, 0, 0, 0);
+                left: -15px;
+                position: absolute;
+                top: -8px;
+            }
+
+    #menu-fixed .pmenu {
+        margin: 0;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 14px;
+        font-weight: 300;
+    }
+
+    #menu-fixed hr {
+        width: 75%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    #menu-fixed .menu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+        #menu-fixed .menu li {
+            padding: 10px 0px 10px 0px;
+            width: 40%;
+            margin: auto;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-style: dotted;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+            #menu-fixed .menu li:last-child {
+                border: none;
+            }
+
+            #menu-fixed .menu li:hover {
+                background: #000;
+                transition: all 0.3s;
+            }
+
+                #menu-fixed .menu li:hover > .material-icons {
+                    color: white;
+                }
+
+            #menu-fixed .menu li .material-icons {
+                color: #999;
+            }
+
+            #menu-fixed .menu li p {
+                display: none;
+                margin: auto;
+                color: #888;
+                font-size: 14px;
+                font-weight: 300;
+                position: absolute;
+                padding-left: 10px;
+                line-height: 30px;
+            }
+
+.material-icons.info {
+    color: #999;
+    position: absolute;
+    margin: 0;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+}
+
+a:link, a:visited {
+    text-decoration: none;
+}
+
+.notes {
+    position: fixed;
+    width: 100px;
+    height: 70px;
+    top: 20px;
+    left: 130px;
+    z-index: 5;
+    background: #009688;
+    border-radius: 10px;
+    transition: all 0.6s;
+}
+
+    .notes::after {
+        content: '';
+        display: block;
+        position: fixed;
+        width: 0px;
+        height: 0px;
+        top: 50px;
+        left: 115px;
+        border-top: 8px solid rgba(0, 0, 0, 0);
+        border-bottom: 8px solid rgba(0, 0, 0, 0);
+        border-left: 8px solid rgba(0, 0, 0, 0);
+        border-right: 8px solid #009688;
+    }
+
+    .notes p {
+        color: #222;
+        padding: 12px;
+        margin: 0;
+    }

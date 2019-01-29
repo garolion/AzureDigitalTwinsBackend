@@ -13,6 +13,8 @@ namespace DigitalTwinsBackend.Controllers
 {
     public class PropertyKeyController : BaseController
     {
+        List<UISpace> spaces;
+
         public PropertyKeyController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
             _httpContextAccessor = httpContextAccessor;
@@ -156,6 +158,55 @@ namespace DigitalTwinsBackend.Controllers
             {
                 //TODO replace with default view (List)
                 return RedirectToAction(nameof(PropertyKeyController.Create));
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> List()
+        {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
+            spaces = new List<UISpace>
+            {
+                new UISpace() { Space = new Space() { Name = "Root", Id = Guid.Empty }, MarginLeft = "0" }
+            };
+
+            var propertyKeys = await DigitalTwinsHelper.GetPropertyKeys(_cache, Loggers.SilentLogger);
+            foreach (var propertyKey in propertyKeys)
+            {
+                await MergeTree(propertyKey, propertyKey.SpacesHierarchy, 0);
+            }
+
+            return View(spaces.Skip(1));
+        }
+
+        private async Task MergeTree(PropertyKey propertyKey, IEnumerable<Guid> spacePath, int level)
+        {
+            level++;
+            Guid spaceId = spacePath.First();
+            Space space = await DigitalTwinsHelper.GetSpaceAsync(spaceId, _cache, Loggers.SilentLogger);
+
+            if (spacePath.Count() == 1)
+            {
+                if (!space.PropertyKeys.Exists(p => p.Id == propertyKey.Id))
+                {
+                    space.PropertyKeys.Add(propertyKey);
+                }
+            }
+
+            if (!spaces.Exists(s => s.Space.Id == space.Id))
+            {
+                int index = spaces.FindIndex(s => s.Space.Id == space.ParentSpaceId);
+                spaces.Insert(index + 1, new UISpace() { Space = space, MarginLeft = $"{25 * level-1}px" });
+            }
+            else
+            {
+                spaces.First(s => s.Space.Id == space.Id).Space = space;
+            }
+
+            if (spacePath.Count() > 1)
+            {
+                await MergeTree(propertyKey, spacePath.Skip(1), level);
             }
         }
     }

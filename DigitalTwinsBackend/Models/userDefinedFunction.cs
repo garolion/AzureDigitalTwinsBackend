@@ -11,7 +11,7 @@ namespace DigitalTwinsBackend.Models
 {
     public class UserDefinedFunction : BaseModel
     {
-        public IEnumerable<Matcher> Matchers { get; set; }
+        public List<Matcher> Matchers { get; set; }
         public string Name { get; set; }
         [Display(Name = "Space Id")]
         public Guid SpaceId { get; set; }
@@ -21,6 +21,7 @@ namespace DigitalTwinsBackend.Models
         public UserDefinedFunction()
         {
             Matchers = new List<Matcher>();
+            SpacesHierarchy = new List<Guid>();
         }
 
         public override Dictionary<string, object> ToCreate()
@@ -47,15 +48,15 @@ namespace DigitalTwinsBackend.Models
                 {
                     if (Name != null && !Name.Equals(refInCache.Name)) changes.Add("Name", Name);
                     if (!SpaceId.Equals(refInCache.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (Matchers!= null && !Matchers.Equals(refInCache.Matchers)) changes.Add("Matchers", Matchers);
+                    if (Matchers!= null && Matchers.Count > 0 && !Matchers.Equals(refInCache.Matchers)) changes.Add("Matchers", GetMatchersIds());
                 }
                 else
                 {
                     refInCache = this;
 
                     if (Name != null) changes.Add("Name", Name);
-                    if (SpaceId != null) changes.Add("SpaceId", SpaceId);
-                    if (Matchers != null) changes.Add("Matchers", GetMatchersIds());
+                    if (SpaceId != null && SpaceId != Guid.Empty) changes.Add("SpaceId", SpaceId);
+                    if (Matchers != null && Matchers.Count>0) changes.Add("Matchers", GetMatchersIds());
                 }
             }
             updatedElement = refInCache;

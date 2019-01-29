@@ -238,6 +238,18 @@ namespace DigitalTwinsBackend.Helpers
             return devices != null ? (IEnumerable<Device>)devices : null;
         }
 
+        public static IEnumerable<UserDefinedFunction> GetUDFListFromCache(IMemoryCache memoryCache)
+        {
+            var udfs = GetFromCache(memoryCache, Guid.Empty, Context.UDF);
+            return udfs != null ? (IEnumerable<UserDefinedFunction>)udfs : null;
+        }
+
+        public static IEnumerable<PropertyKey> GetPropertyKeyListFromCache(IMemoryCache memoryCache)
+        {
+            var propertyKeys = GetFromCache(memoryCache, Guid.Empty, Context.PropertyKey);
+            return propertyKeys != null ? (IEnumerable<PropertyKey>)propertyKeys : null;
+        }
+
         public static Space GetSpaceFromCache(IMemoryCache memoryCache, Guid id)
         {
             var space = GetFromCache(memoryCache, id, Context.Space);

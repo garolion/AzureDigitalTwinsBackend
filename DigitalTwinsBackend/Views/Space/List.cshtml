@@ -5,7 +5,7 @@
 }
 
 <h2>Spaces</h2>
-
+<hr />
 <div class="row">
     <div class="col-xs-4">
         <a asp-action="Create" class="ButtonNew">Create a new Space</a>
@@ -29,58 +29,57 @@
             {
                 if (space.Id != Guid.Empty)
                 {
-        <div class="defaultEncart">
-            <div class="colEncart1">
-                <div class="label-group">
-                    <label class="label-field">Name</label>
-                    <label class="label-value">@space.Name </label>
-                </div>
-                <div class="label-group">
-                    <label class="label-field">Friendly Name</label>
-                    <label class="label-value">@space.FriendlyName </label>
-                </div>
-                <div class="label-group">
-                    <label class="label-field">Id</label>
-                    <label class="label-value">@space.Id </label>
-                </div>
+                    <div class="defaultEncart">
+                        <div class="col-md-5">
+                            <div class="label-group">
+                                <label class="label-field">Name</label>
+                                <label class="label-value">@space.Name </label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Friendly Name</label>
+                                <label class="label-value">@space.FriendlyName </label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Id</label>
+                                <label class="label-value">@space.Id </label>
+                            </div>
 
-            </div>
-            <div class="colEncart2">
-                <div class="label-group">
-                    <label class="label-field">Parent Id</label>
-                    <label class="label-value">@space.ParentSpaceId </label>
-                </div>
-                <div class="label-group">
-                    <label class="label-field">Type</label>
-                    <label class="label-value">@space.Type </label>
-                </div>
-                <div class="label-group">
-                    <label class="label-field">SubType</label>
-                    <label class="label-value">@space.SubType </label>
-                </div>
-                <div class="label-group">
-                    <label class="label-field">Status</label>
-                    <label class="label-value">@space.Status </label>
-                </div>
-            </div>
-            <div class="colEncart3" style="text-align:center">
-                <div class="label-group">
-                    @{ if (space.ParentSpaceId != Guid.Empty)
-                        {
-                            <a asp-action="Details" asp-route-id="@space.ParentSpaceId" class="ButtonSpaceDetails">Navigate to Parent</a> 
-                            <br />
-                        }
-                    }
-                    <a asp-action="Details" asp-route-id="@space.Id" class="ButtonSpaceDetails">Navigate to this Space</a>
-                    <br />
-                    <a asp-action="Edit" asp-route-id="@space.Id" class="ButtonEdit">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@space.Id" class="ButtonDelete">Delete</a>
-                </div>
-            </div>
-        </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="label-group">
+                                <label class="label-field">Parent Id</label>
+                                <label class="label-value">@space.ParentSpaceId </label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Type</label>
+                                <label class="label-value">@space.Type </label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">SubType</label>
+                                <label class="label-value">@space.SubType </label>
+                            </div>
+                            <div class="label-group">
+                                <label class="label-field">Status</label>
+                                <label class="label-value">@space.Status </label>
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="text-align:center">
+                            <div class="label-group">
+                                @{ if (space.ParentSpaceId != Guid.Empty)
+                                    {
+                                        <a asp-action="Details" asp-route-id="@space.ParentSpaceId" class="ButtonSpaceDetails">Navigate to Parent</a>
+                                        <br />
+                                    }
+                                }
+                                <a asp-action="Details" asp-route-id="@space.Id" class="ButtonSpaceDetails">Navigate to this Space</a>
+                                <br />
+                                <a asp-action="Edit" asp-route-id="@space.Id" class="ButtonEdit">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@space.Id" class="ButtonDelete">Delete</a>
+                            </div>
+                        </div>
+                    </div>
                 }
             }
         }
     </div>
 </div>
-

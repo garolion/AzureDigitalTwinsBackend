@@ -25,12 +25,14 @@ namespace DigitalTwinsBackend.Models
         public string Status { get; set; }
         public string ConnectionString { get; set; }
         public IEnumerable<Sensor> Sensors { get; set; }
+        public Resource IoTHubResource { get; set; }
 
         public override string Label { get { return Name; } }
 
         public Device()
         {
             Sensors = new List<Sensor>();
+            SpacesHierarchy = new List<Guid>();
         }
 
         public override Dictionary<string, object> ToCreate()

@@ -48,6 +48,11 @@ namespace DigitalTwinsBackend.Models
 
         public override string Label { get { return Name; } }
         
+        public PropertyKey()
+        {
+            SpacesHierarchy = new List<Guid>();
+        }
+
         public override Dictionary<string, object> ToCreate()
         {
             Dictionary<string, object> createFields = new Dictionary<string, object>();

@@ -55,14 +55,29 @@
 
 <div class="row">
     <div class="col-md-3">
-        <h2>Spaces</h2>
+        <h2>View</h2>
         <ul>
-            <li><a asp-area="" asp-controller="Space" asp-action="List">List all spaces</a></li>
-            <li><a asp-area="" asp-controller="Space" asp-action="Create">Create a new space element</a></li>
+            <li><a asp-area="" asp-controller="Space" asp-action="List">List all Spaces</a></li>
         </ul>
     </div>
     <div class="col-md-3">
-        <h2>Admin</h2>
+        <h2>Add</h2>
+        <ul>
+            <li><a asp-area="" asp-controller="Space" asp-action="Create">Create a new space element</a></li>
+            <li><a asp-area="" asp-controller="Provision" asp-action="Index">Run a YAML script</a></li>
+        </ul>
+    </div>
+    <div class="col-md-3">
+        <h2>Localize</h2>
+        <ul>
+            <li><a asp-area="" asp-controller="Device" asp-action="List">Discover all Devices</a></li>
+            <li><a asp-area="" asp-controller="UDF" asp-action="List">Discover all UDF</a></li>
+            <li><a asp-area="" asp-controller="PropertyKey" asp-action="List">Discover all Property keys</a></li>
+        </ul>
+    </div>
+
+    <div class="col-md-3">
+        <h2>Administer</h2>
         <ul>
             <li><a asp-area="" asp-controller="Home" asp-action="Settings">Modify application settings</a></li>
         </ul>

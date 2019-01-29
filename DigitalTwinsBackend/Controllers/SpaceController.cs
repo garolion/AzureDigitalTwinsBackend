@@ -84,6 +84,13 @@ namespace DigitalTwinsBackend.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(SpaceViewModel model, string createButton)
         {
+            string previousPage = CacheHelper.GetPreviousPage(_cache);
+            
+            if (createButton.Equals("Cancel"))
+            {
+                return Redirect(previousPage);
+            }
+                       
             if (ModelState.IsValid)
             {
                 try
@@ -93,7 +100,7 @@ namespace DigitalTwinsBackend.Controllers
                     switch (createButton)
                     {
                         case "Save & Close":
-                            return Redirect(CacheHelper.GetPreviousPage(_cache));
+                            return Redirect(previousPage);
                         case "Save & Create another":
                             return RedirectToAction(nameof(Create));
                         case "Save & Edit":
@@ -103,7 +110,7 @@ namespace DigitalTwinsBackend.Controllers
                             }
                             else
                             {
-                                return RedirectToAction(nameof(List));
+                                return Redirect(previousPage);
                             }
                         default:
                             return RedirectToAction(nameof(List));
