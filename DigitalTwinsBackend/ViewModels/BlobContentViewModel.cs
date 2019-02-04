@@ -55,32 +55,32 @@ namespace DigitalTwinsBackend.ViewModels
                 case ParentType.Space:
                     {
                         BlobContentTypeList = await DigitalTwinsHelper.GetTypesAsync(
-                            Models.Types.SpaceBlobType, _cache, Loggers.SilentLogger);
+                            Models.Types.SpaceBlobType, _cache, Loggers.SilentLogger, onlyEnabled: true);
                         BlobContentSubTypeList = await DigitalTwinsHelper.GetTypesAsync(
-                            Models.Types.SpaceBlobSubtype, _cache, Loggers.SilentLogger);
+                            Models.Types.SpaceBlobSubtype, _cache, Loggers.SilentLogger, onlyEnabled: true);
                         break;
                     }
                 case ParentType.Device:
                     {
                         BlobContentTypeList = await DigitalTwinsHelper.GetTypesAsync(
-                            Models.Types.DeviceBlobType, _cache, Loggers.SilentLogger);
+                            Models.Types.DeviceBlobType, _cache, Loggers.SilentLogger, onlyEnabled: true);
                         BlobContentSubTypeList = await DigitalTwinsHelper.GetTypesAsync(
-                            Models.Types.DeviceBlobSubtype, _cache, Loggers.SilentLogger);
+                            Models.Types.DeviceBlobSubtype, _cache, Loggers.SilentLogger, onlyEnabled: true);
                         break;
                     }
                 case ParentType.Sensor:
                     {
                         BlobContentTypeList = await DigitalTwinsHelper.GetTypesAsync(
-                            Models.Types.SensorDataType, _cache, Loggers.SilentLogger);
+                            Models.Types.SensorDataType, _cache, Loggers.SilentLogger, onlyEnabled: true);
                         BlobContentSubTypeList = await DigitalTwinsHelper.GetTypesAsync(
-                            Models.Types.DeviceBlobSubtype, _cache, Loggers.SilentLogger);
+                            Models.Types.DeviceBlobSubtype, _cache, Loggers.SilentLogger, onlyEnabled: true);
                         break;
                     }
             }
             
             if (id != null)
             {
-                this.SelectedBlobContentItem = await DigitalTwinsHelper.GetBlobAsync((Guid)id, _cache, Loggers.SilentLogger, false);
+                this.SelectedBlobContentItem = await DigitalTwinsHelper.GetBlobAsync((Guid)id, _cache, Loggers.SilentLogger, true);
             }
             else
             {

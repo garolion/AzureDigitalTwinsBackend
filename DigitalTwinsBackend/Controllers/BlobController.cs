@@ -37,8 +37,13 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(BlobContentViewModel model)
+        public async Task<ActionResult> Create(BlobContentViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 model.SelectedBlobContentItem.Sharing = "None";
@@ -48,6 +53,44 @@ namespace DigitalTwinsBackend.Controllers
                     model.SelectedBlobContentItem, 
                     model.File, 
                     _cache, 
+                    Loggers.SilentLogger);
+
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+            catch (Exception ex)
+            {
+                await FeedbackHelper.Channel.SendMessageAsync(ex.Message, MessageType.Info);
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Edit(ParentType blobType, Guid blobId)
+        {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
+            BlobContentViewModel model = new BlobContentViewModel(blobType, _cache, blobId);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(BlobContentViewModel model, string updateButton)
+        {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
+            try
+            {
+                model.SelectedBlobContentItem.Sharing = "None";
+
+                await DigitalTwinsHelper.CreateOrUpdateBlob(
+                    model.SelectedBlobContentItem.ParentType,
+                    model.SelectedBlobContentItem,
+                    model.File,
+                    _cache,
                     Loggers.SilentLogger);
 
                 return Redirect(CacheHelper.GetPreviousPage(_cache));
@@ -70,8 +113,13 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(BlobContentViewModel model)
+        public async Task<ActionResult> Delete(BlobContentViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 await DigitalTwinsHelper.DeleteBlobAsync(model.SelectedBlobContentItem, _cache, Loggers.SilentLogger);
@@ -84,13 +132,6 @@ namespace DigitalTwinsBackend.Controllers
             }
         }
 
-        [HttpGet]
-        public ActionResult Edit(ParentType blobType, Guid blobId)
-        {
-            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
-            BlobContentViewModel model = new BlobContentViewModel(blobType, _cache, blobId);
-            return View(model);
-        }
     }
 }

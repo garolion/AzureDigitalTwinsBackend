@@ -5,10 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Select Properties to Add to the Space</h2>
+<h2>Select available Properties to add to the Space</h2>
 
 <h4>Property key</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-8">
         <form asp-action="Add" method="post" enctype="multipart/form-data">
@@ -39,8 +40,8 @@
             </table>
 
             <div class="form-group">
-                <input type="submit" value="Add" class="ButtonNew" />
-                <input type="submit" onclick="history.go(-1)" class="ButtonCancel" value="Cancel" />
+                <input type="submit" name="updateButton" value="Add" class="ButtonNew" />
+                <input type="submit" name="updateButton" value="Cancel" class="ButtonCancel" />
             </div>
         </form>
     </div>

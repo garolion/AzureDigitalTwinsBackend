@@ -1,0 +1,27 @@
+﻿@model DigitalTwinsBackend.Models.Matcher
+
+@Html.HiddenFor(x => x.Id)
+@Html.HiddenFor(x => x.Name)
+@Html.HiddenFor(x => x.SpaceId)
+
+<tr>
+    <td>
+        @Html.CheckBoxFor(x => x.Add)
+    </td>
+    <td>
+        @Html.DisplayFor(x => x.Name)
+    </td>
+    <td>
+        @if (Model.Conditions != null && Model.Conditions.Count > 0)
+        {
+            @Html.DisplayFor(x => x.Conditions[0].Target)
+            @Html.Raw(" ")
+            @Html.DisplayFor(x => x.Conditions[0].Comparison)
+            @Html.Raw(" ")
+            @Html.DisplayFor(x => x.Conditions[0].Value)
+        }
+    </td>
+    <td>
+        @Html.DisplayFor(x => x.SpaceId)
+    </td>
+</tr>

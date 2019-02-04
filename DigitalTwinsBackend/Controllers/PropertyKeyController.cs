@@ -36,8 +36,13 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(PropertyKeyViewModel model)
+        public async Task<ActionResult> Create(PropertyKeyViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 var id = await DigitalTwinsHelper.CreatePropertyKeyAsync(model.SelectedPropertyKey, _cache, Loggers.SilentLogger);
@@ -80,8 +85,13 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Add(List<PropertyKey> model)
+        public async Task<ActionResult> Add(List<PropertyKey> model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 Space space = await DigitalTwinsHelper.GetSpaceAsync(CacheHelper.GetObjectId(_cache), _cache, Loggers.SilentLogger);

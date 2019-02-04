@@ -1,0 +1,75 @@
+﻿@model DigitalTwinsBackend.ViewModels.UDFViewModel
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>UDF</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Delete">
+            <input asp-for="UDF.Id" type="hidden" />
+            <input asp-for="UDF.SpaceId" type="hidden" />
+            <div class="form-group">
+                <label asp-for="UDF.Id" class="control-label"></label>
+                <input asp-for="UDF.Id" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="UDF.Name" class="control-label"></label>
+                <input asp-for="UDF.Name" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Space</label>
+                <select asp-for="UDF.SpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList, "Id", "Name"))" disabled="disabled"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="25" cols="1" disabled="disabled"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="submit" name="updateButton" value="Delete" class="ButtonDelete" />
+                <input type="submit" name="updateButton" value="Cancel" class="ButtonCancel" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <h4>Matchers</h4>
+        <a asp-controller="Matcher" asp-action="Add" asp-route-udfid="@Model.UDF.Id" asp-route-spaceid="@Model.UDF.SpaceId" class="ButtonNew" disabled="disabled">Add Matcher</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    @*<th>
+                        # Conditions
+                    </th>*@
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var matcher in Model.UDF.Matchers)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => matcher.Name)
+                        </td>
+                        @*<td>
+                            @Html.DisplayFor(modelItem => matcher.Conditions.Count().ToString())
+                        </td>*@
+                        <td>
+                            <a asp-controller="Matcher" asp-action="Edit" asp-route-blobId="@matcher.Id" class="ButtonEdit" disabled="disabled">Edit</a>
+                            <a asp-controller="Matcher" asp-action="Delete" asp-route-blobId="@matcher.Id" class="ButtonDelete" disabled="disabled">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

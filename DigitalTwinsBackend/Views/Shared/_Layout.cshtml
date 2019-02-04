@@ -40,30 +40,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    @*<nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">DigitalTwinsBackend</a>
-                </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li><a asp-area="" asp-controller="Home" asp-action="Spaces">Spaces</a></li>
-                        <li><a asp-area="" asp-controller="Ontology" asp-action="List">Ontologies</a></li>
-                        <li><a asp-area="" asp-controller="DeviceSimulator" asp-action="Index">Device Simulator</a></li>
-                        <li><a asp-area="" asp-controller="Provision" asp-action="Index">Provision</a></li>
-                        <li><a asp-area="" asp-controller="Home" asp-action="Settings">Settings</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>*@
-
     <div id="cont">
         <div id="menu-fixed">
             <a href="#cont">
@@ -129,7 +105,7 @@
                     if (infoMessages != null)
                     {
                         <div>
-                            <input type="submit" name="createButton" value="Clear messages" onclick="return Reset()" class="btn btn-default" />
+                            <input type="submit" value="Clear messages" onclick="return Reset()" class="btn btn-default" />
                         </div>
                         <div id="infoMessages" class="errorZone">
                             @foreach (string message in infoMessages)
@@ -165,7 +141,7 @@
         </div>
         <hr />
         <footer>
-            <p>&copy; 2018 - Solution backend for Azure Digital Twins by GBB France</p>
+            <p>&copy; 2018 - Solution backend for Azure Digital Twins by Microsoft GBB IoT France</p>
         </footer>
     </div>
 

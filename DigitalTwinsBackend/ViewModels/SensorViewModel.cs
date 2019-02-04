@@ -48,9 +48,9 @@ namespace DigitalTwinsBackend.ViewModels
         {
             SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
 
-            DataTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataType, _cache, Loggers.SilentLogger);
-            DataUnitTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataUnitType, _cache, Loggers.SilentLogger);
-            DataSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataSubtype, _cache, Loggers.SilentLogger);
+            DataTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataType, _cache, Loggers.SilentLogger, onlyEnabled: true);
+            DataUnitTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataUnitType, _cache, Loggers.SilentLogger, onlyEnabled: true);
+            DataSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SensorDataSubtype, _cache, Loggers.SilentLogger, onlyEnabled: true);
         }
 
     }

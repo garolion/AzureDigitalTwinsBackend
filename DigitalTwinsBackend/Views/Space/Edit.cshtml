@@ -11,9 +11,8 @@
 <div class="row">
     <div class="col-md-8">
         <form asp-action="Edit">
-            <div>
+            <div style="margin:-30px 0px 0px 0px">
                 <h3>Core Properties</h3>
-                <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input asp-for="SelectedSpaceItem.Id" type="hidden" />
                 <div class="form-group">
@@ -55,7 +54,6 @@
             <div>
                 <hr />
                 <h3>Extended Properties</h3>
-                <hr />
                 <a asp-controller="PropertyKey" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Create a new Property</a>
                 <a asp-controller="PropertyKey" asp-action="Add" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add an existing Property</a>
                 <table class="table">
@@ -96,93 +94,132 @@
                                     }
                                 </td>
                                 <td>
-                                    <a asp-controller="PropertyKey" 
-                                        asp-action="Remove" 
-                                        asp-route-spaceId="@Model.SelectedSpaceItem.Id" 
-                                        asp-route-name="@Model.SelectedSpaceItem.Properties[i].Name" 
-                                        class="ButtonDelete">Remove</a>
+                                    <a asp-controller="PropertyKey"
+                                       asp-action="Remove"
+                                       asp-route-spaceId="@Model.SelectedSpaceItem.Id"
+                                       asp-route-name="@Model.SelectedSpaceItem.Properties[i].Name"
+                                       class="ButtonDelete">Remove</a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
-                <hr />
                 <div class="form-group">
-                    <input type="submit" value="Save" class="ButtonEdit" />
-                    <input type="submit" onclick="history.go(-1)" class="ButtonCancel" value="Cancel" />
+                    <input type="submit" name="updateButton" value="Save" class="ButtonEdit" />
+                    <input type="submit" name="updateButton" class="ButtonCancel" value="Cancel" />
                 </div>
             </div>
         </form>
     </div>
     <div class="col-md-4">
-        <h4>Blob</h4>
-        <a asp-controller="Blob" asp-action="Create" asp-route-parentid="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add File</a>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Description
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Blobs)
-                {
+        <div class="detailsEncart">
+            <div class="label-group" style="display: inline-block;">
+                <h4 style="float:left">Blob</h4>
+                <a style="float:left;margin-top:5px;margin-left:20px" asp-controller="Blob" asp-action="Create" asp-route-blobType="Space" asp-route-parentid="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add File</a>
+            </div>
+            <table class="table" style="margin:0px -10px 0px -10px">
+                <thead>
                     <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Description)
-                        </td>
-                        <td>
-                            <a asp-controller="Blob" asp-action="Edit" asp-route-blobId="@item.Id" class="ButtonEdit">Edit</a>
-                            <a asp-controller="Blob" asp-action="Delete" asp-route-blobId="@item.Id" class="ButtonDelete">Delete</a>
-                        </td>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Description
+                        </th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Blobs)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                <a asp-controller="Blob" asp-action="Edit" asp-route-blobId="@item.Id" class="ButtonEdit">Edit</a>
+                                <a asp-controller="Blob" asp-action="Delete" asp-route-blobId="@item.Id" class="ButtonDelete">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        </div>
+        <div class="col-md-4">
+            <div class="detailsEncart">
+                <div class="label-group" style="display: inline-block;">
+                    <h4 style="float:left">Devices</h4>
+                    <a style="float:left;margin-top:5px;margin-left:20px" asp-controller="Device" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add Device</a>
+                </div>
+                <table class="table" style="margin:0px -10px 0px -10px">
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Hardware Id
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.SelectedSpaceItem.Devices)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.HardwareId)
+                                </td>
+                                <td>
+                                    <a asp-controller="Device" asp-action="Edit" asp-route-id="@item.Id" class="ButtonEdit">Edit</a>
+                                    <a asp-controller="Device" asp-action="Delete" asp-route-id="@item.Id" class="ButtonDelete">Del</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="detailsEncart">
+                <div class="label-group" style="display: inline-block;">
+                    <h4 style="float:left">User Defined Functions</h4>
+                    <a style="float:left;margin-top:5px;margin-left:20px" asp-controller="UDF" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add UDF</a>
+                </div>
+                <table class="table" style="margin:0px -10px 0px -10px">
+                    <thead>
+                        <tr>
+                            <th>
+                                Name
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var udf in Model.UDFList)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => udf.Name)
+                                </td>
+                                <td>
+                                    <a asp-controller="UDF" asp-action="Edit" asp-route-id="@udf.Id" class="ButtonEdit">Edit</a>
+                                    <a asp-controller="UDF" asp-action="Delete" asp-route-id="@udf.Id" class="ButtonDelete">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h4>Devices</h4>
-        <a asp-controller="Device" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add a new Device</a>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Hardware Id
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.SelectedSpaceItem.Devices)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.HardwareId)
-                        </td>
-                        <td>
-                            <a asp-controller="Device" asp-action="Edit" asp-route-id="@item.Id" class="ButtonEdit">Edit</a>
-                            <a asp-controller="Device" asp-action="Delete" asp-route-id="@item.Id" class="ButtonDelete">Delete</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

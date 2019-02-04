@@ -145,10 +145,18 @@ namespace DigitalTwinsBackend.Helpers
             //context = scope;
             id = key.ToString();
 
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromSeconds(ConfigHelper.Config.parameters.CacheTime));
-            
-            memoryCache.Set(CacheKey(context), cacheElement, cacheEntryOptions);
+            if (cacheElement != null)
+            {
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromSeconds(ConfigHelper.Config.parameters.CacheTime));
+
+                memoryCache.Set(CacheKey(context), cacheElement, cacheEntryOptions);
+            }
+            else
+            {
+                memoryCache.Remove(CacheKey(context));
+            }
         }
 
         internal static void ResetMessagesInCache(IMemoryCache memoryCache)

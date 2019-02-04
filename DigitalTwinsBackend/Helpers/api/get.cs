@@ -493,13 +493,29 @@ namespace DigitalTwinsBackend.Helpers
                 if (content != null && content.Length > 0)
                 {
                     var error = JsonConvert.DeserializeObject<ErrorMessage>(content);
-                    await FeedbackHelper.Channel.SendMessageAsync($"Error {error.Error.Code} - {error.Error.Message}", MessageType.Info);
-                    logger.LogInformation($"Error {error.Error.Code} - {error.Error.Message}");
+                    var errorMessage = GetFunctionalErrorMessage(error.Error);
+
+                    await FeedbackHelper.Channel.SendMessageAsync(errorMessage, MessageType.Info);
+                    logger.LogInformation(errorMessage);
                 }
                 return false;
             }
         }
+        private static string GetFunctionalErrorMessage(InnerError error)
+        {
+            switch (error.Code)
+            {
+                // item already exist
+                //case "400.600.000.000":
+                //    return $"Error - Check the Name or Hardware Id you filled. They may be already in use by another Device.";
+                //case "404.600.000.001":
+                //    return $"Error - You cannot add a Device to this Space, because no IoT Hub is attached.";
+                default:
+                    return $"Error {error.Code} - {error.Message}";
+            }
+        }
     }
+
 
     public class ErrorMessage
     {

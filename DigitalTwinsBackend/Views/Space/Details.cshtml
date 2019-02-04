@@ -53,31 +53,11 @@
         </div>
         <div class="form-group">
             <a asp-area="" asp-controller="Space" asp-action="Edit" asp-route-id="@Model.SelectedSpaceItem.Id" class="ButtonEdit">Edit Space</a>
+            <a asp-area="" asp-controller="Space" asp-action="Delete" asp-route-id="@Model.SelectedSpaceItem.Id" class="ButtonDelete">Delete Space</a>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <h4>Blob</h4>
-        <a asp-controller="Blob" asp-action="Create" asp-route-blobType="Space" asp-route-parentid="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add File</a>
-
-        @foreach (var blob in Model.Blobs)
-        {
-            <div class="defaultEncart">
-                <h4>@blob.Name</h4>
-                <div class="label-group">
-                    <label class="label-field">Description</label>
-                    <label class="label-value">@blob.Description</label>
-                </div>
-                <div class="label-group">
-                    <label class="label-field">Type</label>
-                    <label class="label-value">@blob.Type</label>
-                </div>
-                <div class="label-group">
-                    <img src="@blob.ContentInfos[0].FilePath" alt="Image" style="padding-bottom:15px" />
-                </div>
-            </div>
-        }
-
+    <div class="col-md-4" style="display: inline-block;">
         <h4>Properties</h4>
         <table class="table">
             <thead>
@@ -111,40 +91,84 @@
                 }
             </tbody>
         </table>
-    </div>
 
-    <div class="col-md-4">
-        <h4>Values</h4>
+        <div class="label-group" style="display:inline-block;">
+            <h4 style="float:left">Blob</h4>
+            <a style="float:left;margin-top:5px;margin-left:20px" asp-controller="Blob" asp-action="Create" asp-route-blobType="Space" asp-route-parentid="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add File</a>
+        </div>
+
+        @foreach (var blob in Model.Blobs)
+        {
+            <div class="detailsEncart">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="colapsible-panel" data-toggle="collapse" data-parent="#accordion" href="#@string.Join("", blob.Name.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries))">
+                            @blob.Name
+                        </a>
+                    </h4>
+                </div>
+                <div id="@string.Join("", blob.Name.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries))" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="label-group">
+                            <label class="label-field">Description</label>
+                            <label class="label-value">@blob.Description</label>
+                        </div>
+                        <div class="label-group">
+                            <label class="label-field">Type</label>
+                            <label class="label-value">@blob.Type</label>
+                        </div>
+                        <div>
+                            <img src="@blob.ContentInfos[0].FilePath" alt="Image" class="resize" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="label-group" style="margin:20px 0px 0px 0px">
+            <h4>Values</h4>
+        </div>
+
         @foreach (var value in Model.SelectedSpaceItem.Values)
         {
-            <div class="defaultEncart">
-                <h4>@value.Type</h4>
-                <div class="label-group">
-                    <label class="label-field">Time stamp</label>
-                    <label class="label-value">@value.Timestamp</label>
+            <div class="detailsEncart">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="colapsible-panel" data-toggle="collapse" data-parent="#accordion" href="#@value.Type">
+                            @value.Type
+                        </a>
+                    </h4>
                 </div>
-                <div class="label-group">
-                    <label class="label-field">Value</label>
-                    <label class="label-value">@value.Value </label>
-                </div>
-                <hr />
-                @if (value.HistoricalValues != null)
-                {
-                    <div>
-                        <h4>Historical values</h4>
-                        @foreach (var historicalValue in value.HistoricalValues)
+                <div id="@value.Type" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="label-group">
+                            <label class="label-field">Time stamp</label>
+                            <label class="label-value">@value.Timestamp</label>
+                        </div>
+                        <div class="label-group">
+                            <label class="label-field">Value</label>
+                            <label class="label-value">@value.Value </label>
+                        </div>
+                        <hr />
+                        @if (value.HistoricalValues != null)
                         {
-                            <div class="label-group">
-                                <label class="label-field">Value</label>
-                                <label class="label-value">@historicalValue.Value </label>
+                            <div>
+                                <h4>Historical values</h4>
+                                @foreach (var historicalValue in value.HistoricalValues)
+                                {
+                                    <div class="label-group">
+                                        <label class="label-field">Value</label>
+                                        <label class="label-value">@historicalValue.Value </label>
+                                    </div>
+                                }
                             </div>
                         }
                     </div>
-                }
+                </div>
             </div>
         }
     </div>
-</div>
+    </div>
 
 <div class="row">
     <div class="col-md-6">
@@ -210,7 +234,10 @@
     </div>
 
     <div class="col-md-6">
-        <h2>Children</h2>
+        <div class="label-group" style="display: inline-block;margin: 0px 0px -14px 0px">
+            <h2 style="float:left">Children</h2>
+            <a style="float:left;margin: 25px 0px 0px 20px" asp-controller="Space" asp-action="Create" asp-route-parentId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add</a>
+        </div>
         @foreach (var child in Model.SelectedSpaceItem.Children)
         {
             <div class="spaceEncart">
@@ -244,8 +271,8 @@
                     <label class="label-value">@child.Status</label>
                 </div>
                 @*<div class="form-group">
-                        <a asp-action="Details" asp-route-id="@child.Id" class="ButtonSpaceDetails">Navigate to this child</a>
-                    </div>*@
+                    <a asp-action="Details" asp-route-id="@child.Id" class="ButtonSpaceDetails">Navigate to this child</a>
+                </div>*@
             </div>
         }
     </div>
@@ -253,8 +280,11 @@
 
 <div class="row">
     <div class="col-md-3">
-        <h4>Devices</h4>
-        <a asp-controller="Device" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add a new Device</a>
+        <div class="label-group" style="display: inline-block;margin: 0px 0px -14px 0px">
+            <h4 style="float:left">Devices</h4>
+            <a style="float:left;margin: 5px 0px 0px 20px" asp-controller="Device" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add</a>
+        </div>
+
         @foreach (var device in Model.SelectedSpaceItem.Devices)
         {
             <div class="deviceEncart">
@@ -316,8 +346,10 @@
     </div>
 
     <div class="col-md-3">
-        <h4>User Defined Fonctions</h4>
-        <a asp-controller="UDF" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add a new Function</a>
+        <div class="label-group" style="display: inline-block;margin: 0px 0px -14px 0px">
+            <h4 style="float:left">User Defined Fonctions</h4>
+            <a style="float:left;margin: 5px 0px 0px 20px" asp-controller="UDF" asp-action="Create" asp-route-spaceId="@Model.SelectedSpaceItem.Id" class="ButtonNew">Add</a>
+        </div>
         @foreach (var udf in Model.UDFList)
         {
             <div class="udfEncart">

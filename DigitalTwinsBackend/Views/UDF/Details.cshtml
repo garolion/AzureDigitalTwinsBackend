@@ -32,8 +32,8 @@
                     <textarea asp-for="Content" class="form-control" rows="25" cols="1"></textarea>
                 </div>
                 <div class="form-group">
-                    @*<input type="submit" name="updateButton" value="Edit UDF Definition" class="ButtonEdit" />*@
-                    <a asp-controller="UDF" asp-action="Edit" asp-route-id="@Model.UDF.Id" class="ButtonEdit">Edit the UDF</a>
+                    <a asp-controller="UDF" asp-action="Edit" asp-route-id="@Model.UDF.Id" class="ButtonEdit">Edit UDF</a>
+                    <a asp-controller="UDF" asp-action="Delete" asp-route-id="@Model.UDF.Id" class="ButtonDelete">Delete UDF</a>
                 </div>
             </form>
         </div>

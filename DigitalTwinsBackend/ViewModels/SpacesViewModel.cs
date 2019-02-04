@@ -50,7 +50,7 @@ namespace DigitalTwinsBackend.ViewModels
         {
             SpaceTypeList = new List<Models.Type>();
             SpaceTypeList.Add(new Models.Type() { Name = "All" });
-            SpaceTypeList.AddRange(await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceType, _cache, Loggers.SilentLogger));
+            SpaceTypeList.AddRange(await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceType, _cache, Loggers.SilentLogger, onlyEnabled: true));
         }
     }
 }

@@ -10,7 +10,7 @@
 <h4>Sensor</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Delete">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input asp-for="SelectedSensor.Id" type="hidden" />
@@ -59,12 +59,9 @@
                 <span asp-validation-for="SelectedSensor.PortTypeId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Delete" class="btn btn-default" />
+                <input type="submit" name="updateButton" value="Delete" class="ButtonDelete" />
+                <input type="submit" name="updateButton" value="Cancel" class="ButtonCancel" />
             </div>
         </form>
     </div>
-
-    <div>
-        <a asp-action="Index">Back to List</a>
-    </div>
-
+</div>

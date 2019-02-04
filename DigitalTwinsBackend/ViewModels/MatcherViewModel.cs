@@ -66,10 +66,11 @@ namespace DigitalTwinsBackend.ViewModels
 
             if (id != null)
             {
-                this.SelectedMatcher = await DigitalTwinsHelper.GetMatcher((Guid)id, _cache, Loggers.SilentLogger);
+                this.SelectedMatcher = await DigitalTwinsHelper.GetMatcherAsync((Guid)id, _cache, Loggers.SilentLogger, false);
             }
             else
             {
+                // if we are back from the creation of a MatcherCondition, we reload the working Matcher 
                 Matcher matcher = (Matcher)CacheHelper.GetFromCache(_cache, Guid.Empty, Context.Matcher);
                 if (matcher == null)
                 {
@@ -77,6 +78,7 @@ namespace DigitalTwinsBackend.ViewModels
                     CacheHelper.AddInCache(_cache, matcher, matcher.Id, Context.Matcher);
                 }
                 this.SelectedMatcher = matcher;
+                this.SelectedMatcherCondition = new MatcherCondition();
             }
         }
     }

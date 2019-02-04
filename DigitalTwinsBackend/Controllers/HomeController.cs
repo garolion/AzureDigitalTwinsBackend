@@ -22,10 +22,11 @@ namespace DigitalTwinsBackend.Controllers
             _cache = memoryCache;
         }
 
-        public void ResetMessages()
+        [HttpPost]
+        public IActionResult ResetMessages()
         {
             Reset();
-            //return View();
+            return View();
         }
 
 

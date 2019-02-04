@@ -62,16 +62,23 @@ namespace DigitalTwinsBackend.ViewModels
 
             //SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
 
-            SpaceTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceType, _cache, Loggers.SilentLogger);
-            SpaceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceSubtype, _cache, Loggers.SilentLogger);
-            SpaceStatusList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceStatus, _cache, Loggers.SilentLogger);
+            SpaceTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceType, _cache, Loggers.SilentLogger, onlyEnabled: true);
+            SpaceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceSubtype, _cache, Loggers.SilentLogger, onlyEnabled: true);
+            SpaceStatusList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.SpaceStatus, _cache, Loggers.SilentLogger, onlyEnabled: true);
 
             if (id != null)
             {
                 this.SelectedSpaceItem = await DigitalTwinsHelper.GetSpaceAsync((Guid)id, _cache, Loggers.SilentLogger, false);
-                this.UDFList = await DigitalTwinsHelper.GetUDFsBySpaceId((Guid)id, _cache, Loggers.SilentLogger);
+                this.UDFList = await DigitalTwinsHelper.GetUDFsBySpaceIdAsync((Guid)id, _cache, Loggers.SilentLogger, false);
                 this.Blobs = await DigitalTwinsHelper.GetBlobsAsync((Guid)id, _cache, Loggers.SilentLogger, true);
                 this.AvailableProperties = await DigitalTwinsHelper.GetPropertyKeysForSpace((Guid)id, _cache, Loggers.SilentLogger);
+            }
+            else
+            {
+                this.SelectedSpaceItem = new Space();
+                this.UDFList = new List<UserDefinedFunction>();
+                this.Blobs = new List<BlobContent>();
+                this.AvailableProperties = new List<PropertyKey>();
             }
         }
     }

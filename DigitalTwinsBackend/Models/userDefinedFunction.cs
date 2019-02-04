@@ -5,13 +5,19 @@ using DigitalTwinsBackend.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace DigitalTwinsBackend.Models
 {
     public class UserDefinedFunction : BaseModel
     {
-        public List<Matcher> Matchers { get; set; }
+        public ObservableCollection<Matcher> Matchers { get; set; }
+        private bool matchersHasChanged = false;
+        public bool MatchersHasChanged
+        {
+            get { return matchersHasChanged; }
+        }
         public string Name { get; set; }
         [Display(Name = "Space Id")]
         public Guid SpaceId { get; set; }
@@ -20,8 +26,14 @@ namespace DigitalTwinsBackend.Models
 
         public UserDefinedFunction()
         {
-            Matchers = new List<Matcher>();
             SpacesHierarchy = new List<Guid>();
+            Matchers = new ObservableCollection<Matcher>();
+            Matchers.CollectionChanged += Matchers_CollectionChanged;
+        }
+
+        private void Matchers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            matchersHasChanged = true;
         }
 
         public override Dictionary<string, object> ToCreate()
@@ -46,9 +58,21 @@ namespace DigitalTwinsBackend.Models
 
                 if (refInCache != null)
                 {
-                    if (Name != null && !Name.Equals(refInCache.Name)) changes.Add("Name", Name);
-                    if (!SpaceId.Equals(refInCache.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (Matchers!= null && Matchers.Count > 0 && !Matchers.Equals(refInCache.Matchers)) changes.Add("Matchers", GetMatchersIds());
+                    if (Name != null && !Name.Equals(refInCache.Name))
+                    {
+                        changes.Add("Name", Name);
+                        refInCache.Name = Name;
+                    }
+                    if (!SpaceId.Equals(refInCache.SpaceId))
+                    {
+                        changes.Add("SpaceId", SpaceId);
+                        refInCache.SpaceId = SpaceId;
+                    }
+                    if (MatchersHasChanged)
+                    {
+                        changes.Add("Matchers", GetMatchersIds());
+                        refInCache.Matchers = Matchers;
+                    }
                 }
                 else
                 {
@@ -56,7 +80,7 @@ namespace DigitalTwinsBackend.Models
 
                     if (Name != null) changes.Add("Name", Name);
                     if (SpaceId != null && SpaceId != Guid.Empty) changes.Add("SpaceId", SpaceId);
-                    if (Matchers != null && Matchers.Count>0) changes.Add("Matchers", GetMatchersIds());
+                    if (MatchersHasChanged) changes.Add("Matchers", GetMatchersIds());
                 }
             }
             updatedElement = refInCache;

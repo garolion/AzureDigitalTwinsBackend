@@ -18,10 +18,100 @@ namespace DigitalTwinsBackend.Helpers
         private static List<UISpace> spaceResults;
 
         #region Private methods related to cache management
-        private static async Task RefreshCacheAsync(IMemoryCache memoryCache, Object cacheElement, object id, bool elementHasChanged, Context context)
+        private static async Task RefreshRelatedInCacheAsync(IMemoryCache memoryCache, Object cacheElement, object id, Context context)
         {
-            CacheHelper.AddInCache(memoryCache, cacheElement, id, context);
+            if (cacheElement.GetType().Namespace.Equals("DigitalTwinsBackend.Models"))
+            {
+                switch (cacheElement.GetType().Name)
+                {
+                    case "Space":
+                        {
+                            var spaces = await GetSpacesAsync(memoryCache, Loggers.SilentLogger, true);
+                            CacheHelper.AddInCache(memoryCache, spaces, Guid.Empty, Context.Space);
 
+                            if (((Space)cacheElement).ParentSpaceId == Guid.Empty)
+                            {
+                                var rootSpaces = await GetRootSpacesAsync(memoryCache, Loggers.SilentLogger, true);
+                                await AddInCacheAsync(memoryCache, rootSpaces, Guid.Empty, false, Context.RootSpaces).ConfigureAwait(false);
+                            }
+                            break;
+                        }
+                    case "Device":
+                        {
+                            var device = (Device)cacheElement;
+
+                            if (device.SpaceId != Guid.Empty)
+                            {
+                                Space space = await GetSpaceAsync(device.SpaceId, memoryCache, Loggers.SilentLogger, true);
+                                CacheHelper.AddInCache(memoryCache, space, device.SpaceId, Context.Space);
+
+                                await DigitalTwinsHelper.GetDevicesAsync(memoryCache, Loggers.SilentLogger, true);
+                            }
+                            break;
+                        }
+                    case "Sensor":
+                        {
+                            var sensor = (Sensor)cacheElement;
+                            if (sensor.SpaceId != Guid.Empty)
+                            {
+                                Device device = await GetDeviceAsync(sensor.DeviceId, memoryCache, Loggers.SilentLogger, true);
+                                CacheHelper.AddInCache(memoryCache, device, sensor.DeviceId, Context.Device);
+
+                                Space space = await GetSpaceAsync(sensor.SpaceId, memoryCache, Loggers.SilentLogger, true);
+                                CacheHelper.AddInCache(memoryCache, space, sensor.SpaceId, Context.Space);
+                            }
+                            break;
+                        }
+                    case "Matcher":
+                        {
+                            var matcher = (Matcher)cacheElement;
+                            if (matcher.SpaceId != Guid.Empty)
+                            {
+                                var matchers = await DigitalTwinsHelper.GetMatchersBySpaceId(matcher.SpaceId, memoryCache, Loggers.SilentLogger, true);
+                                CacheHelper.AddInCache(memoryCache, matchers, matcher.SpaceId, Context.Matcher);
+
+                                if (matcher.UserDefinedFunctions != null)
+                                {
+                                    
+                                    foreach (var udf in matcher.UserDefinedFunctions)
+                                    {
+                                        CacheHelper.AddInCache(
+                                            memoryCache,
+                                            await GetUserDefinedFunction(udf.Id, memoryCache, Loggers.SilentLogger, true),
+                                            udf.Id, 
+                                            Context.UDF);
+                                    }
+                                }
+
+                            }
+                            break;
+                        }
+                    case "UserDefinedFunction":
+                        {
+                            var udf = (UserDefinedFunction)cacheElement;
+                            if (udf.SpaceId != Guid.Empty)
+                            {
+                                Space space = await GetSpaceAsync(udf.SpaceId, memoryCache, Loggers.SilentLogger, true);
+                                CacheHelper.AddInCache(memoryCache, space, udf.SpaceId, Context.Space);
+
+                                var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, Loggers.SilentLogger);
+                                var userDefinedFunctions = await DigitalTwinsHelper.GetUDFsBySpaceIdAsync(udf.SpaceId, memoryCache, Loggers.SilentLogger, true);
+                                CacheHelper.AddInCache(memoryCache, userDefinedFunctions, space.Id, Context.UDF);
+
+                                userDefinedFunctions = await GetUserDefinedFunctions(memoryCache, Loggers.SilentLogger, true);
+                                CacheHelper.AddInCache(memoryCache, userDefinedFunctions, Guid.Empty, Context.UDF);
+                            }
+                            break;
+                        }
+                    default:
+                        return;
+                }
+            }
+        }
+
+
+        private static async Task AddInCacheAsync(IMemoryCache memoryCache, Object cacheElement, object id, bool elementHasChanged, Context context)
+        {
             // if the cacheElement is an Model Entity (not a list of elements) we check if we need to update lists
             if (elementHasChanged && cacheElement.GetType().Namespace.Equals("DigitalTwinsBackend.Models"))
             {
@@ -29,90 +119,68 @@ namespace DigitalTwinsBackend.Helpers
                 {
                     case "Space":
                         {
-                            IEnumerable<Space> spaces = await GetSpacesAsync(memoryCache, Loggers.SilentLogger, true);
-                            // we update the full list of spaces with the default Guid key
-                            CacheHelper.AddInCache(memoryCache, spaces, Guid.Empty, Context.Space);
-
-                            if (((Space)cacheElement).ParentSpaceId == Guid.Empty)
-                            {
-                                var rootSpaces = await GetRootSpacesAsync(memoryCache, Loggers.SilentLogger, true);
-                                await RefreshCacheAsync(memoryCache, rootSpaces, Guid.Empty, false, Context.RootSpaces).ConfigureAwait(false);
-                            }
+                            cacheElement = await GetSpaceAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                            CacheHelper.AddInCache(memoryCache, cacheElement, id, Context.Space);
+                            break;
+                        }
+                    case "BlobContent":
+                        {
+                            //cacheElement = await GetBlobAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                            //((BlobContent)cacheElement).ContentInfos[0].FilePath = await GetBlobContentAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                            CacheHelper.AddInCache(memoryCache, cacheElement, id, Context.Blob);
                             break;
                         }
                     case "Device":
                         {
-                            Device device = await GetDeviceAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
-                            CacheHelper.AddInCache(memoryCache, device, id, context);
-                            if (device.SpaceId != Guid.Empty)
-                            {
-                                Space space = await GetSpaceAsync(device.SpaceId, memoryCache, Loggers.SilentLogger, true);
-                                CacheHelper.AddInCache(memoryCache, space, device.SpaceId, Context.Space);
-                            }
+                            cacheElement = await GetDeviceAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                            CacheHelper.AddInCache(memoryCache, cacheElement, id, Context.Device);
                             break;
                         }
                     case "Sensor":
                         {
-                            Sensor sensor = await GetSensorAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
-                            CacheHelper.AddInCache(memoryCache, sensor, id, context);
-                            if (sensor.SpaceId != Guid.Empty)
-                            {
-                                Space space = await GetSpaceAsync(sensor.SpaceId, memoryCache, Loggers.SilentLogger, true);
-                                CacheHelper.AddInCache(memoryCache, space, sensor.SpaceId, Context.Space);
-
-                                Device device = await GetDeviceAsync(sensor.DeviceId, memoryCache, Loggers.SilentLogger, true);
-                                CacheHelper.AddInCache(memoryCache, device, sensor.DeviceId, Context.Device);
-                            }
+                            cacheElement = await GetSensorAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                            CacheHelper.AddInCache(memoryCache, cacheElement, id, Context.Sensor);
                             break;
                         }
-
-                    default:
-                        return;
+                    case "UserDefinedFunction":
+                        {
+                            cacheElement = await GetUserDefinedFunction((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                            CacheHelper.AddInCache(memoryCache, cacheElement, id, Context.UDF);
+                            break;
+                        }
                 }
+                await RefreshRelatedInCacheAsync(memoryCache, cacheElement, id, context);
+            }
+            else
+            {
+                CacheHelper.AddInCache(memoryCache, cacheElement, id, context);
             }
         }
 
-        private static async Task RemoveFromCacheAsync(IMemoryCache memoryCache, Object cacheElement, object id)
+        private static async Task RemoveFromCacheAsync(IMemoryCache memoryCache, Object cacheElement, object id, Context context)
         {
-            IEnumerable<Space> spaces = null;
-
             switch (cacheElement.GetType().Name)
             {
                 case "Space":
-                    CacheHelper.DeleteFromCache(memoryCache, id, Context.None);
-                    spaces = await GetSpacesAsync(memoryCache, Loggers.SilentLogger, true);
-                    CacheHelper.AddInCache(memoryCache, spaces, id, Context.Space);
-                    break;
+                    {
+                        CacheHelper.DeleteFromCache(memoryCache, id, Context.None);
+                        break;
+                    }
                 case "Device":
                     {
-                        Device device = (Device)cacheElement;
-                        CacheHelper.DeleteFromCache(memoryCache, device.Id, Context.Device);
-
-                        if (device.SpaceId != Guid.Empty)
-                        {
-                            Space space = await GetSpaceAsync(device.SpaceId, memoryCache, Loggers.SilentLogger, true);
-                            CacheHelper.AddInCache(memoryCache, space, device.SpaceId, Context.Space);
-                        }
                         break;
                     }
                 case "Sensor":
                     {
-                        var sensor = (Sensor)cacheElement;
-                        CacheHelper.DeleteFromCache(memoryCache, sensor.Id, Context.Sensor);
-
-                        if (sensor.SpaceId != Guid.Empty)
-                        {
-                            Space space = await GetSpaceAsync(sensor.SpaceId, memoryCache, Loggers.SilentLogger, true);
-                            CacheHelper.AddInCache(memoryCache, space, sensor.SpaceId, Context.Space);
-
-                            Device device = await GetDeviceAsync(sensor.DeviceId, memoryCache, Loggers.SilentLogger, true);
-                            CacheHelper.AddInCache(memoryCache, device, sensor.DeviceId, Context.Device);
-                        }
                         break;
                     }
-                default:
-                    return;
+                case "UserDefinedFunction":
+                    {
+                        break;
+                    }
             }
+            await RefreshRelatedInCacheAsync(memoryCache, cacheElement, id, context);
+            CacheHelper.DeleteFromCache(memoryCache, id, context);
         }
         #endregion
 
@@ -157,7 +225,7 @@ namespace DigitalTwinsBackend.Helpers
                         await CreateMatchers(memoryCache, logger, description.matchers, space.Id);
 
                     if (description.userdefinedfunctions != null)
-                        await CreateUserDefinedFunction(memoryCache, logger, description.userdefinedfunctions, udfFiles, space.Id);
+                        await CreateUserDefinedFunctions(memoryCache, logger, description.userdefinedfunctions, udfFiles, space.Id);
 
                     if (description.roleassignments != null)
                         await CreateRoleAssignments(memoryCache, logger, description.roleassignments, space.Id);
@@ -333,7 +401,7 @@ namespace DigitalTwinsBackend.Helpers
 
 
 
-        private static async Task CreateUserDefinedFunction(
+        private static async Task CreateUserDefinedFunctions(
             IMemoryCache memoryCache,
             ILogger logger,
             IEnumerable<UserDefinedFunctionDescription> descriptions,
@@ -474,14 +542,18 @@ namespace DigitalTwinsBackend.Helpers
             return await CreateMatcherAsync(matcherToCreateOrPatch, memoryCache, logger);
         }
 
-        public static async Task CreateOrPatchUserDefinedFunctionAsync(
+        private static async Task CreateOrPatchUserDefinedFunctionAsync(
             IMemoryCache cache,
             ILogger logger,
-            UserDefinedFunction udf)
+            UserDefinedFunction udf,
+            string js = null)
         {
-            var content = await GetUserDefinedFunctionContent(udf.Id, cache, logger);
+            if (js == null)
+            {
+                js = await GetUserDefinedFunctionContent(udf.Id, cache, logger);
+            }
 
-            await CreateOrPatchUserDefinedFunctionAsync(cache, logger, udf, content, udf.SpaceId, udf.Matchers);
+            await CreateOrPatchUserDefinedFunctionAsync(cache, logger, udf, js, udf.SpaceId, udf.Matchers);
         }
         
         private static async Task CreateOrPatchUserDefinedFunctionAsync(
@@ -500,11 +572,56 @@ namespace DigitalTwinsBackend.Helpers
                 await FeedbackHelper.Channel.SendMessageAsync($"Updating the UserDefinedFunction {existingUserDefinedFunction.Id} that already exist.", MessageType.Info);
                 existingUserDefinedFunction.Name = udf.Name;
                 existingUserDefinedFunction.Matchers = udf.Matchers;
-                await Api.UpdateUserDefinedFunctionAsync(cache, logger, existingUserDefinedFunction, js);
+
+                await UpdateUserDefinedFunctionAsync(cache, logger, existingUserDefinedFunction, js);
             }
             else
             {
-                await Api.CreateUserDefinedFunctionAsync(httpClient, logger, udf, js);
+                await CreateUserDefinedFunctionAsync(cache, logger, udf, js);
+            }
+        }
+
+        public static async Task<Guid> CreateUserDefinedFunctionAsync(
+            IMemoryCache cache,
+            ILogger logger,
+            UserDefinedFunction udf,
+            string js)
+        {
+            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(cache, logger);
+            var id = await Api.CreateUserDefinedFunctionAsync(httpClient, logger, udf, js);
+            await AddInCacheAsync(cache, new UserDefinedFunction(), id, true, Context.UDF).ConfigureAwait(false);
+
+            return id;
+        }
+
+        public static async Task UpdateUserDefinedFunctionAsync(
+            IMemoryCache cache,
+            ILogger logger,
+            UserDefinedFunction udf,
+            string js = null)
+        {
+            if (js == null)
+            {
+                js = await GetUserDefinedFunctionContent(udf.Id, cache, logger);
+            }
+
+            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(cache, logger);
+            await Api.UpdateUserDefinedFunctionAsync(cache, logger, udf, js);
+            await AddInCacheAsync(cache, udf, udf.Id, true, Context.UDF).ConfigureAwait(false);
+        }
+
+        public static async Task<bool> DeleteUserDefinedFunctionAsync(UserDefinedFunction udf, IMemoryCache memoryCache, ILogger logger)
+        {
+            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+            if (await Api.DeleteAsync<UserDefinedFunction>(httpClient, logger, udf))
+            {
+                await RemoveFromCacheAsync(memoryCache, udf, udf.Id, Context.UDF).ConfigureAwait(false);
+                logger.LogInformation($"DeleteUserDefinedFunctionAsync: {udf.Id}");
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         #endregion
@@ -536,11 +653,8 @@ namespace DigitalTwinsBackend.Helpers
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
-                spaces = await Api.GetSpaces(
-                    httpClient, logger,
-                    maxNumberToGet: 1000, includes: "types,values,properties");
-
-                await RefreshCacheAsync(memoryCache, spaces, Guid.Empty, false, Context.Space).ConfigureAwait(false);
+                spaces = await Api.GetSpaces(httpClient, logger, includes: "types,values,properties");
+                await AddInCacheAsync(memoryCache, spaces, Guid.Empty, false, Context.Space).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetSpacesAsync: {JsonConvert.SerializeObject(spaces, Formatting.Indented)}");
@@ -563,7 +677,7 @@ namespace DigitalTwinsBackend.Helpers
                     navigation: "maxLevel=1",
                     includes: "types");
 
-                await RefreshCacheAsync(memoryCache, spaces, Guid.Empty, false, Context.RootSpaces).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, spaces, Guid.Empty, false, Context.RootSpaces).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetRootSpacesAsync: {JsonConvert.SerializeObject(spaces, Formatting.Indented)}");
@@ -582,18 +696,34 @@ namespace DigitalTwinsBackend.Helpers
             IMemoryCache memoryCache,
             ILogger logger)
         {
+            Guid id;
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
             var blobs = await GetBlobsAsync(blobContent.ParentId, memoryCache, logger, false);
             var blob = blobs.FirstOrDefault(b => b.Name.Equals(blobContent.Name));
-            
-            if (blob!=null && blob.Id!=null)
+
+            if (blob != null && blob.Id != null)
             {
-                return blob.Id;
+                await Api.UpdateBlobAsync(httpClient, logger, blobType, blobContent, file);
+                id = blobContent.Id;
+
+                blob = await GetBlobAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                await AddInCacheAsync(memoryCache, blobContent, blobContent.Id, true, Context.Blob).ConfigureAwait(false);
+
+                //recharger le blobCOntent (avec contentInfo) puis remise dans le cache
+                ////cacheElement = await GetBlobAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+                ////((BlobContent)cacheElement).ContentInfos[0].FilePath = await GetBlobContentAsync((Guid)id, memoryCache, Loggers.SilentLogger, true);
+
+
+                //await AddInCacheAsync(memoryCache, blobContent, blobContent.Id, true, Context.Blob).ConfigureAwait(false);
+                //CacheHelper.AddInCache(memoryCache, blobContent, blobContent.Id, Context.Blob);
+            }
+            else
+            {
+                id = await Api.CreateBlobAsync(httpClient, logger, blobType, blobContent, file);
+                CacheHelper.DeleteFromCache(memoryCache, blobContent.ParentId, Context.Blob);
             }
 
-            var id = await Api.CreateBlobAsync(httpClient, logger, blobType, blobContent, file);
-            CacheHelper.DeleteFromCache(memoryCache, blobContent.ParentId, Context.Blob);
             return id;
         }
 
@@ -614,7 +744,7 @@ namespace DigitalTwinsBackend.Helpers
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
                 blobs = await Api.GetBlobsAsync(httpClient, logger, spaceId, includes: "contentInfo,description,types");
-                await RefreshCacheAsync(memoryCache, blobs, spaceId, true, Context.Blob).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, blobs, spaceId, true, Context.Blob).ConfigureAwait(false);
 
                 if (loadLatestContent)
                 {
@@ -631,18 +761,22 @@ namespace DigitalTwinsBackend.Helpers
 
         public static async Task<BlobContent> GetBlobAsync(Guid blobId, IMemoryCache memoryCache, ILogger logger, bool loadLatestContent)
         {
-            BlobContent blob = CacheHelper.GetBlobContentFromCache(memoryCache, blobId);
+            BlobContent blob = null;
+            if (!loadLatestContent)
+            {
+                blob = CacheHelper.GetBlobContentFromCache(memoryCache, blobId);
+            }
 
             if (blob == null)
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
                 blob = await Api.GetBlobAsync(httpClient, logger, blobId, includes: "contentInfo,description,types");
-                await RefreshCacheAsync(memoryCache, blob, blobId, true, Context.Blob).ConfigureAwait(false);
-
+                
                 if (loadLatestContent)
                 {
-                    blob.ContentInfos[0].FilePath = await GetBlobContentAsync(blob.Id, memoryCache, logger, false);
+                    blob.ContentInfos[0].FilePath = await GetBlobContentAsync(blob.Id, memoryCache, logger, true);
                 }
+                await AddInCacheAsync(memoryCache, blob, blobId, false, Context.Blob).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetSpacesAsync: {JsonConvert.SerializeObject(blob, Formatting.Indented)}");
@@ -698,10 +832,10 @@ namespace DigitalTwinsBackend.Helpers
                 // get space element from Digital Twins API
                 space = await Api.GetSpace(
                     httpClient, logger,
-                    spaceId, includes: "types,values,parent,parenttypes,childspaces,childspacestypes,properties,devices,sensors,users,resources");
+                    spaceId, includes: "types,values,parent,parenttypes,childspaces,childspacestypes,properties,devices,devicestypes,sensors,users,resources");
 
                 // Add the Space element in cache & refresh Space list in cache
-                await RefreshCacheAsync(memoryCache, space, spaceId, false, Context.Space).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, space, spaceId, false, Context.Space).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetSpaceAsync: {spaceId}");
@@ -715,7 +849,7 @@ namespace DigitalTwinsBackend.Helpers
 
             if (refreshInCache)
             {
-                await RefreshCacheAsync(memoryCache, space, space.Id, true, Context.Space).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, space, space.Id, true, Context.Space).ConfigureAwait(false);
             }
             logger.LogInformation($"CreateSpaceAsync: {space.Id}");
             return space;
@@ -726,7 +860,7 @@ namespace DigitalTwinsBackend.Helpers
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             if (await Api.UpdateAsync<Space>(memoryCache, logger, space, refreshInCache) && refreshInCache)
             {
-                await RefreshCacheAsync(memoryCache, space, space.Id, true, Context.Space).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, space, space.Id, true, Context.Space).ConfigureAwait(false);
             }
             logger.LogInformation($"UpdateSpaceAsync: {space.Id}");
         }
@@ -741,7 +875,7 @@ namespace DigitalTwinsBackend.Helpers
                 //    await RefreshCacheAsync(memoryCache, space, space.Id, true, Context.Space);
                 //}
                 var updatedSpace = await GetSpaceAsync(space.Id, memoryCache, logger, true);
-                await RefreshCacheAsync(memoryCache, updatedSpace, updatedSpace.Id, true, Context.Space);
+                await AddInCacheAsync(memoryCache, updatedSpace, updatedSpace.Id, true, Context.Space);
                 logger.LogInformation($"UpdateSpacePropertiesAsync: {space.Id}");
             }
         }
@@ -751,7 +885,7 @@ namespace DigitalTwinsBackend.Helpers
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             if (await Api.DeleteAsync<Space>(httpClient, logger, space))
             {
-                await RemoveFromCacheAsync(memoryCache, space, space.Id).ConfigureAwait(false);
+                await RemoveFromCacheAsync(memoryCache, space, space.Id, Context.Space).ConfigureAwait(false);
                 logger.LogInformation($"DeleteSpaceAsync: {space.Id}");
                 return true;
             }
@@ -781,8 +915,8 @@ namespace DigitalTwinsBackend.Helpers
             if (devices == null)
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-                devices = await Api.GetDevices(httpClient, logger, includes: "sensors,iothub,fullpath");
-                await RefreshCacheAsync(memoryCache, devices, Guid.Empty, false, Context.Device).ConfigureAwait(false);
+                devices = await Api.GetDevices(httpClient, logger, includes: "sensors,iothub,fullpath,types");
+                await AddInCacheAsync(memoryCache, devices, Guid.Empty, false, Context.Device).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetDevices: {JsonConvert.SerializeObject(devices, Formatting.Indented)}");
@@ -806,7 +940,7 @@ namespace DigitalTwinsBackend.Helpers
                     httpClient, logger,
                     deviceId, includes: "sensors,sensorstypes,sensorsvalues,ConnectionString,properties,space,spacetypes,iothub,fullpath");
 
-                await RefreshCacheAsync(memoryCache, device, deviceId, false, Context.Device).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, device, deviceId, false, Context.Device).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetDevice: {device}");
@@ -817,14 +951,19 @@ namespace DigitalTwinsBackend.Helpers
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             var deviceId = await Api.CreateAsync<Device>(httpClient, logger, device);
+            device.Id = deviceId;
 
-            device = await Api.GetDevice(httpClient, logger, deviceId, includes: "sensors, sensorsvalues, ConnectionString");
-            if (refreshInCache)
+            if (deviceId != Guid.Empty)
             {
-                await RefreshCacheAsync(memoryCache, device, deviceId, true, Context.Device).ConfigureAwait(false);
-            }
+                //device = await Api.GetDevice(httpClient, logger, deviceId, includes: "sensors, sensorsvalues, ConnectionString");
 
-            logger.LogInformation($"CreateDevice: {deviceId}");
+                if (refreshInCache)
+                {
+                    await AddInCacheAsync(memoryCache, device, deviceId, true, Context.Device).ConfigureAwait(false);
+                }
+
+                logger.LogInformation($"CreateDevice: {deviceId}");
+            }
             return device;
         }
 
@@ -832,7 +971,7 @@ namespace DigitalTwinsBackend.Helpers
         {
             if (await Api.UpdateAsync<Device>(memoryCache, logger, device, refreshInCache) && refreshInCache)
             {
-                await RefreshCacheAsync(memoryCache, device, device.Id, true, Context.Device).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, device, device.Id, true, Context.Device).ConfigureAwait(false);
             }
             logger.LogInformation($"UpdateDevice: {device.Id}");
         }
@@ -841,7 +980,7 @@ namespace DigitalTwinsBackend.Helpers
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             await Api.DeleteAsync<Device>(httpClient, logger, device);
-            await RemoveFromCacheAsync(memoryCache, device, device.Id).ConfigureAwait(false);
+            await RemoveFromCacheAsync(memoryCache, device, device.Id, Context.Device).ConfigureAwait(false);
 
             logger.LogInformation($"DeleteDevice: {device.Id}");
         }
@@ -858,7 +997,7 @@ namespace DigitalTwinsBackend.Helpers
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
                 sensor = await Api.GetSensor(httpClient, logger, id, includes: "value,properties,space,spacetypes,types,device,devicetypes");
-                await RefreshCacheAsync(memoryCache, sensor, id, false, Context.Sensor).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, sensor, id, false, Context.Sensor).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetSensor: {id}");
@@ -873,7 +1012,7 @@ namespace DigitalTwinsBackend.Helpers
             sensor = await Api.GetSensor(httpClient, logger, sensorId, includes: "value");
             if (refreshInCache)
             {
-                await RefreshCacheAsync(memoryCache, sensor, sensorId, true, Context.Sensor).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, sensor, sensorId, true, Context.Sensor).ConfigureAwait(false);
             }
 
             logger.LogInformation($"CreateSensor: {sensorId}");
@@ -883,7 +1022,7 @@ namespace DigitalTwinsBackend.Helpers
         {
             if (await Api.UpdateAsync<Sensor>(memoryCache, logger, sensor, refreshInCache) && refreshInCache)
             {
-                await RefreshCacheAsync(memoryCache, sensor, sensor.Id, true, Context.Device).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, sensor, sensor.Id, true, Context.Device).ConfigureAwait(false);
             }
 
             logger.LogInformation($"UpdateSensor: {sensor.Id}");
@@ -893,21 +1032,26 @@ namespace DigitalTwinsBackend.Helpers
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             await Api.DeleteAsync<Sensor>(httpClient, logger, sensor);
-            await RemoveFromCacheAsync(memoryCache, sensor, sensor.Id).ConfigureAwait(false);
+            await RemoveFromCacheAsync(memoryCache, sensor, sensor.Id, Context.Sensor).ConfigureAwait(false);
 
             logger.LogInformation($"DeleteSensor: {sensor.Id}");
         }
 
 
         #region Matcher & UDF management
-        public static async Task<Matcher> GetMatcher(Guid matcherId, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<Matcher> GetMatcherAsync(Guid matcherId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
-            Matcher matcher = CacheHelper.GetMatcherFromCache(memoryCache, matcherId);
+            Matcher matcher = null;
+
+            if (!bypassCache)
+            {
+                matcher = CacheHelper.GetMatcherFromCache(memoryCache, matcherId);
+            }
 
             if (matcher == null)
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-                matcher = await Api.GetAsync<Matcher>(httpClient, logger, matcherId, includes: "conditions");
+                matcher = await Api.GetAsync<Matcher>(httpClient, logger, matcherId, includes: "conditions,userdefinedfunctions");
                 CacheHelper.AddInCache(memoryCache, matcher, matcherId, Context.Matcher);
             }
 
@@ -915,9 +1059,14 @@ namespace DigitalTwinsBackend.Helpers
             return matcher;
         }
 
-        public static async Task<IEnumerable<Matcher>> GetMatchersBySpaceId(Guid spaceId, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<IEnumerable<Matcher>> GetMatchersBySpaceId(Guid spaceId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
-            IEnumerable<Matcher> matchers = CacheHelper.GetMatchersFromCache(memoryCache, Context.Matcher, spaceId);
+            IEnumerable<Matcher> matchers = null;
+
+            if (!bypassCache)
+            {
+                matchers = CacheHelper.GetMatchersFromCache(memoryCache, Context.Matcher, spaceId);
+            }
 
             if (matchers == null)
             {
@@ -926,9 +1075,9 @@ namespace DigitalTwinsBackend.Helpers
 
                 matchers = await Api.GetMatchersBySpaceId(
                     httpClient, logger, spaceId,
-                    includes: "conditions");
+                    includes: "conditions&traverse=up");
 
-                await RefreshCacheAsync(memoryCache, matchers, spaceId, false, Context.Matcher).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, matchers, spaceId, false, Context.Matcher).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetMatchersBySpaceId: {JsonConvert.SerializeObject(matchers, Formatting.Indented)}");
@@ -941,7 +1090,7 @@ namespace DigitalTwinsBackend.Helpers
             var matcherId = await Api.CreateAsync<Matcher>(httpClient, logger, matcher);
             matcher.Id = matcherId;
 
-            await RefreshCacheAsync(memoryCache, matcher, matcherId, true, Context.Matcher).ConfigureAwait(false);
+            await AddInCacheAsync(memoryCache, matcher, matcherId, true, Context.Matcher).ConfigureAwait(false);
             logger.LogInformation($"CreateMatcher: {matcherId}");
             return matcherId;
         }
@@ -951,7 +1100,7 @@ namespace DigitalTwinsBackend.Helpers
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             if (await Api.UpdateAsync<Matcher>(memoryCache, logger, matcher))
             {
-                await RefreshCacheAsync(memoryCache, matcher, matcher.Id, true, Context.Matcher).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, matcher, matcher.Id, true, Context.Matcher).ConfigureAwait(false);
                 logger.LogInformation($"UpdateMatcher: {matcher.Id}");
             }
         }
@@ -959,9 +1108,11 @@ namespace DigitalTwinsBackend.Helpers
         public static async Task<bool> DeleteMatcherAsync(Matcher matcher, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+            matcher = await GetMatcherAsync(matcher.Id, memoryCache, logger, true);
+
             if (await Api.DeleteAsync<Matcher>(httpClient, logger, matcher))
             {
-                await RemoveFromCacheAsync(memoryCache, matcher, matcher.Id).ConfigureAwait(false);
+                await RemoveFromCacheAsync(memoryCache, matcher, matcher.Id, Context.Matcher).ConfigureAwait(false);
                 logger.LogInformation($"DeleteMatcher: {matcher.Id}");
                 return true;
             }
@@ -971,20 +1122,20 @@ namespace DigitalTwinsBackend.Helpers
             }
         }
 
-        public static async Task<IEnumerable<UserDefinedFunction>> GetUDFsBySpaceId(Guid spaceId, IMemoryCache memoryCache, ILogger logger)
+        public static async Task<IEnumerable<UserDefinedFunction>> GetUDFsBySpaceIdAsync(Guid spaceId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
-            var userDefinedFunctions = CacheHelper.GetUDFsFromCache(memoryCache, Context.UDF, spaceId);
-
+            IEnumerable<UserDefinedFunction> userDefinedFunctions = null;
+            if (!bypassCache)
+            {
+                userDefinedFunctions = CacheHelper.GetUDFsFromCache(memoryCache, Context.UDF, spaceId);
+            }
 
             if (userDefinedFunctions == null)
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
-                userDefinedFunctions = await Api.GetUserDefinedFunctions(
-                    httpClient, logger, spaceId,
-                    includes: "matchers");
-
-                await RefreshCacheAsync(memoryCache, userDefinedFunctions, spaceId, false, Context.UDF).ConfigureAwait(false);
+                userDefinedFunctions = await Api.GetUserDefinedFunctions(httpClient, logger, spaceId, includes: "matchers");
+                await AddInCacheAsync(memoryCache, userDefinedFunctions, spaceId, false, Context.UDF).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetUserDefinedFunctions: {JsonConvert.SerializeObject(userDefinedFunctions, Formatting.Indented)}");
@@ -1009,42 +1160,54 @@ namespace DigitalTwinsBackend.Helpers
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
                 userDefinedFunctions = await Api.GetUserDefinedFunctions(httpClient, logger, includes: "matchers,fullpath");
-                await RefreshCacheAsync(memoryCache, userDefinedFunctions, Guid.Empty, false, Context.UDF).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, userDefinedFunctions, Guid.Empty, false, Context.UDF).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetUserDefinedFunctions: {JsonConvert.SerializeObject(userDefinedFunctions, Formatting.Indented)}");
             return userDefinedFunctions;
         }
 
-        public static async Task<UserDefinedFunction> GetUserDefinedFunction(Guid functionId, IMemoryCache memoryCache, ILogger logger)
+        //public static async Task<UserDefinedFunction> GetUserDefinedFunction(Guid functionId, IMemoryCache memoryCache, ILogger logger)
+        //{
+        //    var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+
+        //    var userDefinedFunction = await Api.GetUserDefinedFunction(httpClient, logger, functionId, includes: "matchers");
+
+        //    if (userDefinedFunction != null)
+        //        logger.LogInformation($"GetUserDefinedFunctions: {JsonConvert.SerializeObject(userDefinedFunction, Formatting.Indented)}");
+
+        //    return userDefinedFunction;
+        //}
+
+        public static async Task<UserDefinedFunction> GetUserDefinedFunction(Guid functionId, IMemoryCache memoryCache, ILogger logger, bool bypassCache)
         {
-            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
+            UserDefinedFunction udf = null;
+            if (!bypassCache)
+            {
+                udf = CacheHelper.GetUDFFromCache(memoryCache, functionId);
+            }
 
-            var userDefinedFunction = await Api.GetUserDefinedFunction(httpClient, logger, functionId, includes: "matchers");
+            if (udf == null)
+            {
+                var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
 
-            if (userDefinedFunction != null)
-                logger.LogInformation($"GetUserDefinedFunctions: {JsonConvert.SerializeObject(userDefinedFunction, Formatting.Indented)}");
+                udf = await Api.GetUserDefinedFunction(httpClient, logger, functionId, includes: "matchers");
 
-            return userDefinedFunction;
+                await AddInCacheAsync(memoryCache, udf, functionId, false, Context.UDF).ConfigureAwait(false);
+            }
+
+            if (udf != null)
+                logger.LogInformation($"GetUserDefinedFunctions: {JsonConvert.SerializeObject(udf, Formatting.Indented)}");
+            return udf;
         }
+
+
 
         public static async Task<string> GetUserDefinedFunctionContent(Guid functionId, IMemoryCache memoryCache, ILogger logger)
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             var userDefinedFunctions = await Api.GetUserDefinedFunctionContent(httpClient, logger, functionId);
             return userDefinedFunctions;
-        }
-        
-        public static async Task UpdateUserDefinedFunction(UserDefinedFunction userDefinedFunction, string content, IMemoryCache memoryCache, ILogger logger)
-        {
-            var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
-            await Api.UpdateUserDefinedFunctionAsync(
-                memoryCache,
-                logger,
-                userDefinedFunction,
-                content);
-
-            logger.LogInformation($"UpdateUserDefinedFunction: {userDefinedFunction.Id}");
         }
                                  
         #endregion
@@ -1064,7 +1227,7 @@ namespace DigitalTwinsBackend.Helpers
 
                 logger.LogInformation($"GetSpaceTypes: {JsonConvert.SerializeObject(types, Formatting.Indented)}");
 
-                await RefreshCacheAsync(memoryCache, types, listType, false, Context.None).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, types, listType, false, Context.None).ConfigureAwait(false);
             }
 
             return types;
@@ -1089,7 +1252,7 @@ namespace DigitalTwinsBackend.Helpers
 
                 logger.LogInformation($"GetOntologiesWithTypes: {JsonConvert.SerializeObject(ontologies, Formatting.Indented)}");
 
-                await RefreshCacheAsync(memoryCache, ontologies, CacheKeys.OntologyList, false, Context.None).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, ontologies, CacheKeys.OntologyList, false, Context.None).ConfigureAwait(false);
             }
             else
             {
@@ -1117,7 +1280,7 @@ namespace DigitalTwinsBackend.Helpers
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
                 propertyKeys = await Api.GetPropertyKeys(httpClient, logger, includes: "fullpath");
-                await RefreshCacheAsync(memoryCache, propertyKeys, Guid.Empty, false, Context.PropertyKey).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, propertyKeys, Guid.Empty, false, Context.PropertyKey).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetPropertyKeys: {JsonConvert.SerializeObject(propertyKeys, Formatting.Indented)}");
@@ -1144,7 +1307,7 @@ namespace DigitalTwinsBackend.Helpers
             {
                 var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
                 propertyKey = await Api.GetAsync<PropertyKey>(httpClient, logger, id, includes: "description");
-                await RefreshCacheAsync(memoryCache, propertyKey, id, false, Context.PropertyKey).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, propertyKey, id, false, Context.PropertyKey).ConfigureAwait(false);
             }
 
             logger.LogInformation($"GetPropertyKey: {id}");
@@ -1159,7 +1322,7 @@ namespace DigitalTwinsBackend.Helpers
             PropertyKey = await Api.GetAsync<PropertyKey>(httpClient, logger, propertyKeyId, includes: "description");
             if (propertyKeyId != 0)
             {
-                await RefreshCacheAsync(memoryCache, PropertyKey, propertyKeyId, true, Context.PropertyKey).ConfigureAwait(false);
+                await AddInCacheAsync(memoryCache, PropertyKey, propertyKeyId, true, Context.PropertyKey).ConfigureAwait(false);
             }
 
             logger.LogInformation($"CreatePropertyKey: {propertyKeyId}");
@@ -1169,7 +1332,7 @@ namespace DigitalTwinsBackend.Helpers
         public static async Task UpdatePropertyKeyAsync(PropertyKey PropertyKey, IMemoryCache memoryCache, ILogger logger)
         {
             await Api.UpdateAsync<PropertyKey>(memoryCache, logger, PropertyKey);
-            await RefreshCacheAsync(memoryCache, PropertyKey, PropertyKey.Id, true, Context.Device).ConfigureAwait(false);
+            await AddInCacheAsync(memoryCache, PropertyKey, PropertyKey.Id, true, Context.Device).ConfigureAwait(false);
 
             logger.LogInformation($"UpdatePropertyKey: {PropertyKey.Id}");
         }
@@ -1178,7 +1341,7 @@ namespace DigitalTwinsBackend.Helpers
         {
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             await Api.DeleteAsync<PropertyKey>(httpClient, logger, PropertyKey);
-            await RemoveFromCacheAsync(memoryCache, PropertyKey, PropertyKey.Id).ConfigureAwait(false);
+            await RemoveFromCacheAsync(memoryCache, PropertyKey, PropertyKey.Id, Context.PropertyKey).ConfigureAwait(false);
 
             logger.LogInformation($"DeletePropertyKey: {PropertyKey.Id}");
         }

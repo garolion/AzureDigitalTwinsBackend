@@ -46,8 +46,13 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(SensorViewModel model)
+        public async Task<ActionResult> Create(SensorViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 var id = await DigitalTwinsHelper.CreateSensorAsync(model.SelectedSensor, _cache, Loggers.SilentLogger);
@@ -73,8 +78,13 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(SensorViewModel model)
+        public async Task<ActionResult> Edit(SensorViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 await DigitalTwinsHelper.UpdateSensorAsync(model.SelectedSensor, _cache, Loggers.SilentLogger);
@@ -93,14 +103,18 @@ namespace DigitalTwinsBackend.Controllers
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
             SensorViewModel model = new SensorViewModel(_cache, id);
-
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(SensorViewModel model)
+        public async Task<ActionResult> Delete(SensorViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 await DigitalTwinsHelper.DeleteSensorAsync(model.SelectedSensor, _cache, Loggers.SilentLogger);

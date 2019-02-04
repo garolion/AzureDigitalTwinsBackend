@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DigitalTwinsBackend.Helpers;
@@ -11,12 +12,9 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace DigitalTwinsBackend.Controllers
 {
-    public class UDFController : Controller
+    public class UDFController : BaseController
     {
         List<UISpace> spaces;
-
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private IMemoryCache _cache;
 
         public UDFController(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
@@ -30,9 +28,63 @@ namespace DigitalTwinsBackend.Controllers
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
-            var udf = await DigitalTwinsHelper.GetUserDefinedFunction(id, _cache, Loggers.SilentLogger);
+            var udf = await DigitalTwinsHelper.GetUserDefinedFunction(id, _cache, Loggers.SilentLogger, false);
             var viewModel = new UDFViewModel(_cache, udf);
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public ActionResult Create(Guid spaceId)
+        {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
+            //var udf = await DigitalTwinsHelper.GetUserDefinedFunction(spaceId, _cache, Loggers.SilentLogger);
+            var viewModel = new UDFViewModel(_cache);
+            viewModel.UDF.SpaceId = spaceId;
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create(UDFViewModel model, string updateButton)
+        {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
+            try
+            {
+                string js;
+
+                if (model.UDFFile != null)
+                {
+                    using (var r = new StreamReader(model.UDFFile.OpenReadStream()))
+                    {
+                        js = await r.ReadToEndAsync();
+                        if (String.IsNullOrWhiteSpace(js))
+                        {
+                            await FeedbackHelper.Channel.SendMessageAsync($"Error - We cannot read the content of the file {model.UDFFile.FileName}.", MessageType.Info);
+                        }
+                    }
+                }
+                else if (model.Content != null)
+                {
+                    js = model.Content;
+                }
+                else
+                {
+                    js = string.Empty;
+                }
+
+                var id = await DigitalTwinsHelper.CreateUserDefinedFunctionAsync(_cache, Loggers.SilentLogger, model.UDF, js);
+
+                return RedirectToAction(nameof(Edit), new { id = id });
+            }
+            catch
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
         }
 
         [HttpGet]
@@ -40,7 +92,42 @@ namespace DigitalTwinsBackend.Controllers
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
 
-            var udf = await DigitalTwinsHelper.GetUserDefinedFunction(id, _cache, Loggers.SilentLogger);
+            var udf = await DigitalTwinsHelper.GetUserDefinedFunction(id, _cache, Loggers.SilentLogger,false);
+            var viewModel = new UDFViewModel(_cache, udf);
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(UDFViewModel model, string updateButton)
+        {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
+            try
+            {
+                //we retrieve matchers from cache
+                var cachedUDF = CacheHelper.GetUDFFromCache(_cache, model.UDF.Id);
+                model.UDF.Matchers = cachedUDF.Matchers;
+
+                await DigitalTwinsHelper.UpdateUserDefinedFunctionAsync(_cache, Loggers.SilentLogger, model.UDF, model.Content);
+                return RedirectToAction("List", "UDF");
+                //return RedirectToAction("Edit", "Space", new { id = model.UDF.SpaceId });
+            }
+            catch
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult> Delete(Guid id)
+        {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
+            var udf = await DigitalTwinsHelper.GetUserDefinedFunction(id, _cache, Loggers.SilentLogger, false);
             var viewModel = new UDFViewModel(_cache, udf);
             return View(viewModel);
         }
@@ -48,19 +135,17 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(UDFViewModel model, string updateButton)
+        public async Task<ActionResult> Delete(UDFViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
-                if (updateButton.Equals("Cancel"))
-                {
-                    return Redirect(CacheHelper.GetPreviousPage(_cache));
-                }
-
-                //var udf = await DigitalTwinsHelper.GetUserDefinedFunction(model.UDF.Id, _cache, Loggers.SilentLogger);
-
-                await DigitalTwinsHelper.UpdateUserDefinedFunction(model.UDF, model.Content, _cache, Loggers.SilentLogger);
-                return Redirect(CacheHelper.GetPreviousPage(_cache));
+                await DigitalTwinsHelper.DeleteUserDefinedFunctionAsync(model.UDF, _cache, Loggers.SilentLogger);
+                return RedirectToAction("List", "UDF");
             }
             catch
             {

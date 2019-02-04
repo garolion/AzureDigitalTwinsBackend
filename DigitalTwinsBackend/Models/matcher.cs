@@ -10,6 +10,8 @@ namespace DigitalTwinsBackend.Models
 {
     public class Matcher : BaseModel
     {
+        //used to add the Matcher to a udf in UDF Edit mode
+        public bool Add { get; set; }
         public string Name { get; set; }
         public Guid SpaceId { get; set; }
         public List<MatcherCondition> Conditions { get; set; }
@@ -43,10 +45,11 @@ namespace DigitalTwinsBackend.Models
 
                 if (refInCache != null)
                 {
-                    if (Name != null && !Name.Equals(refInCache.Name)) changes.Add("Name", Name);
+                    changes.Add("Name", Name);
                     if (!SpaceId.Equals(refInCache.SpaceId)) changes.Add("SpaceId", SpaceId);
-                    if (!Conditions.Equals(refInCache.Conditions)) changes.Add("Conditions", Conditions);
-                    if (!UserDefinedFunctions.Equals(refInCache.UserDefinedFunctions)) changes.Add("UserDefinedFunctions", UserDefinedFunctions);
+                    changes.Add("Conditions", Conditions);
+                    //if (!Conditions.Equals(refInCache.Conditions)) changes.Add("Conditions", Conditions);
+                    if (UserDefinedFunctions != null && UserDefinedFunctions.Equals(refInCache.UserDefinedFunctions)) changes.Add("UserDefinedFunctions", UserDefinedFunctions);
                 }
                 else
                 {

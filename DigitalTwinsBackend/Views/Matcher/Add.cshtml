@@ -1,82 +1,46 @@
-﻿@model DigitalTwinsBackend.ViewModels.MatcherViewModel
+﻿@model IEnumerable<DigitalTwinsBackend.Models.Matcher>
 
 @{
-    ViewData["Title"] = "AddMatcherCondition";
+    ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Add</h2>
+<h2>Select available Matchers to add to the UDF</h2>
 
-<h4>Matcher</h4>
+<h4>Add</h4>
 <hr />
+
 <div class="row">
-    <div class="col-md-8">
-        <form asp-action="Add">
+    <div class="col-md-12">
+        <form asp-action="Add" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input asp-for="SelectedMatcher.SpaceId" type="hidden" />
-            <input asp-for="UdfId" type="hidden" />
-            <div class="form-group">
-                <label asp-for="SelectedMatcher.Name" class="control-label"></label>
-                <input asp-for="SelectedMatcher.Name" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label asp-for="SelectedMatcher.SpaceId" class="control-label"></label>
-                <input asp-for="SelectedMatcher.SpaceId" class="form-control" disabled="disabled" />
-            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Add to udf
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Condition
+                        </th>
+                        <th>
+                            Origin Space Id
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @Html.EditorForModel()
+                </tbody>
+            </table>
 
             <div class="form-group">
-                <h4>Conditions</h4>
-                <a asp-controller="Matcher" asp-action="AddCondition" class="ButtonNew">Add a new Condition</a>
-            </div>
-
-            <div class="form-group">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>
-                                Target
-                            </th>
-                            <th>
-                                Path
-                            </th>
-                            <th>
-                                Value
-                            </th>
-                            <th>
-                                Comparison
-                            </th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var condition in Model.SelectedMatcher.Conditions)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => condition.Target)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => condition.Path)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => condition.Value)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => condition.Comparison)
-                                </td>
-                                <td>
-                                    <a asp-action="Edit" asp-route-id="@condition.Id" class="ButtonEdit">Edit or Delete</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="form-group">
-                <input type="submit" name="createButton" value="Add" class="ButtonNew" />
-                <input type="submit" name="createButton" value="Cancel" class="ButtonCancel" />
+                <input type="submit" name="updateButton" value="Add" class="ButtonNew" />
+                <input type="submit" name="updateButton" value="Cancel" class="ButtonCancel" />
             </div>
         </form>
     </div>
 </div>
+

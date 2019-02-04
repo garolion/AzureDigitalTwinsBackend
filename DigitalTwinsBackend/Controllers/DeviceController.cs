@@ -25,7 +25,6 @@ namespace DigitalTwinsBackend.Controllers
         public ActionResult Details(Guid id)
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
-
             DeviceViewModel model = new DeviceViewModel(_cache, id);
             return View(model);
         }
@@ -43,14 +42,20 @@ namespace DigitalTwinsBackend.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(DeviceViewModel model)
+        public async Task<ActionResult> Create(DeviceViewModel model, string updateButton)
         {
-            CacheHelper.ResetMessagesInCache(_cache);
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
 
             try
             {
-                var id = await DigitalTwinsHelper.CreateDeviceAsync(model.SelectedDeviceItem, _cache, Loggers.SilentLogger);
-                await FeedbackHelper.Channel.SendMessageAsync($"Device with id '{id}' successfully created.", MessageType.Info);
+                var id = (await DigitalTwinsHelper.CreateDeviceAsync(model.SelectedDeviceItem, _cache, Loggers.SilentLogger)).Id;
+                if (id != Guid.Empty)
+                {
+                    await FeedbackHelper.Channel.SendMessageAsync($"Device with id '{id}' successfully created.", MessageType.Info);
+                }
 
                 return Redirect(CacheHelper.GetPreviousPage(_cache));
             }
@@ -65,15 +70,19 @@ namespace DigitalTwinsBackend.Controllers
         public ActionResult Edit(Guid id)
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
-
             DeviceViewModel mmodel = new DeviceViewModel(_cache, id);
             return View(mmodel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(DeviceViewModel model)
+        public async Task<ActionResult> Edit(DeviceViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 await DigitalTwinsHelper.UpdateDeviceAsync(model.SelectedDeviceItem, _cache, Loggers.SilentLogger);
@@ -90,15 +99,19 @@ namespace DigitalTwinsBackend.Controllers
         public ActionResult Delete(Guid id)
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
-
             DeviceViewModel mmodel = new DeviceViewModel(_cache, id);
             return View(mmodel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(DeviceViewModel model)
+        public async Task<ActionResult> Delete(DeviceViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             CacheHelper.ResetMessagesInCache(_cache);
 
             try

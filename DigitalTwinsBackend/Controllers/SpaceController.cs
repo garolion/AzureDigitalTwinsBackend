@@ -55,6 +55,12 @@ namespace DigitalTwinsBackend.Controllers
         }
         #endregion
 
+        [HttpGet]
+        public ActionResult Search()
+        {
+            return Redirect("List");
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Search(SpacesViewModel model)
@@ -73,10 +79,16 @@ namespace DigitalTwinsBackend.Controllers
 
         #region Create
         [HttpGet]
-        public ActionResult Create()
+        public ActionResult Create(Guid parentId)
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
             SpaceViewModel model = new SpaceViewModel(_cache);
+
+            if (parentId!=Guid.Empty)
+            {
+                model.SelectedSpaceItem.ParentSpaceId = parentId;
+            }
+
             return View(model);
         }
 
@@ -135,15 +147,19 @@ namespace DigitalTwinsBackend.Controllers
         public ActionResult Edit(Guid id)
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
-
             SpaceViewModel model = new SpaceViewModel(_cache, id);
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(SpaceViewModel model)
+        public async Task<ActionResult> Edit(SpaceViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 await DigitalTwinsHelper.UpdateSpaceAsync(model.SelectedSpaceItem, _cache, Loggers.SilentLogger);
@@ -163,15 +179,19 @@ namespace DigitalTwinsBackend.Controllers
         public ActionResult Delete(Guid id)
         {
             CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
-
             SpaceViewModel model = new SpaceViewModel(_cache, id);
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(SpaceViewModel model)
+        public async Task<ActionResult> Delete(SpaceViewModel model, string updateButton)
         {
+            if (updateButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             try
             {
                 if (await DigitalTwinsHelper.DeleteSpaceAsync(model.SelectedSpaceItem, _cache, Loggers.SilentLogger))

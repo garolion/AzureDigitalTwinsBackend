@@ -1,0 +1,43 @@
+﻿@model DigitalTwinsBackend.ViewModels.UDFViewModel
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>UDF</h4>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label asp-for="UDF.Name" class="control-label"></label>
+                    <input asp-for="UDF.Name" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Space</label>
+                    <select asp-for="UDF.SpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList, "Id", "Name"))"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Content" class="control-label"></label>
+                    <div class="col-md-12">
+                        <label class="control-label">Add a source file (.js) for this UDF</label>
+                        <input type="file" asp-for="UDFFile" class="form-control" />
+                    </div>
+                    <div class="col-md-12">
+                        <p></p>
+                        <label class="control-label">Or copy and past the source code below </label>
+                        <textarea asp-for="Content" class="form-control" rows="25" cols="1"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input style="margin:20px 0px 0px 0px" type="submit" name="updateButton" value="Create & Add matchers" class="ButtonEdit" />
+                    <input style="margin:20px 0px 0px 0px" type="submit" name="updateButton" value="Cancel" class="ButtonCancel" />
+                </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

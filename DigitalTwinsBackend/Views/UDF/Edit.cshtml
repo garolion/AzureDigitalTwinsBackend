@@ -23,8 +23,8 @@
                     <input asp-for="UDF.Name" class="form-control" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="UDF.SpaceId" class="control-label"></label>
-                    <input asp-for="UDF.SpaceId" class="form-control" disabled="disabled" />
+                    <label class="control-label">Space</label>
+                    <select asp-for="UDF.SpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList, "Id", "Name"))" disabled="disabled"></select>
                 </div>
                 <div class="form-group">
                     <label asp-for="Content" class="control-label"></label>
@@ -38,17 +38,17 @@
         </form>
     </div>
     <div class="col-md-4">
-        <h4>Blob</h4>
-        <a asp-controller="Matcher" asp-action="Add" asp-route-udfid="@Model.UDF.Id" asp-route-spaceid="@Model.UDF.SpaceId" class="ButtonNew">Add Matcher</a>
+        <div class="label-group" style="display: inline-block;">
+            <h4 style="float:left">Matchers</h4>
+            <a style="float:left;margin-top:5px;margin-left:20px" asp-controller="Matcher" asp-action="create" asp-route-udfid="@Model.UDF.Id" asp-route-spaceid="@Model.UDF.SpaceId" class="ButtonNew">Create New</a>
+            <a style="float:left;margin-top:5px;margin-left:20px" asp-controller="Matcher" asp-action="Add" asp-route-udfid="@Model.UDF.Id" asp-route-spaceid="@Model.UDF.SpaceId" class="ButtonNew">Add Existing</a>
+        </div>
         <table class="table">
             <thead>
                 <tr>
                     <th>
                         Name
                     </th>
-                    @*<th>
-                        # Conditions
-                    </th>*@
                     <th></th>
                 </tr>
             </thead>
@@ -59,12 +59,9 @@
                         <td>
                             @Html.DisplayFor(modelItem => matcher.Name)
                         </td>
-                        @*<td>
-                            @Html.DisplayFor(modelItem => matcher.Conditions.Count().ToString())
-                        </td>*@
                         <td>
-                            <a asp-controller="Matcher" asp-action="Edit" asp-route-blobId="@matcher.Id" class="ButtonEdit">Edit</a>
-                            <a asp-controller="Matcher" asp-action="Delete" asp-route-blobId="@matcher.Id" class="ButtonDelete">Delete</a>
+                            <a asp-controller="Matcher" asp-action="Edit" asp-route-udfid="@Model.UDF.Id" asp-route-matcherId="@matcher.Id" class="ButtonEdit">Edit</a>
+                            <a asp-controller="Matcher" asp-action="Delete" asp-route-udfid="@Model.UDF.Id" asp-route-matcherId="@matcher.Id" class="ButtonDelete">Delete</a>
                         </td>
                     </tr>
                 }

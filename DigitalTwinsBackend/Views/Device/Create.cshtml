@@ -24,14 +24,14 @@
                 <span asp-validation-for="SelectedDeviceItem.HardwareId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SelectedDeviceItem.SpaceId" class="control-label"></label>
+                <label class="control-label">Space</label>
                 <select asp-for="SelectedDeviceItem.SpaceId" class="form-control" asp-items="@(new SelectList(Model.SpaceList,"Id","Name"))"></select>
                 <span asp-validation-for="SelectedDeviceItem.SpaceId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <div class="form-group">
-                    <input type="submit" value="Create" class="ButtonNew" />
-                    <input type="submit" onclick="history.go(-1)" class="ButtonCancel" value="Cancel" />
+                    <input type="submit" name="updateButton" value="Create" class="ButtonNew" />
+                    <input type="submit" name="updateButton" value="Cancel" class="ButtonCancel"  />
                 </div>
             </div>
         </form>

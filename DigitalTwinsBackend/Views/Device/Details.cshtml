@@ -41,6 +41,10 @@
             <textarea asp-for="SelectedDeviceItem.ConnectionString" class="form-control" rows="2" cols="1" disabled="disabled"></textarea>
             <span asp-validation-for="SelectedDeviceItem.ConnectionString" class="text-danger"></span>
         </div>
+        <div class="form-group">
+            <a asp-area="" asp-controller="Device" asp-action="Edit" asp-route-id="@Model.SelectedDeviceItem.Id" class="ButtonEdit">Edit Device</a>
+            <a asp-area="" asp-controller="Device" asp-action="Delete" asp-route-id="@Model.SelectedDeviceItem.Id" class="ButtonDelete">Delete Device</a>
+        </div>
     </div>
     
     <div class="col-md-4">
@@ -143,7 +147,10 @@
     </div>
 
     <div class="col-md-6">
-        <h2>Sensors</h2>
+        <div class="label-group" style="display: inline-block;margin: 0px 0px -14px 0px">
+            <h2 style="float:left">Sensors</h2>
+            <a style="float:left;margin: 25px 0px 0px 20px" asp-controller="Sensor" asp-action="Create" asp-route-deviceId="@Model.SelectedDeviceItem.Id" class="ButtonNew">Add</a>
+        </div>
         @foreach (var sensor in Model.SelectedDeviceItem.Sensors)
         {
             <div class="sensorEncart">

@@ -45,8 +45,8 @@ namespace DigitalTwinsBackend.ViewModels
         private async Task LoadAsync(Guid? id = null)
         {
             SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
-            DeviceTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceType, _cache, Loggers.SilentLogger);
-            DeviceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceSubtype, _cache, Loggers.SilentLogger);
+            DeviceTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceType, _cache, Loggers.SilentLogger, onlyEnabled:true);
+            DeviceSubTypeList = await DigitalTwinsHelper.GetTypesAsync(Models.Types.DeviceSubtype, _cache, Loggers.SilentLogger, onlyEnabled: true);
 
             if (id != null)
             {

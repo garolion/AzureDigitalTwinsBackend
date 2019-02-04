@@ -12,7 +12,7 @@ namespace DigitalTwinsBackend.Models
         public Guid Id { get; set; }
         public string Target { get; set; }
         [Display(Name = "Path (for example '$.dataType'")]
-        public string Path { get; set; }
+        public string Path { get; set; } = "$.dataType";
         public string Value { get; set; }
         public string Comparison { get; set; }
         public bool isTrue { get; set; }

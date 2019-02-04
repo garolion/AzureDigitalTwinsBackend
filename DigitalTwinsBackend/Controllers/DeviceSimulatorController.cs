@@ -34,23 +34,15 @@ namespace DigitalTwinsBackend.Controllers
             return View(simulator);
         }
 
-        public ActionResult AddSensor()
-        {
-            return View();
-        }
-
-        public ActionResult Edit(string id)
-        {
-            var simulator = new SimulatorViewModel(_cache);
-            simulator.SelectedSensor = id;
-
-            return View(simulator);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SimulatorAction(SimulatorViewModel model, string action)
+        public async Task<ActionResult> SimulatorAction(SimulatorViewModel model, string Action)
         {
+            if (Action.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             if (model.SelectedDevice == Guid.Empty)
             {
                 await FeedbackHelper.Channel.SendMessageAsync("No connection string added to connect to Azure IoT Hub", MessageType.Info);
@@ -62,7 +54,7 @@ namespace DigitalTwinsBackend.Controllers
 
                 try
                 {
-                    if (action.Equals("Launch") && !CacheHelper.IsInSendingDataState(_cache))
+                    if (Action.Equals("Launch") && !CacheHelper.IsInSendingDataState(_cache))
                     {
 
 
@@ -88,7 +80,7 @@ namespace DigitalTwinsBackend.Controllers
                             await FeedbackHelper.Channel.SendMessageAsync("No sensor defined to send data", MessageType.Info);
                         }
                     }
-                    else if (action.Equals("Stop"))
+                    else if (Action.Equals("Stop"))
                     {
                         await FeedbackHelper.Channel.SendMessageAsync("Stopping sending data...", MessageType.Info);
 
@@ -103,10 +95,23 @@ namespace DigitalTwinsBackend.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
+        [HttpGet]
+        public ActionResult AddSensor()
+        {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddSensor(SimulatedSensor item)
+        public async Task<ActionResult> AddSensor(SimulatedSensor item, string createButton)
         {
+            if (createButton.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             if (item.HardwareId == null) item.HardwareId = Guid.NewGuid().ToString();
 
             if (item.DataType == DataTypeEnum.Motion)
@@ -122,19 +127,30 @@ namespace DigitalTwinsBackend.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public ActionResult Edit(string id)
+        {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+            var simulator = new SimulatorViewModel(_cache);
+            simulator.SelectedSensor = id;
+
+            return View(simulator);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(SimulatorViewModel model, string action)
         {
+            if (action.Equals("Cancel"))
+            {
+                return Redirect(CacheHelper.GetPreviousPage(_cache));
+            }
+
             var list = await CacheHelper.GetSimulatedSensorListFromCacheAsync(_cache);
             var item = list.First(t => t.HardwareId.Equals(model.SelectedSensor));
             var index = list.IndexOf(item);
             list.Remove(item);
-
-            if (action.Equals("Save"))
-            {
-                list.Insert(index, model.SensorInEdit);
-            }
+            list.Insert(index, model.SensorInEdit);
 
             await CacheHelper.AddSimulatedSensorListInCacheAsync(_cache, list);
 

@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using DigitalTwinsBackend.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -85,6 +87,25 @@ namespace DigitalTwinsBackend.Helpers
             var httpClient = await CacheHelper.GetHttpClientFromCacheAsync(memoryCache, logger);
             var response = await httpClient.PatchAsync($"userdefinedfunctions/{userDefinedFunction.Id}", multipartContent);
 
+            return await IsSuccessCall(response, logger);
+        }
+
+        public static async Task<bool> UpdateBlobAsync(HttpClient httpClient, ILogger logger, ParentType blobType, BlobContent blobContent, IFormFile file)
+        {
+            var metadataContent = new StringContent(JsonConvert.SerializeObject(blobContent.ToCreate()), Encoding.UTF8, "application/json");
+            metadataContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json; charset=utf-8");
+
+            var reader = new StreamReader(file.OpenReadStream());
+            var subContent = new StreamContent(reader.BaseStream);
+            subContent.Headers.ContentType = MediaTypeHeaderValue.Parse(file.ContentType);
+
+            var multipartContent = new MultipartFormDataContent("blobBoundary")
+                {
+                    { metadataContent, "metadata" },
+                    { subContent, "blob" }
+                };
+
+            var response = await httpClient.PatchAsync($"{blobType}s/blobs/{blobContent.Id}", multipartContent);
             return await IsSuccessCall(response, logger);
         }
     }

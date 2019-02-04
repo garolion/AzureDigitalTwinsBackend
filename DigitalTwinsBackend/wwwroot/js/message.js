@@ -17,11 +17,10 @@ function Reset() {
 
     document.getElementById("infoMessages").innerHTML = "";
 
-    $.ajax({
-        url: '@Url.Action("ResetMessages", "Home")',
-        type: 'GET',
-        dataType: 'json',
-        cache: false,
-        success: function (results) {}
-    });
+    $.post("/Home/ResetMessages");
+
+    //$.ajax({
+    //    type: 'POST',
+    //    url: "/Home/ResetMessages"
+    //});
 }

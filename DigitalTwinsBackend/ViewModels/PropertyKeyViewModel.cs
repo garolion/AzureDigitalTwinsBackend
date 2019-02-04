@@ -21,7 +21,7 @@ namespace DigitalTwinsBackend.ViewModels
         private IMemoryCache _cache;
         private AuthenticationHelper _auth;
         public PropertyKey SelectedPropertyKey { get; set; }
-
+        public IEnumerable<Space> SpaceList { get; set; }
         public List<string> PrimitiveDataTypeList;
 
 
@@ -38,6 +38,8 @@ namespace DigitalTwinsBackend.ViewModels
             }
             catch (Exception ex)
             {
+                SpaceList = new List<Space>();
+
                 FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
                 FeedbackHelper.Channel.SendMessageAsync($"Please check your settings.", MessageType.Info).Wait();
             }
@@ -45,6 +47,8 @@ namespace DigitalTwinsBackend.ViewModels
 
         private async Task LoadAsync(string id)
         {
+            SpaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
+
             PrimitiveDataTypeList = new List<string>();
             PrimitiveDataTypeList.Add("Bool");
             PrimitiveDataTypeList.Add("String");

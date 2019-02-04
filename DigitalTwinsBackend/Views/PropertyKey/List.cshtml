@@ -18,6 +18,7 @@
             <div class="label-group" style="display: inline-block;">
                 <h4 style="float:left">Space</h4>
                 <a style="position: absolute; right: 50px; margin-top:15px; margin-left:20px" asp-controller="Space" asp-action="Details" asp-route-id="@space.Space.Id" class="ButtonSpaceDetails">Details</a>
+                <a style="position: absolute; right: 120px; margin-top:15px;" asp-controller="PropertyKey" asp-action="Create" asp-route-spaceid="@space.Space.Id" class="ButtonNew">Add a Property Key</a>
             </div>
             <div class="label-group">
                 <label class="label-field">Id</label>
