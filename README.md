@@ -4,12 +4,13 @@ This project is a first web application that help you undestand how to take adva
 
 We are not trying to implement another end user web application like the [Smart Hotel 360](https://github.com/Microsoft/SmartHotel360-IoT).
 You will have in your hands a backend application to simply the way you use the Azure Digital Twins APIs for:
-- browsing ontologies, creating types and properties (To be added soon)
+- browsing ontologies, creating types and properties
 - navigating in your space graph, creating, editing or deleting nodes
-- managing devices, sensors and unser defined functions associated to your space nodes
+- managing devices, sensors and user defined functions associated to your space nodes
 - simulating devices and sending data
+- manipulating blobs
 - creating spaces, devices, sensors in batch mode using a Yaml script
-- more to come (RoleAssigment, Space Blob, ...)
+- more to come (RoleAssigment, ...)
 
 Please use the [Issues](https://github.com/garolion/AzureDigitalTwinsBackend/issues) section to ask for new features
 
@@ -17,8 +18,20 @@ Please use the [Issues](https://github.com/garolion/AzureDigitalTwinsBackend/iss
 
 > Search & List your Spaces 
 
-![space list](/Doc/Search.jpg)
+![space list](/Doc/Home.png)
 
-![Devices list](/Doc/Devices.jpg)
+![Viewing a Space](/Doc/Details.png)
 
-![Space Edition](/Doc/Edit.jpg)
+![Editing a Space](/Doc/Edit.png)
+
+![Viewing device hierarchy](/Doc/Devices.png)
+
+![Simulating a Device](/Doc/Simulator.png)
+
+![Generating a topology](/Doc/Generator.png)
+
+
+##To run the solution:
+- install Visual Studio 2017
+- update VIsual Studio for the latest version (mandatory to run ASP.NET Core Runtime)
+- install [.NET Core 2.1 SDK](https://dotnet.microsoft.com/download/thank-you/dotnet-sdk-2.1.503-windows-x64-installer)
