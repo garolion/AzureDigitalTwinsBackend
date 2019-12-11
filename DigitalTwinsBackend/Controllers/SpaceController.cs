@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.IO;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 
 namespace DigitalTwinsBackend.Controllers
 {
@@ -54,6 +55,92 @@ namespace DigitalTwinsBackend.Controllers
             return View(model);
         }
         #endregion
+
+        [HttpGet]
+        public async Task<ActionResult> ViewGraph()
+        {
+            CacheHelper.SetPreviousPage(_cache, Request.Headers["Referer"].ToString());
+
+            try
+            {
+                Graph graph = new Graph();
+
+                var spaceList = await DigitalTwinsHelper.GetSpacesAsync(_cache, Loggers.SilentLogger);
+                foreach (Space space in spaceList)
+                {
+                    graph.nodes.Add(new Node() { 
+                        id = space.Id, 
+                        label = new Label() { content = space.Label }, 
+                        fill = "orange",
+                        shape = NodeShape.roundedrect.ToString(),
+                        nodeType = "Space" });
+
+                    if (space.ParentSpaceId != Guid.Empty)
+                    {
+                        graph.edges.Add(new Edge() { id = Guid.NewGuid(), source = space.ParentSpaceId, target = space.Id });
+                    }
+                }
+
+                var deviceList = await DigitalTwinsHelper.GetDevicesAsync(_cache, Loggers.SilentLogger);
+                foreach (Device device in deviceList)
+                {
+                    graph.nodes.Add(new Node() { 
+                        id = device.Id, 
+                        label = new Label() { content = device.Label, fill = "white" }, 
+                        fill = "green",
+                        shape = NodeShape.maxroundedrect.ToString(),
+                        nodeType = "Device" });
+
+                    if (device.SpaceId != Guid.Empty)
+                    {
+                        graph.edges.Add(new Edge() { id = Guid.NewGuid(), source = device.SpaceId, target = device.Id });
+                    }
+
+                    if (device.Sensors != null)
+                    {
+                        foreach (Sensor sensor in device.Sensors)
+                        {
+                            graph.nodes.Add(new Node() { 
+                                id = sensor.Id, 
+                                label = new Label() { content = sensor.Label, fill = "white" }, 
+                                fill = "blue",
+                                shape = NodeShape.maxroundedrect.ToString(),
+                                nodeType = "Sensor" });
+
+                            if (sensor.DeviceId != Guid.Empty)
+                            {
+                                graph.edges.Add(new Edge() { id = Guid.NewGuid(), source = sensor.DeviceId, target = sensor.Id });
+                            }
+                        }
+                    }
+                }
+
+                var udfList = await DigitalTwinsHelper.GetUserDefinedFunctions(_cache, Loggers.SilentLogger);
+                foreach (UserDefinedFunction udf in udfList)
+                {
+                    graph.nodes.Add(new Node() { 
+                        id = udf.Id, 
+                        label = new Label() { content = udf.Label, fill = "white"}, 
+                        fill = "brown",
+                        shape = NodeShape.maxroundedrect.ToString(),
+                        nodeType = "UDF" });
+
+                    if (udf.SpaceId != Guid.Empty)
+                    {
+                        graph.edges.Add(new Edge() { id = Guid.NewGuid(), source = udf.SpaceId, target = udf.Id });
+                    }
+                }
+
+                ViewData["sourceJSON"] = JsonConvert.SerializeObject(graph, Formatting.Indented);
+            }
+            catch (Exception ex)
+            {
+                FeedbackHelper.Channel.SendMessageAsync($"Error - {ex.Message}", MessageType.Info).Wait();
+            }
+
+            return View();
+        }
+
 
         [HttpGet]
         public ActionResult Search()

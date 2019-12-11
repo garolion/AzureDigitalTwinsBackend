@@ -896,8 +896,7 @@ namespace DigitalTwinsBackend.Helpers
         }
 
         #endregion region
-
-
+        
         public static async Task<IEnumerable<Device>> GetDevicesAsync(IMemoryCache memoryCache, ILogger logger)
         {
             return await GetDevicesAsync(memoryCache, logger, false);

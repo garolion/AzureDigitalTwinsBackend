@@ -1,0 +1,48 @@
+﻿@section Scripts
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../ts/boot"></script>
+}
+
+<div id="sourceJSON" hidden="hidden">
+    @ViewData["sourceJSON"]
+</div>
+
+<h2>View Graph</h2>
+<hr />
+
+<div class="controls">
+    <input type="checkbox" class="graphToolbarCheckBox" id="layeredLayoutCheckBox" checked />
+    <span>Layered layout</span>
+    <input type="checkbox" class="graphToolbarCheckBox" id="horizontalLayoutCheckBox" />
+    <span>Horizontal layout</span>
+    <span>Edge routing mode:</span>
+    <select id="edgeRoutingSelect">
+        <option value="splines">Splines</option>
+        <option value="splinesbundling">Splines with Bundling</option>
+        <option value="straightline">Straight Line</option>
+        <option value="sugiyamasplines" selected>Sugiyama Splines</option>
+        <option value="rectilinear">Rectilinear</option>
+        <option value="rectilineartocenter">Rectilinear to Center</option>
+    </select>
+    <button id="reloadGraphButton">Reload Graph</button>
+</div>
+
+<div id="surface">
+    <div id="graphView"></div>
+
+    <div id="graphDetailNode" class="detailsEncart">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="colapsible-panel" style="font-weight:bold" data-toggle="collapse" data-parent="#accordion" href="#details">
+                    Node Details
+                </a>
+            </h4>
+        </div>
+        <div id="details" class="panel-collapse collapse">
+            <div id="nodeView" class="panel-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+
